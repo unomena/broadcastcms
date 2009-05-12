@@ -1,7 +1,7 @@
 from django.db import models
-from broadcastcms.models import ContentBase
+from broadcastcms.contentbase.models import ContentBase
 
-def Post(ContentBase)
+class Post(ContentBase):
     content = models.TextField()
 
     class Meta():

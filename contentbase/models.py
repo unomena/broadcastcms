@@ -1,8 +1,7 @@
 from django.db import models
+from broadcastcms.label.models import Label
 
-def ContentBase(models.Model):
+class ContentBase(models.Model):
     title = models.CharField(max_length='512')
     description = models.TextField()
-
-    class Meta:
-        abstract = True
+    labels = models.ManyToManyField(Label)
