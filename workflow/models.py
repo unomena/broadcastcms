@@ -1,3 +1,7 @@
 from django.db import models
 
-# Create your models here.
+class WorkflowedObject(model.Models):
+    public = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True
