@@ -9,3 +9,5 @@ comma_seperated_admin_label_links.allow_tags = True
 
 class ContentBaseAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', comma_seperated_admin_label_links, 'is_public')
+    list_filter = ('is_public', )
+    search_fields = ('title', 'description', 'content')
