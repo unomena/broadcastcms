@@ -8,4 +8,4 @@ comma_seperated_admin_label_links.short_description = 'Labels'
 comma_seperated_admin_label_links.allow_tags = True
 
 class ContentBaseAdmin(admin.ModelAdmin):
-    list_display = ('title', comma_seperated_admin_label_links)
+    list_display = ('title', 'description', comma_seperated_admin_label_links, 'public')
