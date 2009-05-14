@@ -7,3 +7,4 @@ class ContentBase(PermissionBase):
     title = models.CharField(max_length='512')
     description = models.TextField()
     labels = models.ManyToManyField(Label, blank=True)
+    image = models.ImageField(upload_to='content_images')
