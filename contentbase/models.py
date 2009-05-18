@@ -46,7 +46,8 @@ def add_scales(sender, **kwargs):
     TODO: There is some fun here with long inheritance chains where parent and child classes both save images
     Make sure only child classes actually save images.
     """
-    sender.image_scales = sender.image_scales + get_base_scales(sender)
-    sender.add_to_class('image', models.ImageField(upload_to='content_images', storage=ScaledImageStorage(scales=sender.image_scales)))
+    if hasattr(sender, 'image_scales'):
+        sender.image_scales = sender.image_scales + get_base_scales(sender)
+        sender.add_to_class('image', models.ImageField(upload_to='content_images', storage=ScaledImageStorage(scales=sender.image_scales)))
 
 signals.class_prepared.connect(add_scales)
