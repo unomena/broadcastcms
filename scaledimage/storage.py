@@ -11,7 +11,6 @@ class ScaledImageStorage(FileSystemStorage):
         self.scales = scales
         super(ScaledImageStorage, self).__init__(*args, **kwargs)
 
-
     def scale_and_crop_image(self, data, width, height):
         """
         Scales and crops an image to the requested size retaining its
@@ -76,16 +75,46 @@ class ScaledImageStorage(FileSystemStorage):
             #scale width larger but height smaller:
             return wsf
 
+    def convert_to_png(self, name, content):
+        """
+        We do this purely for consitency and to guarantee all image resources end in .png
+        """
+        content._file.seek(0)
+        raw_image_data = content.read()
+        image = Image.open(StringIO(raw_image_data))
+        
+        image_file = StringIO()
+        image.save(image_file, 'PNG', quality=90)
+        image_file.seek(0)
+        raw_converted_image_data = image_file.read()
+        content._file.seek(0)
+        content._file.truncate(0)
+        content._file.write(raw_converted_image_data)
+
+        try:
+            dot_index = name.rindex('.')
+        except ValueError: # name has no dot
+            converted_name = '%s.png' % name
+        else:
+            converted_name = '%s.png' % name
+
+        return converted_name, content
+
+
     def save(self, name, content):
         """
         Saves new content to the file specified by name. The content should be a
         proper File object, ready to be read from the beginning.
         """
-        import pdb; pdb.set_trace()
         # Get the proper name for the file, as it will actually be saved.
         if name is None:
             name = content.name
         
+        content._file.seek(0)
+        original_image_data = content.read()
+        
+        name, content = self.convert_to_png(name, content)
+
         name = self.get_available_name(name)
         name = self._save(name, content)
 
@@ -103,9 +132,7 @@ class ScaledImageStorage(FileSystemStorage):
                 scaled_name = '%s%sx%s%s' % (scaled_name[:dot_index], width, height, name[dot_index:])
 
             #create scaled content
-            content._file.seek(0)
-            data = content.read()
-            scaled_image = self.scale_and_crop_image(data, width, height)
+            scaled_image = self.scale_and_crop_image(original_image_data, width, height)
             format = scaled_image.format and scaled_image.format or 'PNG'
             image_file = StringIO()
             scaled_image.save(image_file, format, quality=90)
