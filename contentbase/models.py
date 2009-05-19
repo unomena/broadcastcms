@@ -11,9 +11,8 @@ class ContentBase(PermissionBase):
     title = models.CharField(max_length='512')
     description = models.TextField()
     labels = models.ManyToManyField(Label, blank=True)
-    image_scales = ((78, 44),
-                    (527, 289),)
-
+    url = models.URLField(max_length='512', editable=False)
+    image_scales = ((78, 44), (527, 289))
     content_type = models.ForeignKey(ContentType,editable=False,null=True)
 
     def save(self):
