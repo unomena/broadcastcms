@@ -6,7 +6,6 @@ from broadcastcms.permissionbase.models import PermissionBase
 from broadcastcms.label.models import Label
 from broadcastcms.scaledimage.storage import ScaledImageStorage
 
-
 class ContentBase(PermissionBase):
     title = models.CharField(max_length='512')
     description = models.TextField()
