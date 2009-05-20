@@ -7,6 +7,7 @@ class Competition(ContentBase):
         (103, 103),
         (283, 159),
     )
+    content = models.TextField()
     closing_date = models.DateField()
     rules = models.TextField()
 
