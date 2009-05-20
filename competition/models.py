@@ -1,5 +1,5 @@
 from django.db import models
-from broadcastcms.contentbase.models import ContentBase
+from broadcastcms.base.models import ContentBase
 
 
 class Competition(ContentBase):
