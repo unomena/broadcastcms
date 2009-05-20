@@ -5,6 +5,11 @@ from django.db.models import signals
 from broadcastcms.label.models import Label
 from broadcastcms.scaledimage.storage import ScaledImageStorage
 
+def ensure_permitted_objects(sender, **kwargs):
+    sender.add_to_class('permitted_objects', PermissionManager())
+
+signals.class_prepared.connect(ensure_permitted_objects)
+
 class PermissionManager(models.Manager):
     """
     This manager in the form of Model.permitted_objects is to be used as main object query instead of conventional Model.objects, as it pre-filters objects to exclude those not accessable by the current user
@@ -19,7 +24,16 @@ class PermissionBase(models.Model):
     class Meta():
         abstract = True
 
-class ContentBase(PermissionBase):
+class ModelBase(PermissionBase):
+    """
+    ALL objects used on a BCMS system should inherit from ModelBase.
+    ModelBase is a lightweight baseclass adding extra functionality not offered natively by Django.
+    It should be seen as adding value to child classes primaraly through functions, base classes 
+    should provide model fields specific to their requirements.  
+    """
+    pass
+
+class ContentBase(ModelBase):
     title = models.CharField(max_length='512')
     description = models.TextField()
     labels = models.ManyToManyField(Label, blank=True)
