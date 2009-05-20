@@ -41,6 +41,9 @@ class ContentBase(ModelBase):
     image_scales = ((78, 44), (527, 289))
     content_type = models.ForeignKey(ContentType,editable=False,null=True)
 
+    def __unicode__(self):
+        return self.title
+
     def save(self):
         if(not self.content_type):
             self.content_type = ContentType.objects.get_for_model(self.__class__)
