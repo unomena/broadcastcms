@@ -1,8 +1,6 @@
 from django import template
 
-
 register = template.Library()
-
 
 class CallViewNode(template.Node):
     def __init__(self, instance, method):
@@ -11,8 +9,7 @@ class CallViewNode(template.Node):
 
     def render(self, context):
         instance = self.instance.resolve(context)
-        return getattr(instance, self.method)(instance, context)
-
+        return getattr(instance, self.method)(context)
 
 @register.tag
 def call_view(parser, token):
