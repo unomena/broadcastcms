@@ -2,7 +2,7 @@ from django.db import models
 
 class Label(models.Model):
     title = models.CharField(max_length='64')
-    is_visible = models.BooleanField(default=True)
+    is_visible = models.BooleanField(default=True, verbose_name='Visible')
 
     class Meta():
         verbose_name = 'Label'
