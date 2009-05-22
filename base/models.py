@@ -31,19 +31,8 @@ class ModelBase(PermissionBase):
     It should be seen as adding value to child classes primaraly through functions, base classes 
     should provide model fields specific to their requirements.  
     """
-    pass
-
-class ContentBase(ModelBase):
-    title = models.CharField(max_length='512')
-    description = models.TextField()
-    labels = models.ManyToManyField(Label, blank=True)
-    url = models.URLField(max_length='512', editable=False)
-    image_scales = ((78, 44), (527, 289))
     content_type = models.ForeignKey(ContentType,editable=False,null=True)
-
-    def __unicode__(self):
-        return self.title
-
+    
     def save(self):
         if(not self.content_type):
             self.content_type = ContentType.objects.get_for_model(self.__class__)
@@ -56,6 +45,16 @@ class ContentBase(ModelBase):
             return self
         return model.objects.get(id=self.id)
         
+class ContentBase(ModelBase):
+    title = models.CharField(max_length='512')
+    description = models.TextField()
+    labels = models.ManyToManyField(Label, blank=True)
+    url = models.URLField(max_length='512', editable=False)
+    image_scales = ((78, 44), (527, 289))
+
+    def __unicode__(self):
+        return self.title
+
 def get_base_scales(obj):
     """
     Collect all base class image scales
