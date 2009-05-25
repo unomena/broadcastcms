@@ -140,10 +140,10 @@ class ScaledImageStorage(FileSystemStorage):
             image_file.seek(0, 2)
             size = image_file.tell()
             image_file.seek(0)
-            scaled_content = InMemoryUploadedFile(image_file, content.field_name, scaled_name, 'image/png', size, None)
-            
+            scaled_content = InMemoryUploadedFile(image_file, content.field_name, scaled_name, 'image/png', size, None) 
             #save scaled content
-            self._save(scaled_name, scaled_content)            
+            self._save(scaled_name, scaled_content)
+            image_file.close()
 
         # Store filenames with forward slashes, even on Windows
         return force_unicode(name.replace('\\', '/'))
