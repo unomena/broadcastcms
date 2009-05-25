@@ -1,9 +1,11 @@
 from django.core.files.storage import FileSystemStorage
 from django.utils.encoding import force_unicode
-from random import randint
+from random import shuffle
 from StringIO import StringIO
+import cStringIO 
 from PIL import Image, ImageFilter
 from math import ceil
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 class ScaledImageStorage(FileSystemStorage):
 
@@ -119,7 +121,6 @@ class ScaledImageStorage(FileSystemStorage):
         name = self._save(name, content)
 
         for scale in self.scales:
-
             #create scale name
             width = scale[0]
             height = scale[1]
@@ -134,16 +135,15 @@ class ScaledImageStorage(FileSystemStorage):
             #create scaled content
             scaled_image = self.scale_and_crop_image(original_image_data, width, height)
             format = scaled_image.format and scaled_image.format or 'PNG'
-            image_file = StringIO()
+            image_file = cStringIO.StringIO()
             scaled_image.save(image_file, format, quality=90)
+            image_file.seek(0, 2)
+            size = image_file.tell()
             image_file.seek(0)
-            scaled_data = image_file.read()
-            content._file.seek(0)
-            content._file.truncate(0)
-            content._file.write(scaled_data)
-
+            scaled_content = InMemoryUploadedFile(image_file, content.field_name, scaled_name, 'image/png', size, None)
+            
             #save scaled content
-            self._save(scaled_name, content)            
+            self._save(scaled_name, scaled_content)            
 
         # Store filenames with forward slashes, even on Windows
         return force_unicode(name.replace('\\', '/'))
@@ -152,12 +152,10 @@ class ScaledImageStorage(FileSystemStorage):
         """
         Returns a filename that's free on the target storage system, and
         available for new content to be written to.
-        Filename is based on random set of elements.
-        If the filename already exists, keep adding a random element to the name
-        of the file until the filename doesn't exist.
+        Filename is based on random set of 6 elements.
         """
         
-        elements = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        elements = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
         #Grab Path
         try:
@@ -167,22 +165,26 @@ class ScaledImageStorage(FileSystemStorage):
         else:
             path = name[:slash_index + 1]
             
-        #Reset name to initial single random element plus extension
+        #Create initial random filename
+        shuffle(elements)
+        random_name = ''.join(elements[:6])
         try:
             dot_index = name.rindex('.')
         except ValueError: # filename has no dot
-            name = elements[randint(0, len(elements) - 1)]
+            name = random_name
         else:
-            name = elements[randint(0, len(elements) - 1)] + name[dot_index:]
+            name = random_name + name[dot_index:]
 
-        #Keep adding elements to the filename until a file with that name does not exist
+        #Keep generating a new name until a file with that name does not exist
         while self.exists(name):
+            shuffle(elements)
+            random_name = ''.join(elements[:6])
             try:
                 dot_index = name.rindex('.')
             except ValueError: # filename has no dot
-                name += elements[randint(0, len(elements) - 1)]
+                name = random_name
             else:
-                name = name[:dot_index] + elements[randint(0, len(elements) - 1)] + name[dot_index:]
+                name = random_name + name[dot_index:]
         
         #Rebuild and return full path
         return path + name
