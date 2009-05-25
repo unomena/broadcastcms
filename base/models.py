@@ -58,8 +58,6 @@ class ContentBase(ModelBase):
 
     def __unicode__(self):
         return self.title
-        self.save_base()
-
 
 def get_base_scales(obj):
     """
