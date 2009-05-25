@@ -6,6 +6,7 @@ import cStringIO
 from PIL import Image, ImageFilter
 from math import ceil
 from django.core.files.uploadedfile import InMemoryUploadedFile
+import os
 
 class ScaledImageStorage(FileSystemStorage):
 
@@ -147,6 +148,27 @@ class ScaledImageStorage(FileSystemStorage):
 
         # Store filenames with forward slashes, even on Windows
         return force_unicode(name.replace('\\', '/'))
+
+    def delete(self, name):
+        super(ScaledImageStorage, self).delete(name) 
+        name = self.path(name)
+
+        #delete all scaled images
+        for scale in self.scales:
+            width = scale[0]
+            height = scale[1]
+            scaled_name = name
+            try:
+                dot_index = scaled_name.rindex('.')
+            except ValueError: # filename has no dot
+                scaled_name = '%s%sx%s' % (scaled_name, width, height)
+            else:
+                scaled_name = '%s%sx%s%s' % (scaled_name[:dot_index], width, height, name[dot_index:])
+        
+            # If the scaled file exists, delete it from the filesystem.
+            if os.path.exists(scaled_name):
+                os.remove(scaled_name)
+        
 
     def get_available_name(self, name):
         """
