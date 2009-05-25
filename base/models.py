@@ -10,6 +10,7 @@ def ensure_permitted_objects(sender, **kwargs):
 
 signals.class_prepared.connect(ensure_permitted_objects)
 
+
 class PermissionManager(models.Manager):
     """
     This manager in the form of Model.permitted_objects is to be used as main object query instead of conventional Model.objects, as it pre-filters objects to exclude those not accessable by the current user
@@ -18,11 +19,13 @@ class PermissionManager(models.Manager):
     def get_query_set(self):
         return super(PermissionManager, self).get_query_set().filter(is_public=True)
 
+
 class PermissionBase(models.Model):
     is_public = models.BooleanField(default=False, verbose_name="Public")
     
     class Meta():
         abstract = True
+
 
 class ModelBase(PermissionBase):
     """
@@ -33,10 +36,10 @@ class ModelBase(PermissionBase):
     """
     content_type = models.ForeignKey(ContentType,editable=False,null=True)
     
-    def save(self):
+    def save(self, *args, **kwargs):
         if(not self.content_type):
             self.content_type = ContentType.objects.get_for_model(self.__class__)
-        self.save_base()
+        super(ModelBase, self).save(*args, **kwargs)
 
     def as_leaf_class(self):
         content_type = self.content_type
@@ -44,6 +47,7 @@ class ModelBase(PermissionBase):
         if(model == ContentBase):
             return self
         return model.objects.get(id=self.id)
+
         
 class ContentBase(ModelBase):
     title = models.CharField(max_length='512')
@@ -54,6 +58,8 @@ class ContentBase(ModelBase):
 
     def __unicode__(self):
         return self.title
+        self.save_base()
+
 
 def get_base_scales(obj):
     """
@@ -64,6 +70,7 @@ def get_base_scales(obj):
         if hasattr(base, 'image_scales'):
             image_scales += base.image_scales
     return image_scales
+
 
 def add_scales(sender, **kwargs):
     """
