@@ -50,11 +50,14 @@ class ModelBase(PermissionBase):
 
         
 class ContentBase(ModelBase):
+    image_scales = ((78, 44), (527, 289))
+
     title = models.CharField(max_length='512')
     description = models.TextField()
     labels = models.ManyToManyField(Label, blank=True)
     url = models.URLField(max_length='512', editable=False)
-    image_scales = ((78, 44), (527, 289))
+    created = models.DateTimeField('Created Date & Time', auto_now_add=True)
+    modified = models.DateTimeField('Modified Date & Time', auto_now=True, editable=False)
 
     def __unicode__(self):
         return self.title
