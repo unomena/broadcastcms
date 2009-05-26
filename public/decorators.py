@@ -15,5 +15,10 @@ class setupSection(object):
             else:
                 instance = self.view_class
 
-            return f(request, template=self.view_template, instance=instance, *args, **kwargs)
+            context = {
+                'request': request,
+                'instance': instance,
+            }
+
+            return f(request, context, template=self.view_template, *args, **kwargs)
         return wrapped_f
