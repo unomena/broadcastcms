@@ -13,7 +13,9 @@ class CastMember(ModelBase):
         verbose_name_plural = 'Cast Members'
 
 class Show(ContentBase):
-    image_scales = ((170, 96), (283, 159))
+    image_scales = ((170, 96), 
+                    (283, 159),
+                    (158, 89),)
     extended_description = models.TextField(verbose_name='Extended Description')
     genres = models.ManyToManyField(Label, blank=True)
     rating = models.CharField(max_length="128", blank=True, default="All Ages")
