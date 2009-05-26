@@ -33,7 +33,7 @@ class Timeslot(ModelBase):
     show = models.ForeignKey(Show, limit_choices_to={'is_public': True}, verbose_name='Show')
 
     def __unicode__(self):
-        return str(self.start_date_time)
+        return '%s to %s' % (str(self.start_date_time), str(self.end_date_time))
 
     class Meta():
         verbose_name = 'Timeslot'
