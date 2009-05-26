@@ -26,15 +26,3 @@ class Show(ContentBase):
     class Meta():
         verbose_name = 'Show'
         verbose_name_plural = 'Shows'
-
-class Timeslot(ModelBase):
-    start_date_time = models.DateTimeField(verbose_name="Starting Date & Time")
-    end_date_time = models.DateTimeField(verbose_name="Ending Date & Time")
-    show = models.ForeignKey(Show, limit_choices_to={'is_public': True}, verbose_name='Show')
-
-    def __unicode__(self):
-        return '%s to %s' % (str(self.start_date_time), str(self.end_date_time))
-
-    class Meta():
-        verbose_name = 'Timeslot'
-        verbose_name_plural = 'Timeslots'
