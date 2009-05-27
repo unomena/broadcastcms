@@ -1,5 +1,6 @@
 from django.db import models
 from broadcastcms.base.models import ContentBase, ModelBase
+from broadcastcms.calendar.managers import CalendarManager
 
 
 class Location(ModelBase):
@@ -10,6 +11,8 @@ class Location(ModelBase):
 
 
 class Event(ContentBase):
+    objects = CalendarManager()
+
     image_scales = ()
     venue = models.CharField(max_length=255)
     address = models.CharField(max_length=512)
