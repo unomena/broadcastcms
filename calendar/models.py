@@ -1,8 +1,11 @@
 from django.db import models
 from broadcastcms.base.models import ModelBase, ContentBase
+from managers import EntryManager
 
 
 class Entry(ModelBase):
+    objects = EntryManager()
+
     start_date_time = models.DateTimeField(verbose_name="Starting Date & Time")
     end_date_time = models.DateTimeField(verbose_name="Ending Date & Time")
     content = models.ForeignKey(ContentBase, limit_choices_to={'is_public': True}, verbose_name='Content', related_name='entries')
