@@ -78,30 +78,35 @@ class ScaledImageStorage(FileSystemStorage):
             #scale width larger but height smaller:
             return wsf
 
-    def convert_to_png(self, name, content):
+    def convert_to_jpeg(self, name, content):
         """
-        We do this purely for consitency and to guarantee all image resources end in .png
+        Convert the supplied image to JPEG.
+        We do this purely for consitency and to guarantee all image resources end in .jpeg
         """
-        content._file.seek(0)
-        raw_image_data = content.read()
-        image = Image.open(StringIO(raw_image_data))
-        
-        image_file = StringIO()
-        image.save(image_file, 'PNG', quality=90)
-        image_file.seek(0)
-        raw_converted_image_data = image_file.read()
-        content._file.seek(0)
-        content._file.truncate(0)
-        content._file.write(raw_converted_image_data)
-
+        #Rename our file
         try:
             dot_index = name.rindex('.')
         except ValueError: # name has no dot
-            converted_name = '%s.png' % name
+            converted_name = '%s.jpeg' % name
         else:
-            converted_name = '%s.png' % name
+            converted_name = '%s.jpeg' % name[:dot_index]
 
-        return converted_name, content
+        #Create an image from original content
+        content._file.seek(0)
+        original_image_data = content.read()
+        image = Image.open(StringIO(original_image_data))
+        
+        # Save as jpeg in memory
+        image_file = cStringIO.StringIO()
+        image.save(image_file, 'JPEG', quality=90)
+
+        # Create new content object
+        image_file.seek(0, 2)
+        size = image_file.tell()
+        image_file.seek(0)
+        converted_content = InMemoryUploadedFile(image_file, content.field_name, converted_name, 'image/jpeg', size, None) 
+        # Return new content object with new filename
+        return converted_content, converted_name
 
 
     def save(self, name, content):
@@ -112,11 +117,10 @@ class ScaledImageStorage(FileSystemStorage):
         # Get the proper name for the file, as it will actually be saved.
         if name is None:
             name = content.name
-        
+       
+        content, name = self.convert_to_jpeg(name, content)
         content._file.seek(0)
         original_image_data = content.read()
-        
-        name, content = self.convert_to_png(name, content)
 
         name = self.get_available_name(name)
         name = self._save(name, content)
@@ -135,9 +139,8 @@ class ScaledImageStorage(FileSystemStorage):
 
             #create scaled content
             scaled_image = self.scale_and_crop_image(original_image_data, width, height)
-            format = scaled_image.format and scaled_image.format or 'PNG'
             image_file = cStringIO.StringIO()
-            scaled_image.save(image_file, format, quality=90)
+            scaled_image.save(image_file, 'JPEG', quality=85)
             image_file.seek(0, 2)
             size = image_file.tell()
             image_file.seek(0)
