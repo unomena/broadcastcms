@@ -40,7 +40,14 @@ class CalendarQuerySet(ModelBaseQuerySet):
         end = now + timedelta(6 - now.weekday())
         return self._model_specific(start, end)
 
-    def thisweek(self):
+    def week(self, offset=0):
+        """
+        Returns entries for a week starting on Monday and ending on Sunday.
+        If an offset is provided a future or past week is returned relative to the current week:
+        * offset of 0 returns entries for current week (default).
+        * offset of 1 returns entries for next week.
+        * offset of -1 returns entries for the previous week.
+        """
         now = datetime.now()
         start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=7) - timedelta(microseconds=1)
