@@ -50,6 +50,7 @@ class CalendarQuerySet(ModelBaseQuerySet):
         """
         now = datetime.now()
         start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        start = start + timedelta(days = offset * 7)
         end = start + timedelta(days=7) - timedelta(microseconds=1)
         return self._model_specific(start, end)
 
