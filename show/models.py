@@ -1,6 +1,7 @@
 from django.db import models
 from broadcastcms.label.models import Label
 from broadcastcms.base.models import ModelBase, ContentBase
+from broadcastcms.calendar.managers import ContentManager
 
 class CastMember(ModelBase):
     title = models.CharField(max_length="512")
@@ -21,6 +22,8 @@ class Show(ContentBase):
     rating = models.CharField(max_length="128", blank=True, default="All Ages")
     cast_members = models.ManyToManyField(CastMember, blank=True)
     homepage_url = models.URLField(max_length='512', blank=True, verbose_name="Homepage URL")
+
+    objects = ContentManager()
 
     def __unicode__(self):
         return str(self.title)

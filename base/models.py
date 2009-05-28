@@ -1,24 +1,39 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import signals
+from django.db.models.manager import Manager
+from django.db.models.fields import FieldDoesNotExist
 
 from broadcastcms.label.models import Label
 from broadcastcms.scaledimage.storage import ScaledImageStorage
 
-def ensure_permitted_objects(sender, **kwargs):
-    sender.add_to_class('permitted_objects', PermissionManager())
-
-signals.class_prepared.connect(ensure_permitted_objects)
-
-
-class PermissionManager(models.Manager):
+def ensure_model_base_manager(sender, **kwargs):
     """
-    This manager in the form of Model.permitted_objects is to be used as main object query instead of conventional Model.objects, as it pre-filters objects to exclude those not accessable by the current user
-    TODO: Implement actual permissions, currently its a simple is_public check.
+    Make sure all classes have the model base manager for objects 
+    without overriding a child class' set manager.
     """
-    def get_query_set(self):
-        return super(PermissionManager, self).get_query_set().filter(is_public=True)
+    cls = sender
 
+    try:
+        cls.objects
+    except AttributeError:
+        cls.add_to_class('objects', ModelBaseManager())
+        return None
+    if cls.objects.__class__ == Manager().__class__:
+        cls.add_to_class('objects', ModelBaseManager())
+
+signals.class_prepared.connect(ensure_model_base_manager)
+
+
+class ModelBaseManager(models.Manager):
+    """
+    This manager adds BroadcastCMS specific queryset behaviour to all objects.
+    """
+
+    @property 
+    def permitted(self):
+        #TODO: Implement actual permissions, currently it's a simple is_public check.
+        return super(ModelBaseManager, self).get_query_set().filter(is_public=True)
 
 class PermissionBase(models.Model):
     is_public = models.BooleanField(default=False, verbose_name="Public")
@@ -35,7 +50,7 @@ class ModelBase(PermissionBase):
     should provide model fields specific to their requirements.  
     """
     content_type = models.ForeignKey(ContentType,editable=False,null=True)
-    
+
     def save(self, *args, **kwargs):
         if(not self.content_type):
             self.content_type = ContentType.objects.get_for_model(self.__class__)
