@@ -1,10 +1,10 @@
 from django.db import models
 from broadcastcms.base.models import ModelBase, ContentBase
-from managers import EntryManager
+from managers import CalendarManager
 
 
 class Entry(ModelBase):
-    objects = EntryManager()
+    objects = CalendarManager()
 
     start_date_time = models.DateTimeField(verbose_name="Starting Date & Time")
     end_date_time = models.DateTimeField(verbose_name="Ending Date & Time")

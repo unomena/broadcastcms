@@ -7,6 +7,9 @@ from django.db.models.fields import FieldDoesNotExist
 from broadcastcms.label.models import Label
 from broadcastcms.scaledimage.storage import ScaledImageStorage
 
+from managers import ModelBaseManager
+
+
 def ensure_model_base_manager(sender, **kwargs):
     """
     Make sure all classes have the model base manager for objects 
@@ -25,16 +28,6 @@ def ensure_model_base_manager(sender, **kwargs):
 signals.class_prepared.connect(ensure_model_base_manager)
 
 
-class ModelBaseManager(models.Manager):
-    """
-    This manager adds BroadcastCMS specific queryset behaviour to all objects.
-    """
-
-    @property 
-    def permitted(self):
-        #TODO: Implement actual permissions, currently it's a simple is_public check.
-        return super(ModelBaseManager, self).get_query_set().filter(is_public=True)
-
 class PermissionBase(models.Model):
     is_public = models.BooleanField(default=False, verbose_name="Public")
     
@@ -49,6 +42,8 @@ class ModelBase(PermissionBase):
     It should be seen as adding value to child classes primaraly through functions, base classes 
     should provide model fields specific to their requirements.  
     """
+    default_manager = ModelBaseManager()
+
     content_type = models.ForeignKey(ContentType,editable=False,null=True)
 
     def save(self, *args, **kwargs):
