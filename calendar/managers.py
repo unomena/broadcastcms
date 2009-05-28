@@ -41,8 +41,9 @@ class CalendarQuerySet(ModelBaseQuerySet):
         return self._model_specific(start, end)
 
     def thisweek(self):
-        start = datetime.now()
-        end = start + timedelta(6 - start.weekday())
+        now = datetime.now()
+        start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        end = start + timedelta(days=7) - timedelta(microseconds=1)
         return self._model_specific(start, end)
 
     def thismonth(self):
@@ -56,6 +57,9 @@ class CalendarQuerySet(ModelBaseQuerySet):
         end = datetime(now.year, (now.month+2), 1)
         return self._model_specific(start, end)
 
+    def by_content_type(self, model):
+        content_type = ContentType.objects.get_for_model(model)
+        return self.filter(content__content_type__exact=content_type)
 
 class CalendarManager(ModelBaseManager):
     use_for_related_fields = True
