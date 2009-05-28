@@ -16,7 +16,8 @@ class CastMember(ModelBase):
 class Show(ContentBase):
     objects = CalendarManager()
 
-    image_scales = ((170, 96), 
+    image_scales = ((170, 96),
+                    (100, 56),
                     (283, 159),
                     (158, 89),)
     extended_description = models.TextField(verbose_name='Extended Description')
