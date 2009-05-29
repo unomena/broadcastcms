@@ -80,6 +80,12 @@ class ContentBase(ModelBase):
     def __unicode__(self):
         return self.title
 
+    def has_visible_labels(self):
+        for label in self.labels:
+            if label.is_visible:
+                return True
+        return False
+
 def get_base_scales(obj):
     """
     Collect all base class image scales
