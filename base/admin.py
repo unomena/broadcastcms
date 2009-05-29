@@ -8,6 +8,15 @@ comma_seperated_admin_label_links.short_description = 'Labels'
 comma_seperated_admin_label_links.allow_tags = True
 
 class ContentBaseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description', comma_seperated_admin_label_links, 'is_public')
-    list_filter = ('labels', 'is_public',)
+    list_display = ('title', 'description', comma_seperated_admin_label_links, 'created', 'modified', 'is_public')
+    list_filter = ('labels', 'is_public', 'created', 'modified')
     search_fields = ('title', 'description', 'content')
+    fieldsets = (
+        (None, {'fields': ('title', 'description', 'is_public')}),
+        ('Categorization', {'fields': ('labels',),
+                            'classes': ('collapse',),
+        }),
+        ('Meta', {'fields': ('image', 'created',),
+                  'classes': ('collapse',),
+        }),
+    )

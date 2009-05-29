@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import signals
@@ -66,8 +68,14 @@ class ContentBase(ModelBase):
     description = models.TextField()
     labels = models.ManyToManyField(Label, blank=True)
     url = models.URLField(max_length='512', editable=False)
-    created = models.DateTimeField('Created Date & Time', auto_now_add=True)
-    modified = models.DateTimeField('Modified Date & Time', auto_now=True, editable=False)
+    created = models.DateTimeField('Created Date & Time', blank=True)
+    modified = models.DateTimeField('Modified Date & Time', editable=False)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created = datetime.now()
+        self.modified = datetime.now()
+        super(ContentBase, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.title
