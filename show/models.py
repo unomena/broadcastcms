@@ -21,7 +21,7 @@ class Show(ContentBase):
                     (283, 159),
                     (158, 89),)
     extended_description = models.TextField(verbose_name='Extended Description')
-    genres = models.ManyToManyField(Label, blank=True)
+    genres = models.ManyToManyField(Label, related_name="genres", blank=True, limit_choices_to={'restricted_to__contains': 'show-genres'})
     rating = models.CharField(max_length="128", blank=True, default="All Ages")
     cast_members = models.ManyToManyField(CastMember, blank=True)
     homepage_url = models.URLField(max_length='512', blank=True, verbose_name="Homepage URL")

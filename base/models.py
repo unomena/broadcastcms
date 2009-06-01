@@ -66,7 +66,6 @@ class ContentBase(ModelBase):
 
     title = models.CharField(max_length='512')
     description = models.TextField()
-    labels = models.ManyToManyField(Label, blank=True)
     url = models.URLField(max_length='512', editable=False)
     created = models.DateTimeField('Created Date & Time', blank=True)
     modified = models.DateTimeField('Modified Date & Time', editable=False)
@@ -110,3 +109,17 @@ def add_scales(sender, **kwargs):
         sender.add_to_class('image', models.ImageField(upload_to='content_images', storage=ScaledImageStorage(scales=sender.image_scales)))
 
 signals.class_prepared.connect(add_scales)
+
+
+def add_labels(sender, **kwargs):
+    """
+    Adds a labels field to anything inheriting from ContentBase.
+    Labels are limited through a limit_choices_to option on the field 
+    and the restricted_to field on the Label model itself.
+
+    TODO: This is nasty, find a better way to do this :)
+    """
+    if isinstance(sender(), ContentBase):
+        sender.add_to_class('labels', models.ManyToManyField(Label, blank=True, limit_choices_to={'restricted_to__contains': "%s-labels" % sender._meta.module_name}))
+
+signals.class_prepared.connect(add_labels)
