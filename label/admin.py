@@ -5,6 +5,7 @@ from django.db.models import get_apps, get_models
 from models import Label
 
 class LabelAdminForm(forms.ModelForm):
+    restricted_to = forms.MultipleChoiceField()
 
     def __init__(self, *args, **kwargs):
         super(LabelAdminForm, self).__init__(*args, **kwargs)
