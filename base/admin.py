@@ -30,8 +30,8 @@ class ContentBaseAdmin(admin.ModelAdmin):
     search_fields = ('title', 'description', 'content')
     fieldsets = (
         (None, {'fields': ('title', 'description', 'is_public')}),
-        ('Categorization', {'fields': ('labels',),
-                            'classes': ('collapse',),
+        ('Labels', {'fields': ('labels',),
+                    'classes': ('collapse',),
         }),
         ('Meta', {'fields': ('image', 'created',),
                   'classes': ('collapse',),

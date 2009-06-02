@@ -5,7 +5,7 @@ from broadcastcms.post.models import Post
 class PostAdmin(ContentBaseAdmin):
     fieldsets = (
         (None, {'fields': ('title', 'description', 'content', 'is_public')}),
-        ('Categorization', {'fields': ('labels',),
+        ('Labels', {'fields': ('labels',),
                     'classes': ('collapse',),
         }),
         ('Meta', {'fields': ('image', 'created',),
