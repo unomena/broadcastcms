@@ -18,7 +18,7 @@ class LabelAdminForm(forms.ModelForm):
             for model in get_models(app):
                 for many_to_many in model._meta.many_to_many:
                     if many_to_many.rel.to == Label:
-                        choices.append(("%s-%s" % (model._meta.module_name, many_to_many.name), "%s - %s" % (model._meta.verbose_name.title(), many_to_many.name.title())))
+                        choices.append(("%s-%s" % (model._meta.object_name.lower(), many_to_many.name), "%s - %s" % (model._meta.verbose_name.title(), many_to_many.name.title())))
 
         return choices
 
