@@ -81,7 +81,7 @@ class ContentBase(ModelBase):
         return self.title
 
     def has_visible_labels(self):
-        for label in self.labels:
+        for label in self.labels.all():
             if label.is_visible:
                 return True
         return False
