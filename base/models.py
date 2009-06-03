@@ -62,7 +62,7 @@ class ModelBase(PermissionBase):
 
         
 class ContentBase(ModelBase):
-    image_scales = ((78, 44), (527, 289))
+    image_scales = ((78, 44), (125, 70), (527, 289))
 
     title = models.CharField(max_length='512')
     description = models.TextField()
