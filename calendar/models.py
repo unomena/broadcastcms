@@ -12,3 +12,7 @@ class Entry(ModelBase):
 
     def __unicode__(self):
         return str(self.start_date_time)
+
+    class Meta():
+        verbose_name = "Entry"
+        verbose_name_plural = "Entries"
