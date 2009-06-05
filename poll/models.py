@@ -3,9 +3,6 @@ from broadcastcms.base.models import ContentBase, ModelBase
 
 
 class Poll(ContentBase):
-    image_scales = (
-        (111, 63),
-    )
     class Meta:
         verbose_name = 'Poll'
         verbose_name_plural = 'Polls'

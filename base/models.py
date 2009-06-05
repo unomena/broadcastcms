@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db import models
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import signals
 from django.db.models.manager import Manager
@@ -10,6 +11,38 @@ from broadcastcms.label.models import Label
 from broadcastcms.scaledimage.storage import ScaledImageStorage
 
 from managers import ModelBaseManager
+
+def get_image_scales(instance):
+    app_label = instance._meta.app_label
+    object_name = instance._meta.object_name
+    try:
+        image_scales = settings.IMAGE_SCALES[app_label][object_name]['image']
+    except KeyError:
+        image_scales = ()
+    return image_scales
+
+
+def get_base_image_scales(instance):
+    """
+    Collect all base class image scales
+    """
+    image_scales = ()
+    for base in instance.__class__.__bases__:
+        image_scales += get_image_scales(base)
+    
+    return image_scales
+
+    
+def image_path_and_scales(instance, filename):
+    """
+    This is a very nasty little hack to specify image scales per model.
+    I couldn't find a hook through which to set storage attributes prior to actual save.
+    TODO: Create proper hook, see FieldFile.
+    """
+    # Setup image scales
+    instance.image.storage.scales = get_image_scales(instance) + get_base_image_scales(instance)
+    # Return image path
+    return 'content_images/%s' % filename
 
 
 def ensure_model_base_manager(sender, **kwargs):
@@ -60,21 +93,21 @@ class ModelBase(PermissionBase):
             return self
         return model.objects.get(id=self.id)
 
-        
-class ContentBase(ModelBase):
-    image_scales = ((78, 44), (125, 70), (527, 289))
 
+class ContentBase(ModelBase):
     title = models.CharField(max_length='512')
     description = models.TextField()
     labels =  models.ManyToManyField(Label, blank=True)
     url = models.URLField(max_length='512', editable=False)
     created = models.DateTimeField('Created Date & Time', blank=True)
     modified = models.DateTimeField('Modified Date & Time', editable=False)
+    image = models.ImageField(upload_to=image_path_and_scales, storage=ScaledImageStorage())
 
     def save(self, *args, **kwargs):
         if not self.id:
             self.created = datetime.now()
         self.modified = datetime.now()
+
         super(ContentBase, self).save(*args, **kwargs)
 
     def __unicode__(self):
@@ -85,28 +118,3 @@ class ContentBase(ModelBase):
             if label.is_visible:
                 return True
         return False
-
-def get_base_scales(obj):
-    """
-    Collect all base class image scales
-    """
-    image_scales = ()
-    for base in obj.__bases__:
-        if hasattr(base, 'image_scales'):
-            image_scales += base.image_scales
-    return image_scales
-
-
-def add_scales(sender, **kwargs):
-    """
-    Create core image field on class_prepared so that child 
-    classes can specify their own ScaledImageStorage scales.
-
-    TODO: There is some fun here with long inheritance chains where parent and child classes both save images
-    Make sure only child classes actually save images.
-    """
-    if hasattr(sender, 'image_scales'):
-        sender.image_scales = sender.image_scales + get_base_scales(sender)
-        sender.add_to_class('image', models.ImageField(upload_to='content_images', storage=ScaledImageStorage(scales=sender.image_scales)))
-
-signals.class_prepared.connect(add_scales)

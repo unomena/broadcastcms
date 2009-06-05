@@ -10,7 +10,7 @@ import os
 
 class ScaledImageStorage(FileSystemStorage):
 
-    def __init__(self, scales=None, *args, **kwargs):
+    def __init__(self, scales=[], *args, **kwargs):
         self.scales = scales
         super(ScaledImageStorage, self).__init__(*args, **kwargs)
 

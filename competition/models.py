@@ -3,10 +3,6 @@ from broadcastcms.base.models import ContentBase
 
 
 class Competition(ContentBase):
-    image_scales = (
-        (103, 103),
-        (283, 159),
-    )
     content = models.TextField()
     closing_date = models.DateField()
     rules = models.TextField()
