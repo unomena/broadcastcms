@@ -12,13 +12,11 @@ class ScaledImageURLNode(template.Node):
         obj = self.obj.resolve(context)
         image = obj.image
         original_url = image.url
-
-        try:
+        if '.' in original_url:
             dot_index = original_url.rindex('.')
-        except ValueError: # url has no dot
-            scaled_url = '%s%sx%s' % (original_url, self.width, self.height)
-        else:
             scaled_url = '%s%sx%s%s' % (original_url[:dot_index], self.width, self.height, original_url[dot_index:])
+        else:
+            scaled_url = '%s%sx%s' % (original_url, self.width, self.height)
 
         return scaled_url
 
