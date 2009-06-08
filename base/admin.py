@@ -13,10 +13,10 @@ class ContentBaseAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ContentBaseAdminForm, self).__init__(*args, **kwargs)
-        self.fields['labels'].choices = self.get_label_choices(kwargs['instance'], 'labels')
+        self.fields['labels'].choices = self.get_label_choices('labels')
 
-    def get_label_choices(self, instance, field_name):
-        labels = Label.objects.filter(restricted_to__contains='%s-%s' % (instance._meta.object_name.lower(), field_name))
+    def get_label_choices(self, field_name):
+        labels = Label.objects.filter(restricted_to__contains='%s-%s' % (self._meta.model._meta.object_name.lower(), field_name))
         choices = []
         for label in labels:
             choices.append((label.id, str(label)))
