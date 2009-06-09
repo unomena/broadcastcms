@@ -1,7 +1,7 @@
 from django.core.cache import cache
     
 
-def get_inclusion_tag_function_cache_key(node, context, respect_path, f):
+def get_inclusion_view_function_cache_key(node, context, respect_path, f):
     key = str(node.__class__) + str(f.__name__)
     if respect_path:
         request = context['request']
@@ -10,10 +10,10 @@ def get_inclusion_tag_function_cache_key(node, context, respect_path, f):
     key = key.replace(' ', '')
     return key
 
-def cache_inclusion_tag_function(seconds, respect_path=False):
+def cache_inclusion_view_function(seconds, respect_path=False):
     def wrap(f):
         def wrap_f(self, context):
-            key = get_inclusion_tag_function_cache_key(self, context, respect_path, f)
+            key = get_inclusion_view_function_cache_key(self, context, respect_path, f)
             cached_result = cache.get(key)
             if cached_result:
                 return cached_result
