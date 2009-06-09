@@ -42,7 +42,7 @@ def image_path_and_scales(instance, filename):
     # Setup image scales
     instance.image.storage.scales = get_image_scales(instance) + get_base_image_scales(instance)
     # Return image path
-    return 'content_images/%s' % filename
+    return 'media/content_images/%s' % filename
 
 
 def ensure_model_base_manager(sender, **kwargs):
