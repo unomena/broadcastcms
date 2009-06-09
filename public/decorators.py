@@ -1,9 +1,9 @@
 from broadcastcms.base.models import ContentBase
 
 
-class setupSection(object):
-    def __init__(self, view_template, view_class=None):
-        self.view_template = view_template
+class setupView(object):
+    def __init__(self, template=None, view_class=None):
+        self.template = template
         self.view_class = view_class
 
     def __call__(self, f):
@@ -20,5 +20,5 @@ class setupSection(object):
                 'instance': instance,
             }
 
-            return f(request, context, template=self.view_template, *args, **kwargs)
+            return f(request, context, template=self.template, *args, **kwargs)
         return wrapped_f
