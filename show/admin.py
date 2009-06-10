@@ -28,6 +28,10 @@ class ShowAdmin(ContentBaseAdmin):
         }),
     )
 
+class CastMemberAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_public')
+    list_filter = ('is_public',)
+    search_fields = ('title',)
 
 admin.site.register(Show, ShowAdmin)
-admin.site.register(CastMember)
+admin.site.register(CastMember, CastMemberAdmin)
