@@ -29,7 +29,7 @@ class RichTextWidget(forms.TextInput):
 
     def __init__(self, attrs=None):
         super(RichTextWidget, self).__init__(attrs=attrs)
-        self.media_url = reverse('media', args=[''])
+        self.media_url = reverse('media', urlconf='broadcastcms.richtext.urls', args=[''])
 
     def render(self, name, value, attrs={}):
         attrs['id'] = 'id_%s' % name
