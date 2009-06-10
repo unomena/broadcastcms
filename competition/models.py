@@ -1,11 +1,12 @@
 from django.db import models
 from broadcastcms.base.models import ContentBase
+from broadcastcms.richtext.fields import RichTextField
 
 
 class Competition(ContentBase):
-    content = models.TextField()
+    content = RichTextField()
     closing_date = models.DateField()
-    rules = models.TextField()
+    rules = RichTextField()
 
 
 class Winner(models.Model):
