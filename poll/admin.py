@@ -1,6 +1,6 @@
 from django.contrib import admin
 from models import Poll, Option
-
+from broadcastcms.base.admin import ContentBaseAdmin
 
 class OptionInline(admin.TabularInline):
     model = Option
@@ -8,7 +8,17 @@ class OptionInline(admin.TabularInline):
     extra = 1
 
 
-class PollAdmin(admin.ModelAdmin):
+class PollAdmin(ContentBaseAdmin):
+    fieldsets = (
+        (None, {'fields': ('title', 'description', 'is_public')}),
+        ('Labels', {'fields': ('labels',),
+                    'classes': ('collapse',),
+        }),
+        ('Meta', {'fields': ('image', 'created',),
+                  'classes': ('collapse',),
+        }),
+    )
+    
     inlines = (OptionInline,)
 
 
