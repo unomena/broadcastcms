@@ -10,7 +10,7 @@ class EntryInline(admin.TabularInline):
 
 class EntryAdmin(admin.ModelAdmin):
     list_display = ('start_date_time', 'end_date_time', 'content', 'is_public')
-    list_filter = ('content', 'is_public',)
+    list_filter = ('is_public', 'start_date_time', 'end_date_time', 'content')
     search_fields = ('start_date_time', 'end_date_time', 'content')
 
 
