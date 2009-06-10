@@ -9,6 +9,7 @@ from django.db.models.fields import FieldDoesNotExist
 
 from broadcastcms.label.models import Label
 from broadcastcms.scaledimage.storage import ScaledImageStorage
+from broadcastcms.richtext.fields import RichTextField
 
 from managers import ModelBaseManager
 
@@ -95,7 +96,7 @@ class ModelBase(PermissionBase):
 
 class ContentBase(ModelBase):
     title = models.CharField(max_length='512')
-    description = models.TextField()
+    description = RichTextField()
     labels =  models.ManyToManyField(Label, blank=True)
     url = models.URLField(max_length='512', editable=False)
     created = models.DateTimeField('Created Date & Time', blank=True)

@@ -2,6 +2,7 @@ from django.db import models
 from broadcastcms.label.models import Label
 from broadcastcms.base.models import ModelBase, ContentBase
 from broadcastcms.calendar.managers import CalendarManager
+from broadcastcms.richtext.fields import RichTextField
 
 class CastMember(ModelBase):
     title = models.CharField(max_length="512")
@@ -20,7 +21,7 @@ class Show(ContentBase):
                     (100, 56),
                     (283, 159),
                     (158, 89),)
-    extended_description = models.TextField(verbose_name='Extended Description')
+    extended_description = RichTextField(verbose_name='Extended Description')
     genres = models.ManyToManyField(Label, related_name="genres", blank=True, limit_choices_to={'restricted_to__contains': 'show-genres'})
     rating = models.CharField(max_length="128", blank=True, default="All Ages")
     cast_members = models.ManyToManyField(CastMember, blank=True)
