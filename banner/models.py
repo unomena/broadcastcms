@@ -3,7 +3,7 @@ from broadcastcms.base.models import ModelBase
 from broadcastcms.scaledimage.storage import ScaledImageStorage
 
 class Banner(ModelBase):
-    title = models.CharField(max_length='512', help_text='A short descriptive title.')
+    title = models.CharField(max_length='256', help_text='A short descriptive title.')
     
     def __unicode__(self):
         return str(self.title)
