@@ -1,6 +1,7 @@
 from django.db import models
 from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.calendar.managers import CalendarManager
+from broadcastcms.richtext.fields import RichTextField
 
 
 class Location(ModelBase):
@@ -12,6 +13,8 @@ class Location(ModelBase):
 
 class Event(ContentBase):
     objects = CalendarManager()
-    venue = models.CharField(max_length=255)
-    address = models.CharField(max_length=512)
-    locations = models.ManyToManyField(Location, related_name='events')
+    
+    content = RichTextField(help_text="Full article detailing this event.")
+    venue = models.CharField(max_length=255, help_text="Short venue name.")
+    address = models.CharField(max_length=512, help_text="Physical venue address.")
+    locations = models.ManyToManyField(Location, related_name='events', help_text="Event location(s).")

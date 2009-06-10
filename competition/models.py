@@ -4,7 +4,7 @@ from broadcastcms.richtext.fields import RichTextField
 
 
 class Competition(ContentBase):
-    content = RichTextField(help_text="Full article detailing this item.")
+    content = RichTextField(help_text="Full article detailing this competition.")
     closing_date = models.DateField(help_text="Date on which this competition closes.")
     rules = RichTextField(help_text="Rules specific to this competition.")
 
