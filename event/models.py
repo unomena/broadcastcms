@@ -5,7 +5,7 @@ from broadcastcms.richtext.fields import RichTextField
 
 
 class Location(ModelBase):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, help_text="A short descriptive name.")
 
     def __unicode__(self):
         return self.name
