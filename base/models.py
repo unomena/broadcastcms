@@ -64,7 +64,7 @@ signals.class_prepared.connect(ensure_model_base_manager)
 
 
 class PermissionBase(models.Model):
-    is_public = models.BooleanField(default=False, verbose_name="Public")
+    is_public = models.BooleanField(default=False, verbose_name="Public", help_text='Check to make this item visible to the public.')
     
     class Meta():
         abstract = True
