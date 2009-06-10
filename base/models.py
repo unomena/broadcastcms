@@ -97,7 +97,7 @@ class ModelBase(PermissionBase):
 class ContentBase(ModelBase):
     title = models.CharField(max_length='256', help_text='A short descriptive title.')
     description = models.TextField(help_text='A short description. More verbose than the title but limited to one or two sentences.')
-    labels =  models.ManyToManyField(Label, blank=True)
+    labels =  models.ManyToManyField(Label, blank=True, help_text="Labels categorizing this item.")
     created = models.DateTimeField('Created Date & Time', blank=True, help_text='Date and time on which this item was created. This is automatically set on creation, but can be changed subsequently.')
     modified = models.DateTimeField('Modified Date & Time', editable=False, help_text='Date and time on which this item was last modified. This is automatically set each time the item is saved.')
     image = models.ImageField(upload_to=image_path_and_scales, storage=ScaledImageStorage(), help_text='Image associated with this item. The uploaded image will be automatically scaled and cropped to required resolutions.')
