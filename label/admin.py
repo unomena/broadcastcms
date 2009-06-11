@@ -2,6 +2,8 @@ from django import forms
 from django.contrib import admin
 from django.db.models import get_apps, get_models
 
+from broadcastcms.base.admin import ModelBaseAdmin
+
 from models import Label
 
 class LabelAdminForm(forms.ModelForm):
@@ -22,7 +24,7 @@ class LabelAdminForm(forms.ModelForm):
 
         return choices
 
-class LabelAdmin(admin.ModelAdmin):
+class LabelAdmin(ModelBaseAdmin):
     form = LabelAdminForm
     list_display = ('title', 'is_visible')
     list_filter = ('is_visible',)

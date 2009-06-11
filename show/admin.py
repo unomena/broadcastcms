@@ -1,6 +1,6 @@
 from django.contrib import admin
 from broadcastcms.calendar.admin import EntryInline
-from broadcastcms.base.admin import ContentBaseAdmin, comma_seperated_admin_label_links
+from broadcastcms.base.admin import ModelBaseAdmin, ContentBaseAdmin, comma_seperated_admin_label_links
 from broadcastcms.shortcuts import comma_seperated_admin_links
 from models import Show, CastMember
 
@@ -28,7 +28,7 @@ class ShowAdmin(ContentBaseAdmin):
         }),
     )
 
-class CastMemberAdmin(admin.ModelAdmin):
+class CastMemberAdmin(ModelBaseAdmin):
     list_display = ('title', 'is_public')
     list_filter = ('is_public',)
     search_fields = ('title',)

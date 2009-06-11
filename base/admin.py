@@ -3,6 +3,36 @@ from django.contrib import admin
 from broadcastcms.shortcuts import comma_seperated_admin_links
 from broadcastcms.label.models import Label
 
+class ModelBaseAdmin(admin.ModelAdmin):
+
+    def filter_fieldsets(self, request, fieldsets):
+        """
+        Removes the is_public field for non superusers.
+        Filter priviledged fields here.
+        """
+        if request.user.is_superuser:
+            return fieldsets
+
+        for fieldset in fieldsets:
+            for item in fieldset:
+                if item.__class__ == dict:
+                    if item.has_key('fields'):
+                        if 'is_public' in item['fields']:
+                            fields = list(item['fields'])
+                            fields.remove('is_public')
+                            item['fields'] = tuple(fields)
+        return fieldsets
+        
+    def get_fieldsets(self, request, obj=None):
+        "Hook for specifying fieldsets for the add form."
+        if self.declared_fieldsets:
+            fieldsets = self.declared_fieldsets
+        else:
+            form = self.get_form(request, obj)
+            fieldsets = [(None, {'fields': form.base_fields.keys()})]
+        
+        return self.filter_fieldsets(request, fieldsets)
+
 def comma_seperated_admin_label_links(obj):
     return comma_seperated_admin_links(obj.labels.all())
 
@@ -22,7 +52,7 @@ class ContentBaseAdminForm(forms.ModelForm):
             choices.append((label.id, str(label)))
         return choices
 
-class ContentBaseAdmin(admin.ModelAdmin):
+class ContentBaseAdmin(ModelBaseAdmin):
     form = ContentBaseAdminForm
 
     list_display = ('title', 'description', comma_seperated_admin_label_links, 'created', 'modified', 'is_public')
@@ -37,3 +67,4 @@ class ContentBaseAdmin(admin.ModelAdmin):
                   'classes': ('collapse',),
         }),
     )
+   
