@@ -5,6 +5,7 @@ from django.db.models.query import Q
 from django.contrib.contenttypes.models import ContentType
 
 from broadcastcms.base.managers import ModelBaseManager, ModelBaseQuerySet
+from broadcastcms.base.models import ModelBase
 
 
 class CalendarQuerySet(ModelBaseQuerySet):
@@ -19,7 +20,12 @@ class CalendarQuerySet(ModelBaseQuerySet):
                 if relation.model._meta.object_name == 'Entry':
                     accessor = relation.get_accessor_name()
                     kwargs = {'%s__in' % accessor: entries}
-                    return self.filter(**kwargs).distinct()
+                    # using this bad-ass query to work around stupid django
+                    return self.filter(
+                        pk__in=entries.filter(
+                            content__id__in=self.values_list('id', flat=True)
+                        ).values_list('content', flat=True)
+                    )
             if accessor == None:
                 raise Exception('Calendar query model has no relation to the Entry model.')
         return entries
