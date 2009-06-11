@@ -47,7 +47,8 @@ class RichTextWidget(forms.TextInput):
                     buttonList: [
                         'bold', 'italic', 'undeline', 'left', 'center', 'right',
                         'justify', 'ol', 'ul', 'strikethrough', 'removeformat',
-                        'indent', 'outdent', 'hr', 'forecolor', 'link', 'unlink'
+                        'indent', 'outdent', 'hr', 'forecolor', 'link', 'unlink',
+                        'xhtml'
                     ]
                 }).panelInstance('%(id)s');
             </script>
