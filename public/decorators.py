@@ -10,8 +10,11 @@ class setupView(object):
         def wrapped_f(request, *args, **kwargs):
             instance_id = kwargs.get('instance_id', None)
             if instance_id:
-                instance = ContentBase.objects.get(pk=instance_id)
-                instance = instance.as_leaf_class()
+                try:
+                    instance = ContentBase.objects.get(pk=instance_id)
+                    instance = instance.as_leaf_class()
+                except ContentBase.DoesNotExist:
+                    instance = None
             else:
                 instance = self.view_class
 
