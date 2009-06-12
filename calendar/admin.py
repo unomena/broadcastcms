@@ -1,9 +1,9 @@
 from django.contrib import admin
 from models import *
-from broadcastcms.base.admin import ModelBaseAdmin
+from broadcastcms.base.admin import ModelBaseAdmin, ModelBaseTabularInline
 
 
-class EntryInline(admin.TabularInline):
+class EntryInline(ModelBaseTabularInline):
     model = Entry
     fk_name = 'content'
     extra = 1

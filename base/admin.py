@@ -1,37 +1,55 @@
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.options import InlineModelAdmin
 from broadcastcms.shortcuts import comma_seperated_admin_links
 from broadcastcms.label.models import Label
 
-class ModelBaseAdmin(admin.ModelAdmin):
-
-    def filter_fieldsets(self, request, fieldsets):
-        """
-        Removes the is_public field for non superusers.
-        Filter priviledged fields here.
-        """
-        if request.user.is_superuser:
-            return fieldsets
-
-        for fieldset in fieldsets:
-            for item in fieldset:
-                if item.__class__ == dict:
-                    if item.has_key('fields'):
-                        if 'is_public' in item['fields']:
-                            fields = list(item['fields'])
-                            fields.remove('is_public')
-                            item['fields'] = tuple(fields)
+def restrict_fieldsets(request, fieldsets):
+    """
+    Removes fields user does not have privileges to edit.
+    For now we simply remove the is_public field for non superusers.
+    """
+    if request.user.is_superuser:
         return fieldsets
+
+    for fieldset in fieldsets:
+        for item in fieldset:
+            if item.__class__ == dict:
+                if item.has_key('fields'):
+                    if 'is_public' in item['fields']:
+                        fields = list(item['fields'])
+                        fields.remove('is_public')
+                        item['fields'] = tuple(fields)
+        return fieldsets
+
+class ModelBaseInlineModelAdmin(InlineModelAdmin):
         
     def get_fieldsets(self, request, obj=None):
-        "Hook for specifying fieldsets for the add form."
+        "Hook for specifying fieldsets."
+        if self.declared_fieldsets:
+            fieldsets = self.declared_fieldsets
+        else:
+            form = self.get_formset(request).form
+            fieldsets = [(None, {'fields': form.base_fields.keys()})]
+        return restrict_fieldsets(request, fieldsets)
+
+
+class ModelBaseStackedInline(ModelBaseInlineModelAdmin, admin.StackedInline):
+    pass
+
+class ModelBaseTabularInline(ModelBaseInlineModelAdmin, admin.TabularInline):
+    pass
+
+class ModelBaseAdmin(admin.ModelAdmin):
+
+    def get_fieldsets(self, request, obj=None):
+        "Hook for specifying fieldsets."
         if self.declared_fieldsets:
             fieldsets = self.declared_fieldsets
         else:
             form = self.get_form(request, obj)
             fieldsets = [(None, {'fields': form.base_fields.keys()})]
-        
-        return self.filter_fieldsets(request, fieldsets)
+        return restrict_fieldsets(request, fieldsets)
 
 def comma_seperated_admin_label_links(obj):
     return comma_seperated_admin_links(obj.labels.all())

@@ -1,9 +1,9 @@
 from django.contrib import admin
 from models import Competition, Winner
-from broadcastcms.base.admin import ContentBaseAdmin
+from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseTabularInline
 
 
-class WinnerInlineAdmin(admin.TabularInline):
+class WinnerInlineAdmin(ModelBaseTabularInline):
     model = Winner
     extra = 1
 

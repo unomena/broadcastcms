@@ -1,8 +1,8 @@
 from django.contrib import admin
 from models import Poll, Option
-from broadcastcms.base.admin import ContentBaseAdmin
+from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseTabularInline
 
-class OptionInline(admin.TabularInline):
+class OptionInline(ModelBaseTabularInline):
     model = Option
     fk_name = 'poll'
     extra = 1
