@@ -8,8 +8,8 @@ import calendar
 class CastMember(ModelBase):
     title = models.CharField(max_length="256", help_text="Full cast member name.")
    
-    def __unicode__(self):
-        return str(self.title)
+    #def __unicode__(self):
+    #    return str(self.title)
 
     class Meta():
         verbose_name = 'Cast Member'
@@ -63,8 +63,8 @@ class Show(ContentBase):
 
         return time_list
 
-    def __unicode__(self):
-        return str(self.title)
+    #def __unicode__(self):
+    #    return str(self.title)
     
     class Meta():
         verbose_name = 'Show'
