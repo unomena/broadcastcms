@@ -16,3 +16,4 @@ class Entry(ModelBase):
     class Meta():
         verbose_name = "Entry"
         verbose_name_plural = "Entries"
+        ordering = ['start_date_time', 'end_date_time']
