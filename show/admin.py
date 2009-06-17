@@ -13,6 +13,7 @@ comma_seperated_admin_genre_links.allow_tags = True
 class ShowAdmin(ContentBaseAdmin):
     list_display = ('title', 'description', comma_seperated_admin_label_links, comma_seperated_admin_genre_links, 'created', 'modified', 'is_public')
     list_filter = ('labels', 'genres', 'is_public', 'created', 'modified')
+    search_fields = ('title', 'description', 'extended_description')
     
     inlines = (EntryInline,)
     fieldsets = (
