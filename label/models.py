@@ -11,4 +11,4 @@ class Label(models.Model):
         verbose_name_plural = 'Labels'
 
     def __unicode__(self):
-        return str(self.title)
+        return self.title

@@ -6,7 +6,7 @@ class Banner(ModelBase):
     title = models.CharField(max_length='256', help_text='A short descriptive title.')
     
     def __unicode__(self):
-        return str(self.title)
+        return self.title
     
 class CodeBanner(Banner):
     code = models.TextField(help_text='The full HTML/Javascript code snippet to be embedded for this banner.')
