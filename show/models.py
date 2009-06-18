@@ -59,6 +59,8 @@ class Show(ContentBase):
                     item['days'] = cat
             if item['days'] == days:
                 item['days'] = [calendar.day_name[day] for day in days]
+            if item['days'].__class__ == str:
+                item['days'] = [item['days'],]
             time_list.append(item)
 
         return time_list
