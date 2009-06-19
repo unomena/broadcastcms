@@ -17,4 +17,4 @@ class Label(models.Model):
         for related in self._meta.get_all_related_objects():
             field = getattr(self, related.get_accessor_name())
             field.clear()
-        super(ModelBase, self).delete(*args, **kwargs)
+        super(Label, self).delete(*args, **kwargs)
