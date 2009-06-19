@@ -12,3 +12,9 @@ class Label(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def delete(self, *args, **kwargs):
+        for related in self._meta.get_all_related_objects():
+            field = getattr(self, related.get_accessor_name())
+            field.clear()
+        super(ModelBase, self).delete(*args, **kwargs)

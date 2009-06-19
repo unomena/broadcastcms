@@ -13,6 +13,7 @@ from broadcastcms.richtext.fields import RichTextField
 
 from managers import ModelBaseManager
 
+
 def get_image_scales(instance):
     app_label = instance._meta.app_label
     object_name = instance._meta.object_name
@@ -92,6 +93,14 @@ class ModelBase(PermissionBase):
 
     def as_leaf_class(self):
         return self.__getattribute__(self.classname.lower())
+
+    def delete(self, *args, **kwargs):
+        for related in self._meta.get_all_related_objects():
+            cascade = getattr(related.model, '_cascade', True)
+            if not cascade:
+                field = getattr(self, related.get_accessor_name())
+                field.clear()
+        super(ModelBase, self).delete(*args, **kwargs)
 
 
 class ContentBase(ModelBase):
