@@ -1,5 +1,5 @@
 from django.core.cache import cache
-    
+import md5 
 
 def get_inclusion_view_function_cache_key(node, context, respect_path, respect_get, f):
     """
@@ -15,7 +15,7 @@ def get_inclusion_view_function_cache_key(node, context, respect_path, respect_g
         get_key = str(request.GET)
         key += get_key
     
-    key = key.replace(' ', '')
+    key = md5.new(key).hexdigest()
     return key
 
 def cache_inclusion_view_function(seconds, respect_path=False, respect_get=False):
