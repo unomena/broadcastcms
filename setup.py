@@ -10,7 +10,7 @@ setup(
     url='http://projects.praekelt.com/broadcastcms',
     packages = find_packages(),
     dependency_links = [
-        'http://dist.repoze..org/',
+        'http://dist.repoze.org/',
     ],
     install_requires = [
         'PIL==1.1.6',
