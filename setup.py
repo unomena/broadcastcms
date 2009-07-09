@@ -9,4 +9,10 @@ setup(
     author_email='sysadmin@praekeltconsulting.com',
     url='http://projects.praekelt.com/broadcastcms',
     packages = find_packages(),
+    dependency_links = [
+        'http://dist.repoze..org/',
+    ],
+    install_requires = [
+        'PIL==1.1.6',
+    ],
 )
