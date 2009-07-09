@@ -66,7 +66,10 @@ signals.class_prepared.connect(ensure_model_base_manager)
 
 
 class PermissionBase(models.Model):
-    is_public = models.BooleanField(default=False, verbose_name="Public", help_text='Check to make this item visible to the public.')
+    is_public = models.BooleanField(
+        default=False, verbose_name="Public",
+        help_text='Check to make this item visible to the public.'
+    )
     
     class Meta():
         abstract = True
@@ -81,13 +84,12 @@ class ModelBase(PermissionBase):
     """
     default_manager = ModelBaseManager()
 
-    content_type = models.ForeignKey(ContentType,editable=False,null=True)
+    content_type = models.ForeignKey(ContentType, editable=False, null=True)
     classname = models.CharField(max_length=32, editable=False, null=True)
 
     def save(self, *args, **kwargs):
         if(not self.content_type):
             self.content_type = ContentType.objects.get_for_model(self.__class__)
-        
         self.classname = self.__class__.__name__
         super(ModelBase, self).save(*args, **kwargs)
 
