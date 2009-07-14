@@ -96,6 +96,7 @@ class ContentBase(ModelBase):
     )
     rating = models.IntegerField(
         blank=True,
+        null=True,
         choices=[(n, str(n)) for n in range(1,6)],
         help_text='Rating for this item.',
     )

@@ -23,7 +23,7 @@ def get_image_scales(instance):
         for base in bases:
             if issubclass(base, models.Model):
                 image_scales |= get_image_scales(base)
-    except KeyError:
+    except AttributeError, KeyError:
         image_scales = set()
     return image_scales
 
