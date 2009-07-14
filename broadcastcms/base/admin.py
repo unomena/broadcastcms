@@ -77,7 +77,7 @@ class ContentBaseAdmin(ModelBaseAdmin):
     list_filter = ('labels', 'is_public', 'created', 'modified')
     search_fields = ('title', 'description', 'content')
     fieldsets = (
-        (None, {'fields': ('title', 'description', 'is_public')}),
+        (None, {'fields': ('title', 'description', 'rating', 'is_public')}),
         ('Labels', {'fields': ('labels',),
                     'classes': ('collapse',),
         }),

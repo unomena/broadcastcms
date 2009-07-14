@@ -94,6 +94,11 @@ class ContentBase(ModelBase):
         upload_to=image_path_and_scales, storage=ScaledImageStorage(),
         help_text='Image associated with this item. The uploaded image will be automatically scaled and cropped to required resolutions.'
     )
+    rating = models.IntegerField(
+        blank=True,
+        choices=[(n, str(n)) for n in range(1,6)],
+        help_text='Rating for this item.',
+    )
 
     def save(self, *args, **kwargs):
         if not self.id:
