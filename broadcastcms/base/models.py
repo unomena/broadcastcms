@@ -7,7 +7,7 @@ from django.db.models.manager import Manager
 from django.db.models.fields import FieldDoesNotExist
 from django.template.defaultfilters import slugify
 
-from broadcastcms.scaledimage import ScaledImageStorage, image_path_and_scales
+from broadcastcms.scaledimage import ScaledImageField
 from broadcastcms.richtext.fields import RichTextField
 
 from managers import ModelBaseManager
@@ -141,8 +141,7 @@ class ContentBase(ModelBase):
         'Modified Date & Time', editable=False,
         help_text='Date and time on which this item was last modified. This is automatically set each time the item is saved.'
     )
-    image = models.ImageField(
-        upload_to=image_path_and_scales, storage=ScaledImageStorage(),
+    image = ScaledImageField(
         help_text='Image associated with this item. The uploaded image will be automatically scaled and cropped to required resolutions.'
     )
     rating = models.IntegerField(
@@ -156,8 +155,6 @@ class ContentBase(ModelBase):
         if not self.id:
             self.created = datetime.now()
         self.modified = datetime.now()
-
-        
         super(ContentBase, self).save(*args, **kwargs)
 
     def __unicode__(self):
