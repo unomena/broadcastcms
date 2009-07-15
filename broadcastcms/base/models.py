@@ -5,9 +5,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import signals
 from django.db.models.manager import Manager
 from django.db.models.fields import FieldDoesNotExist
+from django.template.defaultfilters import slugify
 
 from broadcastcms.label.models import Label
-#from broadcastcms.scaledimage import ScaledImageStorage, image_path_and_scales
+from broadcastcms.scaledimage import ScaledImageField
 from broadcastcms.richtext.fields import RichTextField
 
 from managers import ModelBaseManager
@@ -51,14 +52,65 @@ class ModelBase(PermissionBase):
     """
     default_manager = ModelBaseManager()
 
-    content_type = models.ForeignKey(ContentType, editable=False, null=True)
-    classname = models.CharField(max_length=32, editable=False, null=True)
+    slug = models.SlugField(
+        editable=False,
+        max_length='275',
+    )
+    content_type = models.ForeignKey(
+        ContentType, 
+        editable=False, 
+        null=True
+    )
+    classname = models.CharField(
+        max_length=32, 
+        editable=False, 
+        null=True
+    )
 
     def save(self, *args, **kwargs):
         if(not self.content_type):
             self.content_type = ContentType.objects.get_for_model(self.__class__)
         self.classname = self.__class__.__name__
+        self.slug = self.slugify()
         super(ModelBase, self).save(*args, **kwargs)
+    
+    def slugify(self):
+        """
+        URL friendly slugs are generated using django.template.defaultfilters' slugify.
+        Numbers are added to the end of slugs for uniqueness.
+       
+        # Slug is generated from title.
+        >>> a = ContentBase(title='title')
+        >>> a.slugify()
+        u'title'
+
+        # On subsequent saves slug should not change.
+        >>> a.save()
+        >>> a.slugify()
+        u'title'
+        
+        # Numbers are added to slug if slug already exists.
+        >>> b = ContentBase(title='title')
+        >>> b.slugify()
+        u'title-1'
+        
+        # Number tail is incremented by 1.
+        >>> b.save()
+        >>> c = ContentBase(title='title')
+        >>> c.slugify()
+        u'title-2'
+        """
+        slug = slugify(self.title)
+        if self.slug == slug:
+            return slug
+        
+        slugs = [content.slug for content in ContentBase.objects.all()]
+        i = 1
+        numbered_slug = slug
+        while numbered_slug in slugs:
+            numbered_slug = "%s-%s" % (slug, i)
+            i += 1
+        return numbered_slug
 
     def as_leaf_class(self):
         return self.__getattribute__(self.classname.lower())
@@ -80,7 +132,7 @@ class ContentBase(ModelBase):
         help_text='A short description. More verbose than the title but limited to one or two sentences.'
     )
     labels =  models.ManyToManyField(
-        Label, blank=True, help_text='Labels categorizing this item.'
+        'label.Label', blank=True, help_text='Labels categorizing this item.'
     )
     created = models.DateTimeField(
         'Created Date & Time', blank=True,
@@ -90,12 +142,15 @@ class ContentBase(ModelBase):
         'Modified Date & Time', editable=False,
         help_text='Date and time on which this item was last modified. This is automatically set each time the item is saved.'
     )
-    """
-    image = models.ImageField(
-        upload_to=image_path_and_scales, storage=ScaledImageStorage(),
+    image = ScaledImageField(
         help_text='Image associated with this item. The uploaded image will be automatically scaled and cropped to required resolutions.'
     )
-    """
+    rating = models.IntegerField(
+        blank=True,
+        null=True,
+        choices=[(n, str(n)) for n in range(1,6)],
+        help_text='Rating for this item.',
+    )
 
     def save(self, *args, **kwargs):
         if not self.id:
