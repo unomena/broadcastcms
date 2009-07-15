@@ -98,8 +98,16 @@ class ModelBase(PermissionBase):
         >>> c = ContentBase(title='title')
         >>> c.slugify()
         u'title-2'
+
+        # Slug is generate from id.
+        >>> a = ModelBase.objects.create()
+        >>> a.slugify()
+        u'3'
         """
-        slug = slugify(self.title)
+        # get the title from either the title or the id
+        title = getattr(self, 'title', None) or self.id
+        # slugify with the default django filter
+        slug = slugify(title)
         if self.slug == slug:
             return slug
         
