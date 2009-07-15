@@ -40,7 +40,7 @@ def image_path_and_scales(instance, filename):
     # Setup image scales
     instance.image.storage.scales = get_image_scales(instance)
     # Return image path
-    return 'images/%s' % filename
+    return 'content/images/%s' % filename
 
 
 class ScaledImageField(ImageField):
