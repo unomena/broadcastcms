@@ -7,7 +7,7 @@ from django.db.models.manager import Manager
 from django.db.models.fields import FieldDoesNotExist
 
 from broadcastcms.label.models import Label
-from broadcastcms.scaledimage import ScaledImageStorage, image_path_and_scales
+#from broadcastcms.scaledimage import ScaledImageStorage, image_path_and_scales
 from broadcastcms.richtext.fields import RichTextField
 
 from managers import ModelBaseManager
@@ -90,10 +90,12 @@ class ContentBase(ModelBase):
         'Modified Date & Time', editable=False,
         help_text='Date and time on which this item was last modified. This is automatically set each time the item is saved.'
     )
+    """
     image = models.ImageField(
         upload_to=image_path_and_scales, storage=ScaledImageStorage(),
         help_text='Image associated with this item. The uploaded image will be automatically scaled and cropped to required resolutions.'
     )
+    """
 
     def save(self, *args, **kwargs):
         if not self.id:
