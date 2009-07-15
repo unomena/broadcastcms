@@ -7,7 +7,6 @@ from django.db.models.manager import Manager
 from django.db.models.fields import FieldDoesNotExist
 from django.template.defaultfilters import slugify
 
-from broadcastcms.label.models import Label
 from broadcastcms.scaledimage import ScaledImageField
 from broadcastcms.richtext.fields import RichTextField
 
