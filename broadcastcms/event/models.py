@@ -11,6 +11,14 @@ class Province(ModelBase):
         return self.name
 
 
+class City(ModelBase):
+    name = models.CharField(max_length=255, help_text='Name of the city')
+    province = models.ForeignKey(
+        Province, related_name='cities', blank=True, null=True,
+        help_text='Province to which the city belongs.',
+    )
+
+
 class Event(ContentBase):
     objects = CalendarManager()
 
@@ -21,4 +29,7 @@ class Location(ModelBase):
     address = models.CharField(max_length=512, help_text='Physical venue address.')
     venue = models.CharField(max_length=255, help_text='Short venue name.')
     event = models.ForeignKey(Event, related_name='locations', help_text='Event this location is for.')
-    province = models.ForeignKey(Province, related_name='locations', help_text='Province of the location.')
+    city = models.ForeignKey(
+        City, related_name='locations', blank=True, null=True,
+        help_text='City in which the location is present.'
+    )
