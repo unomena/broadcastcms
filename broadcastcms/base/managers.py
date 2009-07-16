@@ -15,3 +15,8 @@ class ModelBaseManager(models.Manager):
 
     def get_query_set(self):
         return ModelBaseQuerySet(self.model)
+
+
+class PermittedManager(ModelBaseManager):
+    def get_query_set(self):
+        return super(PermittedManager, self).get_query_set().permitted()

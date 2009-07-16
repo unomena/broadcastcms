@@ -3,33 +3,13 @@ from datetime import datetime
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import signals
-from django.db.models.manager import Manager
 from django.db.models.fields import FieldDoesNotExist
 from django.template.defaultfilters import slugify
 
 from broadcastcms.scaledimage import ScaledImageField
 from broadcastcms.richtext.fields import RichTextField
 
-from managers import ModelBaseManager
-
-
-def ensure_model_base_manager(sender, **kwargs):
-    """
-    Make sure all classes have the model base manager for objects 
-    without overriding a child class' set manager.
-    """
-    cls = sender
-
-    try:
-        cls.objects
-    except AttributeError:
-        cls.add_to_class('objects', ModelBaseManager())
-        return None
-    if cls.objects.__class__ == Manager().__class__:
-        cls.add_to_class('objects', ModelBaseManager())
-
-
-signals.class_prepared.connect(ensure_model_base_manager)
+from managers import ModelBaseManager, PermittedManager
 
 
 class PermissionBase(models.Model):
@@ -173,3 +153,26 @@ class ContentBase(ModelBase):
             if label.is_visible:
                 return True
         return False
+
+
+# Signal Functions
+
+def set_managers(sender, **kwargs):
+    """
+    Make sure all classes have the appropriate managers without
+    overriding the standard manager.
+    """
+    cls = sender
+
+    if issubclass(cls, ModelBase):
+        try:
+            if cls.objects.__class__ == models.Manager:
+                cls.add_to_class('objects', ModelBaseManager())
+        except AttributeError:
+            cls.add_to_class('objects', ModelBaseManager())
+
+    if issubclass(cls, PermissionBase):
+        cls.add_to_class('permitted', PermittedManager())
+
+
+signals.class_prepared.connect(set_managers)
