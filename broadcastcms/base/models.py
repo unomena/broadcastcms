@@ -30,6 +30,7 @@ class ModelBase(PermissionBase):
     should provide model fields specific to their requirements.  
     """
     default_manager = ModelBaseManager()
+    objects = ModelBaseManager()
 
     slug = models.SlugField(
         editable=False,
@@ -58,6 +59,11 @@ class ModelBase(PermissionBase):
         URL friendly slugs are generated using django.template.defaultfilters' slugify.
         Numbers are added to the end of slugs for uniqueness.
        
+        # Slug is generate from id.
+        >>> a = ModelBase.objects.create()
+        >>> a.slugify()
+        u'1'
+
         # Slug is generated from title.
         >>> a = ContentBase(title='title')
         >>> a.slugify()
@@ -78,11 +84,6 @@ class ModelBase(PermissionBase):
         >>> c = ContentBase(title='title')
         >>> c.slugify()
         u'title-2'
-
-        # Slug is generate from id.
-        >>> a = ModelBase.objects.create()
-        >>> a.slugify()
-        u'3'
         """
         # get the title from either the title or the id
         title = getattr(self, 'title', None) or self.id
