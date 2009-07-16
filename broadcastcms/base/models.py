@@ -169,7 +169,6 @@ def set_managers(sender, **kwargs):
     """
     cls = sender
 
-    print cls
     if issubclass(cls, ModelBase):
         try:
             if cls.objects.__class__ == models.Manager:
