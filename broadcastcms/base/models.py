@@ -113,6 +113,10 @@ class ModelBase(PermissionBase):
 
 
 class ContentBase(ModelBase):
+    default_manager = ModelBaseManager()
+    objects = ModelBaseManager()
+    permitted = PermittedManager()
+
     title = models.CharField(
         max_length='256', help_text='A short descriptive title.'
     )
@@ -165,6 +169,7 @@ def set_managers(sender, **kwargs):
     """
     cls = sender
 
+    print cls
     if issubclass(cls, ModelBase):
         try:
             if cls.objects.__class__ == models.Manager:
