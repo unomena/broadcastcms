@@ -11,7 +11,8 @@ import os
 
 class ScaledImageStorage(FileSystemStorage):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, scales=[], *args, **kwargs):
+        self.scales = scales
         super(ScaledImageStorage, self).__init__(*args, **kwargs)
 
     def scale_and_crop_image(self, content, width, height):

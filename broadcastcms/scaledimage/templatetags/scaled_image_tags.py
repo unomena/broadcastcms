@@ -18,9 +18,11 @@ class ScaledImageURLNode(template.Node):
         if original_url:
             if '.' in original_url:
                 dot_index = original_url.rindex('.')
-                scaled_url = '%s%sx%s%s' % (original_url[:dot_index], self.width, self.height, original_url[dot_index:])
+                scaled_name = '%sx%s%s' % (self.width, self.height, original_url[dot_index:])
             else:
-                scaled_url = '%s%sx%s' % (original_url, self.width, self.height)
+                scaled_name = '%sx%s' % (self.width, self.height)
+            
+            scaled_url = '%s/%s' % ('/'.join(original_url.split('/')[:-1]), scaled_name)
 
             return scaled_url
         return ''
