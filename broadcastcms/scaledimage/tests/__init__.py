@@ -26,7 +26,7 @@ class ScalesImageTest(TestCase):
             pass
         models.register_models('scaledimage', Leaf)
 
-        call_command('syncdb', verbosity=1, interactive=False)
+        call_command('syncdb', verbosity=0, interactive=False)
 
         settings.IMAGE_SCALES = {
             'scaledimage': {
