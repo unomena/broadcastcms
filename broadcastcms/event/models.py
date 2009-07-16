@@ -1,5 +1,6 @@
 from django.db import models
 from broadcastcms.base.models import ContentBase, ModelBase
+from broadcastcms.show.models import CastMember
 from broadcastcms.calendar.managers import CalendarManager
 from broadcastcms.richtext.fields import RichTextField
 
@@ -23,6 +24,7 @@ class Event(ContentBase):
     objects = CalendarManager()
 
     content = RichTextField(help_text='Full article detailing this event.')
+    castmembers = models.ManyToManyField(CastMember, through='Appearance')
 
 
 class Location(ModelBase):
@@ -33,3 +35,8 @@ class Location(ModelBase):
         City, related_name='locations', blank=True, null=True,
         help_text='City in which the location is present.'
     )
+
+
+class Appearance(ModelBase):
+    event = models.ForeignKey(Event, related_name='apearances')
+    castmember = models.ForeignKey(CastMember, related_name='apearances')
