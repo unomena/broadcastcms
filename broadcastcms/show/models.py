@@ -7,6 +7,8 @@ import calendar
 
 
 class CastMember(ContentBase):
+    content = RichTextField(help_text='Full article detailing this event.')
+
     class Meta:
         verbose_name = 'Cast Member'
         verbose_name_plural = 'Cast Members'
