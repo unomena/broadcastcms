@@ -80,8 +80,8 @@ class ModelBase(PermissionBase):
         u'title-2'
 
         # Slug is generate from id.
-        >>> d = ModelBase.objects.create()
-        >>> d.slugify()
+        >>> a = ModelBase.objects.create()
+        >>> a.slugify()
         u'3'
         """
         # get the title from either the title or the id
@@ -91,7 +91,7 @@ class ModelBase(PermissionBase):
         if self.slug == slug:
             return slug
         
-        slugs = [content.slug for content in ModelBase.objects.all()]
+        slugs = [content.slug for content in ContentBase.objects.all()]
         i = 1
         numbered_slug = slug
         while numbered_slug in slugs:
