@@ -5,31 +5,33 @@ from broadcastcms.calendar.managers import CalendarManager
 from broadcastcms.richtext.fields import RichTextField
 import calendar
 
-class CastMember(ModelBase):
-    title = models.CharField(max_length="256", help_text="Full cast member name.")
-   
-    def __unicode__(self):
-        return self.title
 
-    class Meta():
+class CastMember(ContentBase):
+    class Meta:
         verbose_name = 'Cast Member'
         verbose_name_plural = 'Cast Members'
+
 
 class Show(ContentBase):
     objects = CalendarManager()
 
-    image_scales = ((170, 96),
-                    (100, 56),
-                    (283, 159),
-                    (158, 89),)
-    extended_description = RichTextField(verbose_name='Extended Description', help_text="Full article detailing this show.")
-    genres = models.ManyToManyField(Label, related_name="genres", blank=True, limit_choices_to={'restricted_to__contains': 'show-genres'})
-    rating = models.CharField(max_length="128", blank=True, default="All Ages", help_text="Age restriction rating.")
-    cast_members = models.ManyToManyField(CastMember, blank=True, help_text="Show cast members.")
-    homepage_url = models.URLField(max_length='512', blank=True, verbose_name="Homepage URL", help_text="External URL to show's homepage.")
+    extended_description = RichTextField(
+        verbose_name='Extended Description', help_text='Full article detailing this show.'
+    )
+    genres = models.ManyToManyField(
+        Label, related_name='shows', blank=True,
+        limit_choices_to={'restricted_to__contains': 'show-genres'}
+    )
+    rating = models.CharField(
+        max_length=128, blank=True, default='All Ages', help_text='Age restriction rating.'
+    )
+    cast_members = models.ManyToManyField(CastMember, blank=True, help_text='Show cast members.')
+    homepage_url = models.URLField(
+        max_length=512, blank=True, verbose_name='Homepage URL',
+        help_text="External URL to show's homepage."
+    )
 
     def show_times(self):
-
         cats = {
             'every day': [0,1,2,3,4,5,6],
             'weekdays': [0,1,2,3,4],
@@ -44,7 +46,6 @@ class Show(ContentBase):
                 time_dict[start_time].append(start_date)
             else:
                 time_dict[start_time] = [start_date,]
-
         time_list = []
         for time in time_dict:
             days = []
@@ -62,12 +63,8 @@ class Show(ContentBase):
             if item['days'].__class__ == str:
                 item['days'] = [item['days'],]
             time_list.append(item)
-
         return time_list
 
-    def __unicode__(self):
-        return self.title
-    
-    class Meta():
+    class Meta:
         verbose_name = 'Show'
         verbose_name_plural = 'Shows'
