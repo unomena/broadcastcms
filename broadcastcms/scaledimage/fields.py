@@ -21,7 +21,10 @@ def get_image_scales(instance):
 
     try:
         # retrieve the scales from the project settings
-        image_scales = set(settings.IMAGE_SCALES[app_label][object_name]['image'])
+        try:
+            image_scales = set(settings.IMAGE_SCALES[app_label][object_name]['image'])
+        except AttributeError:
+            image_scales = set()
         # recurse through the base classes and collect
         for base in bases:
             if issubclass(base, models.Model):

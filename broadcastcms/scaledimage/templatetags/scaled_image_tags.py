@@ -11,14 +11,21 @@ class ScaledImageURLNode(template.Node):
     def render(self, context):
         obj = self.obj.resolve(context)
         image = obj.image
-        original_url = image.url
-        if '.' in original_url:
-            dot_index = original_url.rindex('.')
-            scaled_url = '%s%sx%s%s' % (original_url[:dot_index], self.width, self.height, original_url[dot_index:])
-        else:
-            scaled_url = '%s%sx%s' % (original_url, self.width, self.height)
+        try:
+            original_url = image.url
+        except ValueError:
+            original_url = None
+        if original_url:
+            if '.' in original_url:
+                dot_index = original_url.rindex('.')
+                scaled_name = '%sx%s%s' % (self.width, self.height, original_url[dot_index:])
+            else:
+                scaled_name = '%sx%s' % (self.width, self.height)
+            
+            scaled_url = '%s/%s' % ('/'.join(original_url.split('/')[:-1]), scaled_name)
 
-        return scaled_url
+            return scaled_url
+        return ''
 
 @register.tag       
 def scaled_image_url(parser, token):
