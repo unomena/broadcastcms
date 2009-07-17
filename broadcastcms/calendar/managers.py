@@ -75,6 +75,21 @@ class CalendarQuerySet(ModelBaseQuerySet):
         content_type = ContentType.objects.get_for_model(model)
         return self.filter(content__content_type__exact=content_type)
 
+    def order_by_entries(self):
+        meta = self.model._meta
+        for relation in meta.get_all_related_objects():
+            if relation.model._meta.object_name == 'Entry':
+                accessor = relation.get_accessor_name()
+            if accessor :
+                return self.extra(
+                    select={
+                        'earliest_entry':'SELECT MIN(start_date_time) FROM calendar_entry AS ca WHERE ca.content_id = %s.contentbase_ptr_id' % meta.db_table,
+                    },
+                    order_by=['earliest_entry',],
+                )
+            else:
+                raise Exception('Calendar query model has no relation to the Entry model.')
+
 class CalendarManager(ModelBaseManager):
     use_for_related_fields = True
 
