@@ -24,7 +24,7 @@ class Event(ContentBase):
     objects = CalendarManager()
 
     content = RichTextField(help_text='Full article detailing this event.')
-    castmembers = models.ManyToManyField(CastMember, through='Appearance')
+    castmembers = models.ManyToManyField(CastMember, blank=True, through='Appearance')
 
 
 class Location(ModelBase):
