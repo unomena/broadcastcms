@@ -27,7 +27,7 @@ class Show(ContentBase):
     rating = models.CharField(
         max_length=128, blank=True, default='All Ages', help_text='Age restriction rating.'
     )
-    cast_members = models.ManyToManyField(CastMember, blank=True, help_text='Show cast members.')
+    castmembers = models.ManyToManyField(CastMember, blank=True, help_text='Show cast members.')
     homepage_url = models.URLField(
         max_length=512, blank=True, verbose_name='Homepage URL',
         help_text="External URL to show's homepage."
