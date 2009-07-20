@@ -27,11 +27,11 @@ class CalendarQuerySet(ModelBaseQuerySet):
         # get all the entries that fall inside the specified range
         if start:
             entries = entries.filter(
-                Q(start_date_time__gte=start) | Q(end_date_time__gte=start)
+                Q(start__gte=start) | Q(end__gte=start)
             )
         if end:
             entries = entries.filter(
-                Q(start_date_time__lte=end) | Q(end_date_time__lte=end)
+                Q(start__lte=end) | Q(end__lte=end)
             )
         # filter for the model the query is based upon or return entries
         if self.model._meta.object_name == 'Entry':
@@ -98,7 +98,7 @@ class CalendarQuerySet(ModelBaseQuerySet):
             if accessor :
                 return self.extra(
                     select={
-                        'earliest_entry':'SELECT MIN(start_date_time) FROM calendar_entry AS ca WHERE ca.content_id = %s.contentbase_ptr_id' % meta.db_table,
+                        'earliest_entry':'SELECT MIN(start) FROM calendar_entry AS ca WHERE ca.content_id = %s.contentbase_ptr_id' % meta.db_table,
                     },
                     order_by=['earliest_entry',],
                 )

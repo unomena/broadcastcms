@@ -8,7 +8,7 @@ class EntryLengthNode(template.Node):
 
     def render(self, context):
         obj = self.obj.resolve(context)
-        length = obj.end_date_time - obj.start_date_time
+        length = obj.end - obj.start
         return length.seconds / 60
 
 @register.tag       

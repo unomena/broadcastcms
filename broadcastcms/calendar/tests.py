@@ -26,33 +26,33 @@ class CalendarManagerTests(TestCase):
         objC = self.model.objects.create()
         objD = self.model.objects.create()
         Entry.objects.create(
-            start_date_time=(now - timedelta(days=35)),
-            end_date_time=(now - timedelta(days=15)),
+            start=(now - timedelta(days=35)),
+            end=(now - timedelta(days=15)),
             content=objA,
         )
         Entry.objects.create(
-            start_date_time=(now - timedelta(days=12)),
-            end_date_time=(now - timedelta(days=8)),
+            start=(now - timedelta(days=12)),
+            end=(now - timedelta(days=8)),
             content=objA,
         )
         Entry.objects.create(
-            start_date_time=(now - timedelta(days=1)),
-            end_date_time=(now + timedelta(days=1)),
+            start=(now - timedelta(days=1)),
+            end=(now + timedelta(days=1)),
             content=objB,
         )
         Entry.objects.create(
-            start_date_time=(now + timedelta(days=8)),
-            end_date_time=(now + timedelta(days=12)),
+            start=(now + timedelta(days=8)),
+            end=(now + timedelta(days=12)),
             content=objC,
         )
         Entry.objects.create(
-            start_date_time=(now + timedelta(days=15)),
-            end_date_time=(now + timedelta(days=35)),
+            start=(now + timedelta(days=15)),
+            end=(now + timedelta(days=35)),
             content=objC,
         )
         Entry.objects.create(
-            start_date_time=(now + timedelta(days=40)),
-            end_date_time=(now + timedelta(days=60)),
+            start=(now + timedelta(days=40)),
+            end=(now + timedelta(days=60)),
             content=objD,
         )
 
@@ -143,11 +143,11 @@ class CalendarManagerTests(TestCase):
         # create test data
         objA = objects.create(title='Object A')
         objB = objects.create(title='Object B')
-        entries.create(start_date_time=wed, end_date_time=thu, content=objA)
-        entries.create(start_date_time=thu, end_date_time=sat, content=objB)
-        entries.create(start_date_time=fri, end_date_time=sat, content=objB)
-        entries.create(start_date_time=sat, end_date_time=nxmon, content=objB)
-        entries.create(start_date_time=nxmon, end_date_time=nxtue, content=objA)
+        entries.create(start=wed, end=thu, content=objA)
+        entries.create(start=thu, end=sat, content=objB)
+        entries.create(start=fri, end=sat, content=objB)
+        entries.create(start=sat, end=nxmon, content=objB)
+        entries.create(start=nxmon, end=nxtue, content=objA)
         # test using the data
         self.assertEquals(entries.thisweekend().count(), 3)
         self.assertEquals(objects.thisweekend().count(), 1)
