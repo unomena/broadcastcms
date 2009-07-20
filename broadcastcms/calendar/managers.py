@@ -10,7 +10,6 @@ from broadcastcms.base.models import ContentBase
 
 class CalendarQuerySet(ModelBaseQuerySet):
     def range(self, *args, **kwargs):
-        query = self
         # capture the arguments
         if len(args) == 1: start, end = args[0], None
         elif len(args) == 2: start, end = args
@@ -19,45 +18,28 @@ class CalendarQuerySet(ModelBaseQuerySet):
         # verify the arguments
         if not (start or end):
             raise Exception('Either the start or end (or both) arguments have to be supplied.')
-        # filter for the model the query is based upon
+        # continue the query if it is base on Entry
         if self.model._meta.object_name == 'Entry':
-            if start:
-                query = self.filter(
-                    Q(start_date_time__gte=start) | Q(end_date_time__gte=start)
-                )
-            if end:
-                query = query.filter(
-                    Q(start_date_time__lte=end) | Q(end_date_time__lte=end)
-                )
+            entries = self
+        else:
+            entry_model = models.get_model('calendar', 'entry')
+            entries = entry_model.objects.all()
+        # get all the entries that fall inside the specified range
+        if start:
+            entries = entries.filter(
+                Q(start_date_time__gte=start) | Q(end_date_time__gte=start)
+            )
+        if end:
+            entries = entries.filter(
+                Q(start_date_time__lte=end) | Q(end_date_time__lte=end)
+            )
+        # filter for the model the query is based upon or return entries
+        if self.model._meta.object_name == 'Entry':
+            return entries
         else:
             if not issubclass(self.model, ContentBase):
                 raise Exception('Calendar query model has to based on ContentBase.')
-            entry_model = models.get_model('calendar', 'entry')
-            kwargs = {
-                'et':entry_model._meta.db_table,
-                'ot':self.model._meta.db_table,
-                'pk':self.model._meta.pk.column,
-            }
-            # construct where for start if supplied
-            if start:
-                kwargs.update({'s':start.strftime("TIMESTAMP('%Y-%m-%d %H:%M:%S')")})
-                start_gte_start = '(SELECT MIN(start_date_time) FROM %(et)s WHERE %(et)s.content_id = %(ot)s.%(pk)s) >= %(s)s' % kwargs
-                end_gte_start = '(SELECT MAX(end_date_time) FROM %(et)s WHERE %(et)s.content_id = %(ot)s.%(pk)s) >= %(s)s' % kwargs
-            # construct where for end if supplied
-            if end:
-                kwargs.update({'e':end.strftime("TIMESTAMP('%Y-%m-%d %H:%M:%S')")})
-                start_lte_end = '(SELECT MIN(start_date_time) FROM %(et)s WHERE %(et)s.content_id = %(ot)s.%(pk)s) <= %(e)s' % kwargs
-                end_lte_end = '(SELECT MAX(end_date_time) FROM %(et)s WHERE %(et)s.content_id = %(ot)s.%(pk)s) <= %(e)s' % kwargs
-            # construct the where string
-            if start and end:
-                where = '(%s OR %s) AND (%s OR %s)' % (start_gte_start, end_gte_start, start_lte_end, end_lte_end)
-            elif start:
-                where = '(%s OR %s)' % (start_gte_start, end_gte_start)
-            elif end:
-                where = '(%s OR %s)' % (start_lte_end, end_lte_end)
-            # add to the query
-            query = self.extra(where=[where,])
-        return query
+            return self.filter(pk__in=entries.values_list('content_id', flat=True))
 
     def next7days(self):
         start = datetime.now()

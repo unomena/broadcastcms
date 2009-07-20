@@ -115,25 +115,51 @@ class CalendarManagerTests(TestCase):
 
     def testNext7Days(self):
         self.generateStandardEntries()
-        self.assertEquals(Entry.objects.all().next7days().count(), 1)
-        self.assertEquals(self.model.objects.all().next7days().count(), 1)
+        self.assertEquals(Entry.objects.next7days().count(), 1)
+        self.assertEquals(self.model.objects.next7days().count(), 1)
 
     def testNext14Days(self):
         self.generateStandardEntries()
-        self.assertEquals(Entry.objects.all().next14days().count(), 2)
-        self.assertEquals(self.model.objects.all().next14days().count(), 2)
+        self.assertEquals(Entry.objects.next14days().count(), 2)
+        self.assertEquals(self.model.objects.next14days().count(), 2)
+
+    def testUpcoming(self):
+        self.generateStandardEntries()
+        self.assertEquals(Entry.objects.upcoming().count(), 4)
+        self.assertEquals(self.model.objects.upcoming().count(), 3)
 
     def testThisWeekend(self):
-        pass
+        now = datetime.now()
+        entries = Entry.objects
+        objects = self.model.objects
+        # setup dat markers
+        wed = (now - timedelta(now.weekday() - 2))
+        thu = (now - timedelta(now.weekday() - 3))
+        fri = (now - timedelta(now.weekday() - 4))
+        sat = (now - timedelta(now.weekday() - 5))
+        sun = (now - timedelta(now.weekday() - 6))
+        nxmon = (now - timedelta(now.weekday() - 7))
+        nxtue = (now - timedelta(now.weekday() - 8))
+        # create test data
+        objA = objects.create(title='Object A')
+        objB = objects.create(title='Object B')
+        entries.create(start_date_time=wed, end_date_time=thu, content=objA)
+        entries.create(start_date_time=thu, end_date_time=sat, content=objB)
+        entries.create(start_date_time=fri, end_date_time=sat, content=objB)
+        entries.create(start_date_time=sat, end_date_time=nxmon, content=objB)
+        entries.create(start_date_time=nxmon, end_date_time=nxtue, content=objA)
+        # test using the data
+        self.assertEquals(entries.thisweekend().count(), 3)
+        self.assertEquals(objects.thisweekend().count(), 1)
 
     def testWeek(self):
+        # todo: add tests
         pass
 
     def testThisMonth(self):
+        # todo: add tests
         pass
 
     def testNextMonth(self):
-        pass
-
-    def testUpcoming(self):
+        # todo: add tests
         pass
