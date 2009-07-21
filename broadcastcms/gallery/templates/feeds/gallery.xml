@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+{% load scaled_image_tags %}
+
+<gallery>
+    <album id="ssp" title="{{ gallery.title }}" description="{{ gallery.description }}" tn="{% scaled_image_url gallery %}">
+        {% for image in gallery.images.all %}
+        <img src="{% scaled_image_url image 722 410 %}" tn="{% scaled_image_url image 80 45 %}" title="" caption="" link="" target="_blank" pause="" />
+        {% endfor %}
+    </album>
+</gallery>

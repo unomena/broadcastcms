@@ -1,9 +1,13 @@
 from django.contrib import admin
 
 from broadcastcms.base.admin import ModelBaseAdmin
-from broadcastcms.scaledimage.admin import ImageInline
 
-from models import Gallery
+from models import Gallery, Image
+
+
+class ImageInline(admin.StackedInline):
+    model = Image
+    extra = 1
 
 
 class GalleryAdmin(ModelBaseAdmin):
