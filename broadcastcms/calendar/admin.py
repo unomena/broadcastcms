@@ -10,9 +10,9 @@ class EntryInline(ModelBaseTabularInline):
 
 
 class EntryAdmin(ModelBaseAdmin):
-    list_display = ('start_date_time', 'end_date_time', 'content', 'is_public')
-    list_filter = ('is_public', 'start_date_time', 'end_date_time', 'content')
-    search_fields = ('start_date_time', 'end_date_time', 'content')
+    list_display = ('start', 'end', 'content', 'is_public')
+    list_filter = ('is_public', 'start', 'end', 'content')
+    search_fields = ('start', 'end', 'content')
 
 
 admin.site.register(Entry, EntryAdmin)

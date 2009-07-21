@@ -40,16 +40,20 @@ def image_path_and_scales(instance, filename):
     I couldn't find a hook through which to set storage attributes prior to actual save.
     TODO: Create proper hook, see FieldFile.
     """
-    # Setup image scales
-    instance.image.storage.scales = get_image_scales(instance)
-    # Return image path
+    # setup image scales
+    # todo: find a better place to put this
+    if not instance.image.storage.scales:
+        instance.image.storage.scales = get_image_scales(instance)
+    # return image path
     return 'content/images/%s' % filename
 
 
 class ScaledImageField(ImageField):
     def __init__(self, *args, **kwargs):
+        scales = kwargs.get('scales', [])
+        if scales: del kwargs['scales']
         options = {
-            'storage':ScaledImageStorage(),
+            'storage':ScaledImageStorage(scales),
             'upload_to':image_path_and_scales,
             'max_length':512,
         }
