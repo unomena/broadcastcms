@@ -79,7 +79,6 @@ class ScaledImageStorage(FileSystemStorage):
             # scale width larger but height smaller:
             return wsf
 
-
     def convert_to_jpeg(self, name, content):
         """
         Convert the supplied image to JPEG.
