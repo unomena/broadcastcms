@@ -1,7 +1,7 @@
 from django.contrib import admin
 from broadcastcms.calendar.admin import EntryInline
 from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseStackedInline
-from models import Event, Location, Province
+from models import Event, City, Location, Province
 
 
 class LocationInline(ModelBaseStackedInline):
@@ -23,5 +23,6 @@ class EventAdmin(ContentBaseAdmin):
     inlines = (LocationInline, EntryInline)
 
 
+admin.site.register(City)
 admin.site.register(Province)
 admin.site.register(Event, EventAdmin)
