@@ -1,4 +1,5 @@
 import urllib
+from django.conf import settings
 
 class ReCaptcha(object):
 
@@ -16,4 +17,9 @@ class ReCaptcha(object):
         f = urllib.urlopen("http://api-verify.recaptcha.net/verify", params)
         result = f.read().split('\n')[0]
         
-        return result == 'true'
+        if result == 'true':
+            return True
+        # to allow for tests a 'debug' response value will succeeds when debug setting is true
+        elif settings.DEBUG and response == "debug":
+            return True
+        return False
