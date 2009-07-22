@@ -36,6 +36,6 @@ def scaled_image_url(parser, token):
     if len(token) == 2:
         return ScaledImageURLNode(token[1])
     elif len(token) == 4:
-        return ScaledImageURLNode(*token[1:3])
+        return ScaledImageURLNode(*token[1:4])
     else:
-        raise Exception('%s tag requires either 3 or 1 arguments (obj, width, height)' % token[0])
+        raise Exception('%s tag requires either 1 or 3 arguments (obj, width, height)' % token[0])
