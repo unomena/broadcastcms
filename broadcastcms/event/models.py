@@ -18,6 +18,9 @@ class City(ModelBase):
         Province, related_name='cities', blank=True, null=True,
         help_text='Province to which the city belongs.',
     )
+    
+    def __unicode__(self):
+        return self.name
 
 
 class Event(ContentBase):
