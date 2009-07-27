@@ -12,6 +12,7 @@ class Chart(ContentBase):
 class Song(ModelBase):
     chart = models.ForeignKey(Chart, related_name='songs')
     title = models.CharField(max_length=255)
+    artist = models.CharField(max_length=255)
     current_position = models.IntegerField()
     previous_position = models.IntegerField()
 
