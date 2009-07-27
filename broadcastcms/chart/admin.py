@@ -7,6 +7,7 @@ from models import *
 
 class SongInline(ModelBaseTabularInline):
     model = Song
+    fk_name = 'chart'
 
 
 class ChartAdmin(ModelBaseAdmin):
