@@ -24,8 +24,8 @@ class Show(ContentBase):
         Label, related_name='shows', blank=True,
         limit_choices_to={'restricted_to__contains': 'show-genres'}
     )
-    rating = models.CharField(
-        max_length=128, blank=True, default='All Ages', help_text='Age restriction rating.'
+    classification = models.CharField(
+        max_length=128, blank=True, default='All Ages', help_text='Classification of the show.'
     )
     castmembers = models.ManyToManyField(CastMember, blank=True, help_text='Show cast members.')
     homepage_url = models.URLField(

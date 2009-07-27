@@ -17,7 +17,7 @@ class ShowAdmin(ContentBaseAdmin):
     
     inlines = (EntryInline,)
     fieldsets = (
-        (None, {'fields': ('title', 'description', 'extended_description', 'rating', 'homepage_url', 'is_public')}),
+        (None, {'fields': ('title', 'description', 'extended_description', 'classification', 'homepage_url', 'is_public')}),
         ('Labels', {'fields': ('labels', 'genres'), 'classes': ('collapse',),}),
         ('Cast & Crew', {'fields': ('castmembers',), 'classes': ('collapse',),}),
         ('Meta', {'fields': ('image', 'created',), 'classes': ('collapse',),}),
