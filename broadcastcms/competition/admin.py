@@ -1,6 +1,14 @@
 from django.contrib import admin
-from models import Competition, Winner
+
+from models import *
+
 from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseTabularInline
+
+
+class OptionInlineAdmin(ModelBaseTabularInline):
+    model = Option
+    fk_name = 'competition'
+    extra = 1
 
 
 class WinnerInlineAdmin(ModelBaseTabularInline):
@@ -19,7 +27,7 @@ class CompetitionAdmin(ContentBaseAdmin):
                   'classes': ('collapse',),
         }),
     )
-    inlines = (WinnerInlineAdmin,)
+    inlines = (OptionInlineAdmin, WinnerInlineAdmin,)
 
 
 admin.site.register(Competition, CompetitionAdmin)
