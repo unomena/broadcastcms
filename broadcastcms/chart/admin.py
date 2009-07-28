@@ -5,13 +5,13 @@ from broadcastcms.base.admin import ModelBaseAdmin, ModelBaseTabularInline
 from models import *
 
 
-class SongInline(ModelBaseTabularInline):
-    model = Song
+class ChartEntryInline(ModelBaseTabularInline):
+    model = ChartEntry
     fk_name = 'chart'
 
 
 class ChartAdmin(ModelBaseAdmin):
-    inlines = (SongInline,)
+    inlines = (ChartEntryInline,)
     save_on_top = True
 
 
