@@ -3,7 +3,10 @@ from broadcastcms.base.models import ModelBase
 from broadcastcms.scaledimage.storage import ScaledImageStorage
 
 class Banner(ModelBase):
-    title = models.CharField(max_length='256', help_text='A short descriptive title.')
+    title = models.CharField(
+        max_length='256', 
+        help_text='A short descriptive title.'
+    ) 
     
     def __unicode__(self):
         return self.title
@@ -16,8 +19,16 @@ class CodeBanner(Banner):
         verbose_name_plural = "Code Banners"
 
 class ImageBanner(Banner):
-    image = models.ImageField(upload_to='content_images', help_text='Image to be used for this banner.', storage=ScaledImageStorage(scales=((300, 250),)))
-    url = models.URLField(max_length='512', verbose_name="URL", help_text='URL (internal or external) to which this banner will link.')
+    image = models.ImageField(
+        upload_to='content_images', 
+        help_text='Image to be used for this banner.', 
+        storage=ScaledImageStorage()
+    )
+    url = models.URLField(
+        max_length='512', 
+        verbose_name="URL", 
+        help_text='URL (internal or external) to which this banner will link.'
+    )
 
     class Meta():
         verbose_name = "Image Banner"

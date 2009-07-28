@@ -1,4 +1,5 @@
 from django.db import models
+
 from broadcastcms.fields import modelfields
 from broadcastcms.base.models import ModelBase
 
