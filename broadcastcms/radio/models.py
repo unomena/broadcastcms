@@ -13,6 +13,10 @@ class Song(ModelBase):
     title = models.CharField(max_length=255)
     album = models.CharField(max_length=255, blank=True, null=True)
     artists = models.ManyToManyField('Artist', through='Credit')
+    video_url = models.CharField('Video URL', max_length=255, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.title
 
 
 class Credit(models.Model):
