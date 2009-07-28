@@ -19,3 +19,4 @@ class ChartEntry(ModelBase):
     class Meta:
         verbose_name = 'Song'
         verbose_name_plural = 'Songs'
+        ordering = ['current_position',]
