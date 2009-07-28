@@ -1,6 +1,7 @@
 from django.db import models
 
 from broadcastcms.base.models import ContentBase, ModelBase
+from broadcastcms.radio.models import Song
 
 
 class Chart(ContentBase):
@@ -9,10 +10,9 @@ class Chart(ContentBase):
         verbose_name_plural = 'Charts'
 
 
-class Song(ModelBase):
-    chart = models.ForeignKey(Chart, related_name='songs')
-    title = models.CharField(max_length=255)
-    artist = models.CharField(max_length=255)
+class ChartEntry(ModelBase):
+    chart = models.ForeignKey(Chart, related_name='chartentries')
+    song = models.ForeignKey(Song, related_name='chartentries')
     current_position = models.IntegerField()
     previous_position = models.IntegerField()
 
