@@ -5,6 +5,7 @@ from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseTabularInline
 
 class WinnerInlineAdmin(ModelBaseTabularInline):
     model = Winner
+    fk_name = 'competition'
     extra = 1
 
 
