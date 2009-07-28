@@ -11,12 +11,11 @@ class Artist(ContentBase):
 
 class Song(ModelBase):
     title = models.CharField(max_length=255)
-    current_position = models.IntegerField()
-    previous_position = models.IntegerField()
+    album = models.CharField(max_length=255, blank=True, null=True)
     artists = models.ManyToManyField('Artist', through='Credit')
 
 
 class Credit(models.Model):
     artist = models.ForeignKey(Artist, related_name='credits')
     song = models.ForeignKey(Song, related_name='credits')
-    role = models.CharField(max_length=255)
+    role = models.CharField(max_length=255, blank=True, null=True)
