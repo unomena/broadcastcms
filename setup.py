@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='broadcastcms',
     version='dev',
-    #version='0.9.5',
+    #version='0.9.7',
     description='Broadcast CMS Django Applications',
     author='Praekelt Consulting',
     author_email='sysadmin@praekeltconsulting.com',
