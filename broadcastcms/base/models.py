@@ -107,7 +107,18 @@ class ModelBase(PermissionBase):
     
 
     def as_leaf_class(self):
-        return self.__getattribute__(self.classname.lower())
+        """
+        Inspired by http://www.djangosnippets.org/snippets/1031/
+        """
+        try:
+            return self.__getattribute__(self.classname.lower())
+        except AttributeError:
+            content_type = self.content_type
+            model = content_type.model_class()
+            if(model == ModelBase):
+                return self
+            return model.objects.get(id=self.id)
+
 
     def delete(self, *args, **kwargs):
         for related in self._meta.get_all_related_objects():
