@@ -30,8 +30,11 @@ class Event(ContentBase):
     castmembers = models.ManyToManyField(CastMember, blank=True, through='Appearance')
 
     def get_start(self):
-        first_entry = self.entries.order_by('start')[0]
-        return first_entry.start
+        entries = self.entries.order_by('start')
+        if len(entries):
+            return entries[0].start
+        else:
+            return None
     start = property(get_start)
 
 
