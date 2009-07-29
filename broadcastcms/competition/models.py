@@ -1,5 +1,6 @@
 from django.db import models
 from broadcastcms.base.models import ModelBase, ContentBase
+from broadcastcms.base.managers import ModelBaseManager
 from broadcastcms.richtext.fields import RichTextField
 
 
@@ -11,6 +12,8 @@ class Competition(ContentBase):
 
 
 class Option(ModelBase):
+    objects = ModelBaseManager()
+
     competition = models.ForeignKey(Competition, related_name='options')
     title = models.CharField(max_length=255)
 
@@ -19,6 +22,8 @@ class Option(ModelBase):
 
 
 class Winner(ModelBase):
+    objects = ModelBaseManager()
+
     competition = models.ForeignKey(Competition, related_name='winners')
     name = models.CharField(max_length=255)
     date = models.DateField()
