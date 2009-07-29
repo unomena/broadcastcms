@@ -19,7 +19,7 @@ class WinnerInlineAdmin(ModelBaseTabularInline):
 
 class CompetitionAdmin(ContentBaseAdmin):
     fieldsets = (
-        (None, {'fields': ('title', 'description', 'content', 'rules', 'question', 'closing_date', 'is_public')}),
+        (None, {'fields': ('title', 'description', 'content', 'rules', 'question', 'start', 'end', 'is_public')}),
         ('Labels', {'fields': ('labels',),
                     'classes': ('collapse',),
         }),

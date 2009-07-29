@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from broadcastcms.base.models import ModelBase, ContentBase
 from broadcastcms.base.managers import ModelBaseManager
@@ -6,9 +7,17 @@ from broadcastcms.richtext.fields import RichTextField
 
 class Competition(ContentBase):
     content = RichTextField(help_text='Full article detailing this competition.')
-    closing_date = models.DateField(blank=True, null=True, help_text='Date on which this competition closes.')
+    start = models.DateField(blank=True, null=True, help_text='Date on which this competition opens.')
+    end = models.DateField(blank=True, null=True, help_text='Date on which this competition ends.')
     rules = RichTextField(help_text='Rules specific to this competition.')
     question = RichTextField(blank=True, null=True, help_text='Question to be answered by contestants.')
+
+    def active(self):
+        now = datetime.now()
+        active = True
+        if self.start: active &= self.start < now
+        if self.end: active &= self.end > now
+        return active
 
 
 class Option(ModelBase):
