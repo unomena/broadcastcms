@@ -29,6 +29,11 @@ class Event(ContentBase):
     content = RichTextField(help_text='Full article detailing this event.')
     castmembers = models.ManyToManyField(CastMember, blank=True, through='Appearance')
 
+    def get_start(self):
+        first_entry = self.entries.order_by('start')[0]
+        return first_entry.start
+    start = property(get_start)
+
 
 class Location(ModelBase):
     address = models.CharField(max_length=512, help_text='Physical venue address.')
