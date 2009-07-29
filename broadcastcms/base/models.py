@@ -11,6 +11,9 @@ from broadcastcms.richtext.fields import RichTextField
 
 from managers import ModelBaseManager, PermittedManager
 
+
+# Models
+
 def slugify(self):
     """
     URL friendly slugs are generated using django.template.defaultfilters' slugify.
@@ -75,7 +78,6 @@ class ModelBase(PermissionBase):
     It should be seen as adding value to child classes primaraly through functions, base classes 
     should provide model fields specific to their requirements.  
     """
-    default_manager = ModelBaseManager()
     objects = ModelBaseManager()
 
     slug = models.SlugField(
@@ -128,7 +130,6 @@ class ModelBase(PermissionBase):
 
 
 class ContentBase(ModelBase):
-    default_manager = ModelBaseManager()
     objects = ModelBaseManager()
     permitted = PermittedManager()
 
@@ -185,8 +186,10 @@ def set_managers(sender, **kwargs):
         try:
             if cls.objects.__class__ == models.Manager:
                 cls.add_to_class('objects', ModelBaseManager())
+                cls.add_to_class('_default_manager', ModelBaseManager())
         except AttributeError:
             cls.add_to_class('objects', ModelBaseManager())
+            cls.add_to_class('_default_manager', ModelBaseManager())
 
     if issubclass(cls, PermissionBase):
         cls.add_to_class('permitted', PermittedManager())

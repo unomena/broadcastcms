@@ -12,8 +12,6 @@ class Competition(ContentBase):
 
 
 class Option(ModelBase):
-    objects = ModelBaseManager()
-
     competition = models.ForeignKey(Competition, related_name='options')
     title = models.CharField(max_length=255)
 
@@ -22,8 +20,6 @@ class Option(ModelBase):
 
 
 class Winner(ModelBase):
-    objects = ModelBaseManager()
-
     competition = models.ForeignKey(Competition, related_name='winners')
     name = models.CharField(max_length=255)
     date = models.DateField()
