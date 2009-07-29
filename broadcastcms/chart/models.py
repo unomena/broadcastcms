@@ -1,6 +1,7 @@
 from django.db import models
 
 from broadcastcms.base.models import ContentBase, ModelBase
+from broadcastcms.base.managers import ModelBaseManager
 from broadcastcms.radio.models import Song
 
 
@@ -11,6 +12,8 @@ class Chart(ContentBase):
 
 
 class ChartEntry(ModelBase):
+    objects = ModelBaseManager()
+
     chart = models.ForeignKey(Chart, related_name='chartentries')
     song = models.ForeignKey(Song, related_name='chartentries')
     current_position = models.IntegerField()
