@@ -26,12 +26,17 @@ class RichTextField(models.TextField):
         super(RichTextField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class':RichTextFormField}
+        defaults = {
+            'form_class': RichTextFormField,
+            'widget': RichTextWidget,
+        }
         defaults.update(kwargs)
         return super(RichTextField, self).formfield(**defaults)
         
 
 class RichTextFormField(forms.fields.Field):
+    widget = RichTextWidget
+
     def __init__(self, *args, **kwargs):
-        self.widget = RichTextWidget()
+        kwargs.update({'widget':RichTextWidget})
         super(RichTextFormField, self).__init__(*args, **kwargs)
