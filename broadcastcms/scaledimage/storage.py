@@ -1,12 +1,15 @@
 import random
+import shutil
+from cStringIO import StringIO
+from math import ceil
+import os
+
+from PIL import Image, ImageFilter
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.storage import FileSystemStorage
 from django.core.files.base import ContentFile
 from django.utils.encoding import force_unicode
-from cStringIO import StringIO
-from PIL import Image, ImageFilter
-from math import ceil
-from django.core.files.uploadedfile import InMemoryUploadedFile
-import os
 
 
 class ScaledImageStorage(FileSystemStorage):
@@ -140,23 +143,13 @@ class ScaledImageStorage(FileSystemStorage):
         return force_unicode(name.replace('\\', '/'))
 
     def delete(self, name):
-        super(ScaledImageStorage, self).delete(name) 
+        """
+        Delete original and scaled images
+        """
         name = self.path(name)
         path = name[:name.rindex('/')]
-        # delete all scaled images
-        for scale in self.scales:
-            width = scale[0]
-            height = scale[1]
-            try:
-                dot_index = name.rindex('.')
-            except ValueError: # filename has no dot
-                scaled_name = '%s/%sx%s' % (path, width, height)
-            else:
-                scaled_name = '%s/%sx%s%s' % (path, width, height, name[dot_index:])
-            # if the scaled file exists, delete it from the filesystem.
-            if os.path.exists(scaled_name):
-                os.remove(scaled_name)
-        os.rmdir(path)
+        shutil.rmtree(path)
+        super(ScaledImageStorage, self).delete(name) 
         
     def get_available_name(self, name):
         """
