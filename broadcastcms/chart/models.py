@@ -12,8 +12,6 @@ class Chart(ContentBase):
 
 
 class ChartEntry(ModelBase):
-    objects = ModelBaseManager()
-
     chart = models.ForeignKey(Chart, related_name='chartentries')
     song = models.ForeignKey(Song, related_name='chartentries')
     current_position = models.IntegerField()
