@@ -28,6 +28,7 @@ class ScalesImageTest(TestCase):
 
         call_command('syncdb', verbosity=0, interactive=False)
 
+        self.original_scales = settings.IMAGE_SCALES
         settings.IMAGE_SCALES = {
             'scaledimage': {
                 'Trunk': {'image': ((50, 50), (100, 100))},
@@ -86,3 +87,6 @@ class ScalesImageTest(TestCase):
         # test removal
         obj.delete()
         self.assertEquals(os.access(path, os.F_OK), False)
+
+    def tearDown(self):
+        settings.IMAGE_SCALES = self.original_scales
