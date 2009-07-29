@@ -4,13 +4,59 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
-from django.template.defaultfilters import slugify
+from django.template import defaultfilters
 
 from broadcastcms.scaledimage import ScaledImageField
 from broadcastcms.richtext.fields import RichTextField
 
 from managers import ModelBaseManager, PermittedManager
 
+def slugify(self):
+    """
+    URL friendly slugs are generated using django.template.defaultfilters' slugify.
+    Numbers are added to the end of slugs for uniqueness.
+       
+    # Slug is generate from id.
+    >>> a = ModelBase.objects.create()
+    >>> slugify(a)
+    u'1'
+
+    # Slug is generated from title.
+    >>> a = ContentBase(title='title')
+    >>> slugify(a)
+    u'title'
+
+    # On subsequent saves slug should not change.
+    >>> a.save()
+    >>> slugify(a)
+    u'title'
+        
+    # Numbers are added to slug if slug already exists.
+    >>> b = ContentBase(title='title')
+    >>> slugify(b)
+    u'title-1'
+        
+    # Number tail is incremented by 1.
+    >>> b.save()
+    >>> c = ContentBase(title='title')
+    >>> slugify(c)
+    u'title-2'
+    """
+    # get the title from either the title or the id
+    title = getattr(self, 'title', None) or self.id
+    # slugify with the default django filter
+    slug = defaultfilters.slugify(title)
+    if self.slug == slug:
+        return slug
+    
+    #check to see if slug exists, increment slug tail if it does
+    slugs = [content.slug for content in self.__class__.objects.all()]
+    i = 1
+    numbered_slug = slug
+    while numbered_slug in slugs:
+        numbered_slug = "%s-%s" % (slug, i)
+        i += 1
+    return numbered_slug
 
 class PermissionBase(models.Model):
     is_public = models.BooleanField(
@@ -46,59 +92,17 @@ class ModelBase(PermissionBase):
         editable=False, 
         null=True
     )
+    labels =  models.ManyToManyField(
+        'label.Label', blank=True, help_text='Labels categorizing this item.'
+    )
 
     def save(self, *args, **kwargs):
         if(not self.content_type):
             self.content_type = ContentType.objects.get_for_model(self.__class__)
         self.classname = self.__class__.__name__
-        self.slug = self.slugify()
+        self.slug = slugify(self)
         super(ModelBase, self).save(*args, **kwargs)
     
-    def slugify(self):
-        """
-        URL friendly slugs are generated using django.template.defaultfilters' slugify.
-        Numbers are added to the end of slugs for uniqueness.
-       
-        # Slug is generate from id.
-        >>> a = ModelBase.objects.create()
-        >>> a.slugify()
-        u'1'
-
-        # Slug is generated from title.
-        >>> a = ContentBase(title='title')
-        >>> a.slugify()
-        u'title'
-
-        # On subsequent saves slug should not change.
-        >>> a.save()
-        >>> a.slugify()
-        u'title'
-        
-        # Numbers are added to slug if slug already exists.
-        >>> b = ContentBase(title='title')
-        >>> b.slugify()
-        u'title-1'
-        
-        # Number tail is incremented by 1.
-        >>> b.save()
-        >>> c = ContentBase(title='title')
-        >>> c.slugify()
-        u'title-2'
-        """
-        # get the title from either the title or the id
-        title = getattr(self, 'title', None) or self.id
-        # slugify with the default django filter
-        slug = slugify(title)
-        if self.slug == slug:
-            return slug
-        
-        slugs = [content.slug for content in ContentBase.objects.all()]
-        i = 1
-        numbered_slug = slug
-        while numbered_slug in slugs:
-            numbered_slug = "%s-%s" % (slug, i)
-            i += 1
-        return numbered_slug
 
     def as_leaf_class(self):
         return self.__getattribute__(self.classname.lower())
@@ -122,9 +126,6 @@ class ContentBase(ModelBase):
     )
     description = models.TextField(
         help_text='A short description. More verbose than the title but limited to one or two sentences.'
-    )
-    labels =  models.ManyToManyField(
-        'label.Label', blank=True, help_text='Labels categorizing this item.'
     )
     created = models.DateTimeField(
         'Created Date & Time', blank=True,
