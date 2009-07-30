@@ -12,8 +12,8 @@ class Competition(ContentBase):
     rules = RichTextField(help_text='Rules specific to this competition.')
     question = RichTextField(blank=True, null=True, help_text='Question to be answered by contestants.')
 
-    def active(self):
-        now = datetime.now()
+    def is_active(self):
+        now = datetime.now().date()
         active = True
         if self.start: active &= self.start < now
         if self.end: active &= self.end > now
