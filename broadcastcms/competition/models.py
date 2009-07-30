@@ -1,5 +1,8 @@
 from datetime import datetime
+
 from django.db import models
+from django.contrib.auth.models import User
+
 from broadcastcms.base.models import ModelBase, ContentBase
 from broadcastcms.base.managers import ModelBaseManager
 from broadcastcms.richtext.fields import RichTextField
@@ -26,6 +29,13 @@ class Option(ModelBase):
 
     def __unicode__(self):
         return self.title
+
+
+class CompetitionEntry(models.Model):
+    competition = models.ForeignKey(Competition, related_name='competition_entries')
+    user = models.ForeignKey(User, related_name='competition_entries')
+    option = models.ForeignKey(Option, related_name='competition_entries')
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class Winner(ModelBase):

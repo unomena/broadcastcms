@@ -5,13 +5,19 @@ from models import *
 from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseTabularInline
 
 
-class OptionInlineAdmin(ModelBaseTabularInline):
+class OptionInline(ModelBaseTabularInline):
     model = Option
     fk_name = 'competition'
     extra = 1
 
 
-class WinnerInlineAdmin(ModelBaseTabularInline):
+class CompetitionEntryInline(admin.TabularInline):
+    model = CompetitionEntry
+    fk_name = 'competition'
+    extra = 1
+
+
+class WinnerInline(ModelBaseTabularInline):
     model = Winner
     fk_name = 'competition'
     extra = 1
@@ -27,7 +33,7 @@ class CompetitionAdmin(ContentBaseAdmin):
                   'classes': ('collapse',),
         }),
     )
-    inlines = (OptionInlineAdmin, WinnerInlineAdmin,)
+    inlines = (OptionInline, WinnerInline, CompetitionEntryInline,)
 
 
 admin.site.register(Competition, CompetitionAdmin)
