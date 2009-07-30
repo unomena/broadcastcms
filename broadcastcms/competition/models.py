@@ -18,8 +18,8 @@ class Competition(ContentBase):
     def is_active(self):
         now = datetime.now().date()
         active = True
-        if self.start: active &= self.start < now
-        if self.end: active &= self.end > now
+        if self.start: active &= self.start <= now
+        if self.end: active &= self.end >= now
         return active
 
 
