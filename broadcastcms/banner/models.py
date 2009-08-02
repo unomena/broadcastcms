@@ -1,6 +1,6 @@
 from django.db import models
 from broadcastcms.base.models import ModelBase
-from broadcastcms.scaledimage.storage import ScaledImageStorage
+from broadcastcms.scaledimage import ScaledImageField
 
 class Banner(ModelBase):
     title = models.CharField(
@@ -19,10 +19,8 @@ class CodeBanner(Banner):
         verbose_name_plural = "Code Banners"
 
 class ImageBanner(Banner):
-    image = models.ImageField(
-        upload_to='content_images', 
+    image = ScaledImageField(
         help_text='Image to be used for this banner.', 
-        storage=ScaledImageStorage()
     )
     url = models.URLField(
         max_length='512', 
