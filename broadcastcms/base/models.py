@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.template import defaultfilters
+from django.contrib.auth.models import User
 
 from broadcastcms.scaledimage import ScaledImageField
 from broadcastcms.richtext.fields import RichTextField
@@ -155,6 +156,11 @@ class ContentBase(ModelBase):
         null=True,
         choices=[(n, str(n)) for n in range(1,6)],
         help_text='Rating for this item.',
+    )
+    owner = models.ForeignKey(
+        User, 
+        blank=True,
+        null=True,
     )
 
     def save(self, *args, **kwargs):
