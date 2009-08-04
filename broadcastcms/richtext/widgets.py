@@ -45,7 +45,7 @@ class RichTextWidget(forms.TextInput):
                 %(id)s = new nicEditor({
                     iconsPath:'%(media_url)s/img/nicEditorIcons.gif',
                     buttonList: [
-                        'bold', 'italic', 'undeline', 'left', 'center', 'right',
+                        'bold', 'italic', 'fontSize', 'fontFormat', 'undeline', 'left', 'center', 'right',
                         'justify', 'ol', 'ul', 'strikethrough', 'removeformat',
                         'indent', 'outdent', 'hr', 'forecolor', 'link', 'unlink',
                         'xhtml'
