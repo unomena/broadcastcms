@@ -44,10 +44,12 @@ class Show(ContentBase):
         for entry in entries:
             start_date = entry.start.date()
             start_time = entry.start.time()
-            if time_dict.has_key(start_time):
-                time_dict[start_time].append(start_date)
+            end_time = entry.end.time()
+            time = (start_time, end_time)
+            if time_dict.has_key(time):
+                time_dict[time].append(start_date)
             else:
-                time_dict[start_time] = [start_date,]
+                time_dict[time] = [start_date,]
         time_list = []
         for time in time_dict:
             days = []
@@ -56,7 +58,7 @@ class Show(ContentBase):
 
             days = [day for day in set(days)]
             days.sort()
-            item = {'time': time, 'days': days}
+            item = {'start_time': time[0], 'end_time': time[1], 'days': days}
             for cat in cats:
                 if days == cats[cat]:
                     item['days'] = cat
