@@ -100,7 +100,7 @@ class ScaledImageStorage(FileSystemStorage):
         image = Image.open(StringIO(original_image_data))
         # save as jpeg in memory
         image_file = StringIO()
-        image.save(image_file, 'JPEG', quality=90)
+        image.save(image_file, 'JPEG', quality=100)
         # create new content object
         image_file.seek(0)
         converted_content = ContentFile(image_file.read()) 
@@ -133,7 +133,7 @@ class ScaledImageStorage(FileSystemStorage):
             # create scaled content
             scaled_image = self.scale_and_crop_image(content, width, height)
             image_file = StringIO()
-            scaled_image.save(image_file, 'JPEG', quality=85)
+            scaled_image.save(image_file, 'JPEG', quality=93)
             image_file.seek(0)
             scaled_content = ContentFile(image_file.read())
             # save scaled content
