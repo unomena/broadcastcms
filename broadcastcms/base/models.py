@@ -164,7 +164,7 @@ class ContentBase(ModelBase):
     )
 
     def save(self, *args, **kwargs):
-        if not self.id:
+        if not self.id and not self.created:
             self.created = datetime.now()
         self.modified = datetime.now()
         super(ContentBase, self).save(*args, **kwargs)
