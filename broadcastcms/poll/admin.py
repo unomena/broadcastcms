@@ -1,9 +1,9 @@
 from django.contrib import admin
-from models import Poll, Option
+from models import Poll, PollOption
 from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseTabularInline
 
-class OptionInline(ModelBaseTabularInline):
-    model = Option
+class PollOptionInline(ModelBaseTabularInline):
+    model = PollOption
     fk_name = 'poll'
     extra = 1
 
@@ -19,7 +19,7 @@ class PollAdmin(ContentBaseAdmin):
         }),
     )
     
-    inlines = (OptionInline,)
+    inlines = (PollOptionInline,)
 
 
 admin.site.register(Poll, PollAdmin)

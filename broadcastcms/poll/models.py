@@ -8,15 +8,15 @@ class Poll(ContentBase):
         verbose_name_plural = 'Polls'
 
 
-class Option(ModelBase):
+class PollOption(ModelBase):
     poll = models.ForeignKey(Poll, related_name='options')
     title = models.CharField(max_length=512)
     votes = models.PositiveIntegerField(default=0)
     percentage = models.FloatField(default=0)
 
     class Meta:
-        verbose_name = 'Option'
-        verbose_name_plural = 'Options'
+        verbose_name = 'Poll Option'
+        verbose_name_plural = 'Poll Options'
 
     def __unicode__(self):
         return '%s - %s' % (self.poll, self.title)
