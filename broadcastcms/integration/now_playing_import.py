@@ -47,6 +47,9 @@ def createSong(artist_title, song_title, role):
     created = False
     
     artist, created = Artist.objects.get_or_create(title=artist_title)
+    if not artist.is_public:
+        artist.is_public = True
+        artist.save()
     
     songs = Song.objects.filter(title__iexact=song_title)
     if songs:
