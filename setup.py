@@ -15,4 +15,5 @@ setup(
     install_requires = [
         'PIL==1.1.6',
     ],
+    include_package_data=True,    
 )
