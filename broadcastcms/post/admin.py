@@ -8,7 +8,7 @@ class PostAdmin(ContentBaseAdmin):
         ('Labels', {'fields': ('labels',),
                     'classes': ('collapse',),
         }),
-        ('Meta', {'fields': ('image', 'created',),
+        ('Meta', {'fields': ('image', 'created', 'owner'),
                   'classes': ('collapse',),
         }),
     )
