@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
+from django.contrib.auth.models import User
+
 from broadcastcms.shortcuts import comma_seperated_admin_links
 from broadcastcms.label.models import Label
 
@@ -62,6 +64,7 @@ class ContentBaseAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContentBaseAdminForm, self).__init__(*args, **kwargs)
         self.fields['labels'].choices = self.get_label_choices('labels')
+        #self.fields['owner'].choices = self.get_owner_choices()
 
     def get_label_choices(self, field_name):
         labels = Label.objects.filter(restricted_to__contains='%s-%s' % (self._meta.model._meta.object_name.lower(), field_name))
@@ -69,6 +72,13 @@ class ContentBaseAdminForm(forms.ModelForm):
         for label in labels:
             choices.append((label.id, str(label)))
         return choices
+
+    def get_owner_choices(self):
+        choices = []
+        for user in User.objects.filter(is_staff=True):
+            choices.append((user.id, str(user)))
+        return choices
+
 
 class ContentBaseAdmin(ModelBaseAdmin):
     form = ContentBaseAdminForm
@@ -86,3 +96,8 @@ class ContentBaseAdmin(ModelBaseAdmin):
         }),
     )
    
+    def save_model(self, request, obj, form, change):
+        if not obj.owner:
+            obj.owner = request.user
+            obj.save()
+        return super(ContentBaseAdmin, self).save_model(request, obj, form, change)
