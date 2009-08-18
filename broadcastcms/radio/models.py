@@ -12,7 +12,7 @@ class Artist(ContentBase):
 class Song(ContentBase):
     album = models.CharField(max_length=255, blank=True, null=True)
     artists = models.ManyToManyField('Artist', through='Credit')
-    video_url = models.CharField('Video URL', max_length=255, blank=True, null=True)
+    video_embed = models.TextField('Video Embed Tag', blank=True, null=True)
 
 class Credit(models.Model):
     artist = models.ForeignKey(Artist, related_name='credits')
