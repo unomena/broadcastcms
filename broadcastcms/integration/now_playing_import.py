@@ -1,31 +1,11 @@
-from optparse import OptionParser
 import urllib
 import xml.dom.minidom
 from random import randint
 
-from django.core.management import setup_environ
-
-def setup_develop(option, opt_str, value, parser):
-    from trufm import develop_settings
-    setup_environ(develop_settings)
-
-def setup_production(option, opt_str, value, parser):
-    from trufm import production_settings
-    setup_environ(production_settings)
-
-parser = OptionParser()
-parser.add_option("-d", "--develop", action="callback", callback=setup_develop, help="Import to the development database")
-parser.add_option("-p", "--production", action="callback", callback=setup_production, help="Import to the production database")
-
-(options, args) = parser.parse_args()
-if len(sys.argv) != 2:
-        parser.error("Incorrect number of arguments")
-
-
 from broadcastcms.radio.models import Artist, Song, Credit
 from broadcastcms.calendar.models import Entry
 
-def fetchDom():
+def fetch_dom():
     data = urllib.urlopen("http://mailers.trufm.co.za/nowplaying/onair.xml?%s" % randint(1,9999999)).read()
     try:
         dom = xml.dom.minidom.parseString(data)
@@ -34,7 +14,7 @@ def fetchDom():
     return dom
     
 
-def getTextByTagName(parent, name):
+def get_text_by_tag_name(parent, name):
     elements = parent.getElementsByTagName(name)
     if elements:
         text_nodes = elements[0].childNodes
@@ -42,7 +22,7 @@ def getTextByTagName(parent, name):
             return text_nodes[0].data
     return None
 
-def createSong(artist_title, song_title, role):
+def create_song(artist_title, song_title, role):
     song = None
     created = False
     
@@ -68,10 +48,10 @@ def createSong(artist_title, song_title, role):
 
     return song
 
-def importNowPlaying():
+def import_now_playing():
     entry_created = False
 
-    dom = fetchDom()
+    dom = fetch_dom()
     if not dom:
         print "Error fetching xml, no import made"
         return
@@ -84,7 +64,7 @@ def importNowPlaying():
         current = current_nodes[0]
         next = next_nodes[0]
 
-        item_code = getTextByTagName(current, "itemCode")
+        item_code = get_text_by_tag_name(current, "itemCode")
         if item_code:
             try:
                 int(item_code)
@@ -93,10 +73,10 @@ def importNowPlaying():
                 valid_song = False
 
             if valid_song:
-                song_title = getTextByTagName(current, "titleName")
-                artist_title = getTextByTagName(current, "artistName")
-                start = getTextByTagName(current, "startTime")
-                end = getTextByTagName(next, "startTime")
+                song_title = get_text_by_tag_name(current, "titleName")
+                artist_title = get_text_by_tag_name(current, "artistName")
+                start = get_text_by_tag_name(current, "startTime")
+                end = get_text_by_tag_name(next, "startTime")
 
                 if artist_title and song_title and start and end:
                     artist_title = artist_title.title()
@@ -104,12 +84,10 @@ def importNowPlaying():
                     start = start.replace('T', ' ')
                     end = end.replace('T', ' ')
 
-                    song = createSong(artist_title, song_title, "Performer")
+                    song = create_song(artist_title, song_title, "Performer")
                     entry, entry_created = Entry.objects.get_or_create(start=start, end=end, content=song, is_public=True)
 
     if entry_created:
         print "Created entry %s for song %s" % (entry, song)
     else:
         print "No import made"
-
-importNowPlaying()
