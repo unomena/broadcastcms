@@ -2,6 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.auth.models import User
+from django.db.models import get_model
 
 from broadcastcms.shortcuts import comma_seperated_admin_links
 from broadcastcms.label.models import Label
@@ -9,9 +10,20 @@ from broadcastcms.label.models import Label
 def restrict_fieldsets(request, fieldsets):
     """
     Removes fields user does not have privileges to edit.
-    For now we simply remove the is_public field for non superusers.
+    For now we simply remove the is_public field for non superusers and non owners.
     """
     if request.user.is_superuser:
+        return fieldsets
+    
+    app, model, pk = request.path.split('/')[-4:-1]
+    if pk == 'add':
+        return fieldsets
+
+    model = get_model(app, model)
+    instance = model.objects.get(pk=pk)
+    owner = (request.user == instance.owner)
+
+    if owner:
         return fieldsets
 
     for fieldset in fieldsets:
