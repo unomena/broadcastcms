@@ -22,7 +22,7 @@ class ImageBanner(Banner):
     image = ScaledImageField(
         help_text='Image to be used for this banner.', 
     )
-    url = models.URLField(
+    url = models.CharField(
         max_length='512', 
         verbose_name="URL", 
         help_text='URL (internal or external) to which this banner will link.'

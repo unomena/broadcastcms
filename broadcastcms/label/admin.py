@@ -24,7 +24,8 @@ class LabelAdminForm(forms.ModelForm):
 
         return choices
 
-class LabelAdmin(ModelBaseAdmin):
+
+class LabelAdmin(admin.ModelAdmin):
     form = LabelAdminForm
     list_display = ('title', 'is_visible')
     list_filter = ('is_visible',)

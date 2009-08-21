@@ -1,13 +1,15 @@
+from copy import deepcopy
+
 from django.contrib import admin
 
 from models import *
-
 from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseTabularInline
 
 
 class OptionInline(ModelBaseTabularInline):
     model = Option
     fk_name = 'competition'
+    exclude = ['labels',]
     extra = 1
 
 
@@ -20,20 +22,23 @@ class CompetitionEntryInline(admin.TabularInline):
 class WinnerInline(ModelBaseTabularInline):
     model = Winner
     fk_name = 'competition'
+    exclude = ['labels',]
     extra = 1
 
 
 class CompetitionAdmin(ContentBaseAdmin):
-    fieldsets = (
-        (None, {'fields': ('title', 'description', 'content', 'rules', 'question', 'start', 'end', 'is_public')}),
-        ('Labels', {'fields': ('labels',),
-                    'classes': ('collapse',),
-        }),
-        ('Meta', {'fields': ('image', 'created',),
-                  'classes': ('collapse',),
-        }),
+    
+    fieldsets = deepcopy(ContentBaseAdmin.fieldsets)
+    for fieldset in fieldsets:
+        if fieldset[0] == None:
+            fieldset[1]['fields'] += ('content', 'rules', 'question', 'start', 'end')
+    
+    inlines = (
+        OptionInline, 
+        CompetitionEntryInline,
+        WinnerInline, 
     )
-    inlines = (OptionInline, WinnerInline, CompetitionEntryInline,)
+    save_on_top = True
 
 
 admin.site.register(Competition, CompetitionAdmin)

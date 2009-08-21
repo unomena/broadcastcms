@@ -37,6 +37,13 @@ class CompetitionEntry(models.Model):
     option = models.ForeignKey(Option, related_name='competition_entries')
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Competition Entry'
+        verbose_name_plural = 'Competition Entries'
+
+    def __unicode__(self):
+        return "%s chose %s" % (self.user.username, self.option.title)
+
 
 class Winner(ModelBase):
     competition = models.ForeignKey(Competition, related_name='winners')

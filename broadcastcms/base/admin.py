@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
@@ -6,6 +8,12 @@ from django.db.models import get_model
 
 from broadcastcms.shortcuts import comma_seperated_admin_links
 from broadcastcms.label.models import Label
+
+def comma_seperated_admin_label_links(obj):
+    return comma_seperated_admin_links(obj.labels.all())
+
+comma_seperated_admin_label_links.short_description = 'Labels'
+comma_seperated_admin_label_links.allow_tags = True
 
 def restrict_fieldsets(request, fieldsets):
     """
@@ -36,6 +44,7 @@ def restrict_fieldsets(request, fieldsets):
                         item['fields'] = tuple(fields)
         return fieldsets
 
+
 class ModelBaseInlineModelAdmin(InlineModelAdmin):
         
     def get_fieldsets(self, request, obj=None):
@@ -51,10 +60,36 @@ class ModelBaseInlineModelAdmin(InlineModelAdmin):
 class ModelBaseStackedInline(ModelBaseInlineModelAdmin, admin.StackedInline):
     pass
 
+
 class ModelBaseTabularInline(ModelBaseInlineModelAdmin, admin.TabularInline):
     pass
 
+
+class ModelBaseAdminForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ModelBaseAdminForm, self).__init__(*args, **kwargs)
+        self.fields['labels'].choices = self.get_label_choices('labels')
+
+    def get_label_choices(self, field_name):
+        labels = Label.objects.filter(restricted_to__contains='%s-%s' % (self._meta.model._meta.object_name.lower(), field_name))
+        choices = []
+        for label in labels:
+            choices.append((label.id, str(label)))
+        return choices
+
+
 class ModelBaseAdmin(admin.ModelAdmin):
+    
+    form = ModelBaseAdminForm
+    list_display = (comma_seperated_admin_label_links, 'is_public')
+    list_filter = ('labels', 'is_public',)
+    fieldsets = (
+        (None, {'fields': ('is_public',)}),
+        ('Labels', {'fields': ('labels',),
+                    'classes': ('collapse',),
+        }),
+    )
 
     def get_fieldsets(self, request, obj=None):
         "Hook for specifying fieldsets."
@@ -64,26 +99,13 @@ class ModelBaseAdmin(admin.ModelAdmin):
             form = self.get_form(request, obj)
             fieldsets = [(None, {'fields': form.base_fields.keys()})]
         return restrict_fieldsets(request, fieldsets)
+    
 
-def comma_seperated_admin_label_links(obj):
-    return comma_seperated_admin_links(obj.labels.all())
-
-comma_seperated_admin_label_links.short_description = 'Labels'
-comma_seperated_admin_label_links.allow_tags = True
-
-class ContentBaseAdminForm(forms.ModelForm):
+class ContentBaseAdminForm(ModelBaseAdminForm):
 
     def __init__(self, *args, **kwargs):
         super(ContentBaseAdminForm, self).__init__(*args, **kwargs)
-        self.fields['labels'].choices = self.get_label_choices('labels')
         #self.fields['owner'].choices = self.get_owner_choices()
-
-    def get_label_choices(self, field_name):
-        labels = Label.objects.filter(restricted_to__contains='%s-%s' % (self._meta.model._meta.object_name.lower(), field_name))
-        choices = []
-        for label in labels:
-            choices.append((label.id, str(label)))
-        return choices
 
     def get_owner_choices(self):
         choices = []
@@ -95,14 +117,16 @@ class ContentBaseAdminForm(forms.ModelForm):
 class ContentBaseAdmin(ModelBaseAdmin):
     form = ContentBaseAdminForm
 
-    list_display = ('title', 'description', comma_seperated_admin_label_links, 'created', 'modified', 'is_public')
-    list_filter = ('labels', 'is_public', 'created', 'modified')
+    list_display = ('title', 'owner', 'created', 'modified',) + ModelBaseAdmin.list_display
+    list_filter = ('created', 'modified',) + ModelBaseAdmin.list_filter
     search_fields = ('title', 'description', 'content')
-    fieldsets = (
-        (None, {'fields': ('title', 'description', 'rating', 'is_public')}),
-        ('Labels', {'fields': ('labels',),
-                    'classes': ('collapse',),
-        }),
+    
+    fieldsets = deepcopy(ModelBaseAdmin.fieldsets)
+    for fieldset in fieldsets:
+        if fieldset[0] == None:
+            fieldset[1]['fields'] += ('title', 'description', 'rating',)
+
+    fieldsets += (
         ('Meta', {'fields': ('image', 'created', 'owner'),
                   'classes': ('collapse',),
         }),

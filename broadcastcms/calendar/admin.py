@@ -1,11 +1,16 @@
 from datetime import timedelta
+from copy import deepcopy
+
 from django import forms
 from django.contrib import admin
 from django.forms.formsets import DELETION_FIELD_NAME
 from models import *
 from broadcastcms.base.admin import ModelBaseAdmin, ModelBaseTabularInline
 
-
+# TODO: I'm killing recurring entry inline functionality for now
+# until it's refactored to be more user friendly and all its 
+# associated bugs have been stomped (SS)  
+"""
 RECURRING_CHOICES = (
     ('n', '(None)'),
     ('d', 'Daily'),
@@ -58,12 +63,24 @@ class EntryInline(ModelBaseTabularInline):
     formset = EntryInlineFormSet
     fk_name = 'content'
     extra = 1
+"""
+
+class EntryInline(ModelBaseTabularInline):
+    model = Entry
+    fk_name = 'content'
+    exclude = ['labels',]
 
 
 class EntryAdmin(ModelBaseAdmin):
-    list_display = ('start', 'end', 'content', 'is_public')
-    list_filter = ('is_public', 'start', 'end', 'content')
-    search_fields = ('start', 'end', 'content')
+    list_display = ('start', 'end', 'content',) + ModelBaseAdmin.list_display
+    list_filter = ('start', 'end',) + ModelBaseAdmin.list_filter
+    search_fields = ('start', 'end',)
+    
+    fieldsets = deepcopy(ModelBaseAdmin.fieldsets)
+
+    for fieldset in fieldsets:
+        if fieldset[0] == None:
+            fieldset[1]['fields'] += ('start', 'end', 'content',)
 
 
 admin.site.register(Entry, EntryAdmin)

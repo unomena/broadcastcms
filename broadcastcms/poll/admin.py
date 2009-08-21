@@ -5,21 +5,14 @@ from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseTabularInline
 class PollOptionInline(ModelBaseTabularInline):
     model = PollOption
     fk_name = 'poll'
-    extra = 1
+    exclude = ['labels',]
 
 
 class PollAdmin(ContentBaseAdmin):
-    fieldsets = (
-        (None, {'fields': ('title', 'description', 'is_public')}),
-        ('Labels', {'fields': ('labels',),
-                    'classes': ('collapse',),
-        }),
-        ('Meta', {'fields': ('image', 'created',),
-                  'classes': ('collapse',),
-        }),
+    inlines = (
+        PollOptionInline,
     )
-    
-    inlines = (PollOptionInline,)
+    save_on_top = True
 
 
 admin.site.register(Poll, PollAdmin)

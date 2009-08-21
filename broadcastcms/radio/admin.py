@@ -1,20 +1,35 @@
+from copy import deepcopy
+
 from django.contrib import admin
 
 from broadcastcms.base.admin import ContentBaseAdmin, ModelBaseTabularInline
-
-from models import *
+from models import Artist, Song, Credit
 
 class CreditInline(ModelBaseTabularInline):
     model = Credit
-    extra = 1
 
-class ArtistAdmin(admin.ModelAdmin):
-    inlines = (CreditInline,)
+class ArtistAdmin(ContentBaseAdmin):
+    fieldsets = deepcopy(ContentBaseAdmin.fieldsets)
+    for fieldset in fieldsets:
+        if fieldset[0] == None:
+            fieldset[1]['fields'] += ('content',)
+    
+    inlines = (
+        CreditInline,
+    )
+    save_on_top = True
 
-class SongAdmin(admin.ModelAdmin):
-    inlines = (CreditInline,)
+class SongAdmin(ContentBaseAdmin):
+    fieldsets = deepcopy(ContentBaseAdmin.fieldsets)
+    for fieldset in fieldsets:
+        if fieldset[0] == None:
+            fieldset[1]['fields'] += ('album', 'video_embed',)
+    
+    inlines = (
+        CreditInline,
+    )
+    save_on_top = True
 
 
 admin.site.register(Artist, ArtistAdmin)
 admin.site.register(Song, SongAdmin)
-admin.site.register(Credit)

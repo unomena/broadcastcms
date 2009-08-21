@@ -14,6 +14,7 @@ class Song(ContentBase):
     artists = models.ManyToManyField('Artist', through='Credit')
     video_embed = models.TextField('Video Embed Tag', blank=True, null=True)
 
+
 class Credit(models.Model):
     artist = models.ForeignKey(Artist, related_name='credits')
     song = models.ForeignKey(Song, related_name='credits')

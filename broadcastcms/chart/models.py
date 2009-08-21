@@ -21,3 +21,6 @@ class ChartEntry(ModelBase):
         verbose_name = 'Song'
         verbose_name_plural = 'Songs'
         ordering = ['current_position',]
+
+    def __unicode__(self):
+        return '%s entry %s' % (self.chart.title, self.current_position)

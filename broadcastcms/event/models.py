@@ -16,8 +16,12 @@ class City(ModelBase):
     name = models.CharField(max_length=255, help_text='Name of the city')
     province = models.ForeignKey(
         Province, related_name='cities', blank=True, null=True,
-        help_text='Province to which the city belongs.',
+        help_text='Province in which the city is located.',
     )
+
+    class Meta():
+        verbose_name = 'City'
+        verbose_name_plural = 'Cities'
     
     def __unicode__(self):
         return self.name
