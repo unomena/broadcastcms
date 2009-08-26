@@ -1,16 +1,19 @@
 from django.contrib import admin
 
 from broadcastcms.base.admin import ContentBaseAdmin
-from models import Gallery, Image
+from broadcastcms.base.admin import ModelBaseStackedInline
+from models import Gallery, GalleryImage
 
-
-class ImageInline(admin.StackedInline):
-    model = Image
+class GallerImageInline(ModelBaseStackedInline):
+    model = GalleryImage
+    fk_name = 'gallery'
+    exclude = ['created', 'rating', 'owner', 'labels',]
+    extra = 1
 
 
 class GalleryAdmin(ContentBaseAdmin):
     inlines = (
-        ImageInline,
+        GallerImageInline,
     )
     save_on_top = True
 
