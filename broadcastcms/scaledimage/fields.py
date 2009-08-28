@@ -44,6 +44,7 @@ def image_path_and_scales(instance, filename):
     # todo: find a better place to put this
     if not instance.image.storage.scales:
         instance.image.storage.scales = get_image_scales(instance)
+
     # return image path
     return 'content/images/%s' % filename
 
