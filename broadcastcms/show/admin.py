@@ -3,9 +3,9 @@ from copy import deepcopy
 from django.contrib import admin
 
 from broadcastcms.calendar.admin import EntryInline
-from broadcastcms.base.admin import ModelBaseAdmin, ContentBaseAdmin, comma_seperated_admin_label_links
+from broadcastcms.base.admin import ModelBaseAdmin, ContentBaseAdmin, ModelBaseTabularInline, comma_seperated_admin_label_links
 from broadcastcms.shortcuts import comma_seperated_admin_links
-from models import Show, CastMember
+from models import Show, CastMember, Credit
 
 
 def comma_seperated_admin_genre_links(obj):
@@ -14,6 +14,9 @@ def comma_seperated_admin_genre_links(obj):
 comma_seperated_admin_genre_links.short_description = 'Genres'
 comma_seperated_admin_genre_links.allow_tags = True
 
+
+class CreditInline(ModelBaseTabularInline):
+    model = Credit
 
 class ShowAdmin(ContentBaseAdmin):
     list_display = ContentBaseAdmin.list_display + (comma_seperated_admin_genre_links,)
@@ -27,12 +30,8 @@ class ShowAdmin(ContentBaseAdmin):
         elif fieldset[0] == 'Labels':
             fieldset[1]['fields'] += ('genres',)
 
-    fieldsets += (
-        ('Cast & Crew', {'fields': ('castmembers',), 
-                         'classes': ('collapse',),}),
-    )
-    
     inlines = (
+        CreditInline, 
         EntryInline,
     )
     save_on_top = True
@@ -43,6 +42,11 @@ class CastMemberAdmin(ContentBaseAdmin):
     for fieldset in fieldsets:
         if fieldset[0] == None:
             fieldset[1]['fields'] += ('content', )
+    
+    inlines = (
+        CreditInline, 
+    )
+    save_on_top = True
 
 
 admin.site.register(Show, ShowAdmin)
