@@ -8,6 +8,10 @@ import calendar
 
 class CastMember(ContentBase):
     content = RichTextField(help_text='Full article detailing this castmember.')
+    shows = models.ManyToManyField(
+        'Show', 
+        through='Credit'
+    )
 
     class Meta:
         verbose_name = 'Cast Member'
@@ -27,10 +31,13 @@ class Show(ContentBase):
     classification = models.CharField(
         max_length=128, blank=True, default='All Ages', help_text='Classification of the show.'
     )
-    castmembers = models.ManyToManyField(CastMember, blank=True, help_text='Show cast members.')
     homepage_url = models.URLField(
         max_length=512, blank=True, verbose_name='Homepage URL',
         help_text="External URL to show's homepage."
+    )
+    castmembers = models.ManyToManyField(
+        'CastMember', 
+        through='Credit'
     )
 
     def show_times(self):
@@ -72,3 +79,16 @@ class Show(ContentBase):
     class Meta:
         verbose_name = 'Show'
         verbose_name_plural = 'Shows'
+
+
+class Credit(models.Model):
+    castmember = models.ForeignKey(CastMember, related_name='credits')
+    show = models.ForeignKey(Show, related_name='credits')
+    role = models.CharField(
+        max_length=255, 
+        choices = [('1', 'DJ'), ('2', 'Contributor'), ('3', 'News Reader')],
+        blank=True, 
+        null=True)
+
+    def __unicode__(self):
+        return "%s credit for %s" % (self.castmember.title, self.show.title)
