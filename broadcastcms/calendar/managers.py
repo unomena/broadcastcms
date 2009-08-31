@@ -67,8 +67,13 @@ class CalendarQuerySet(ModelBaseQuerySet):
         """
         now = datetime.now()
         start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
-        start = start + timedelta(days = offset * 7)
-        end = start + timedelta(days=7) - timedelta(microseconds=1)
+        start = start + timedelta(days = offset * 7) 
+        end = start + timedelta(days=7)
+
+        # to force inclusion offset start and end by 1 second
+        start = start + timedelta(seconds=1)
+        end = end - timedelta(seconds=1)
+
         return self.range(start, end)
 
     def thismonth(self):
