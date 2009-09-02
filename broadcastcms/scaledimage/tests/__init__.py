@@ -26,6 +26,14 @@ class ScalesImageTest(TestCase):
             pass
         models.register_models('scaledimage', Leaf)
 
+        class UnspecifiedBranch(Trunk):
+            pass
+        models.register_models('scaledimage', UnspecifiedBranch)
+        
+        class UnspecifiedLeaf(Branch):
+            pass
+        models.register_models('scaledimage', UnspecifiedLeaf)
+
         call_command('syncdb', verbosity=0, interactive=False)
 
         self.original_scales = settings.IMAGE_SCALES
@@ -59,6 +67,18 @@ class ScalesImageTest(TestCase):
         self.assertEquals(
             get_image_scales(obj),
             set(((50, 50), (100, 100), (200, 200), (500, 500), (150, 150), (300, 300)))
+        )
+        
+        obj = models.get_model('scaledimage', 'UnspecifiedBranch')()
+        self.assertEquals(
+            get_image_scales(obj),
+            set(((50, 50), (100, 100),))
+        )
+        
+        obj = models.get_model('scaledimage', 'UnspecifiedLeaf')()
+        self.assertEquals(
+            get_image_scales(obj),
+            set(((50, 50), (100, 100), (200, 200), (500, 500)))
         )
 
     def test_scaling(self):

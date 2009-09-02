@@ -6,7 +6,7 @@ from storage import ScaledImageStorage
 
 def get_image_scales(instance):
     """
-    Returns a set of all the image scales attahced for this model and it's
+    Returns a set of all the image scales attached for this model and it's
     base classes.
     """
     # verify the object type
@@ -19,18 +19,20 @@ def get_image_scales(instance):
     app_label = instance._meta.app_label
     object_name = instance._meta.object_name
 
+    
+    # retrieve the scales from the project settings
     try:
-        # retrieve the scales from the project settings
-        try:
-            image_scales = set(settings.IMAGE_SCALES[app_label][object_name]['image'])
-        except AttributeError:
-            image_scales = set()
-        # recurse through the base classes and collect
-        for base in bases:
-            if issubclass(base, models.Model):
-                image_scales |= get_image_scales(base)
+        image_scales = set(settings.IMAGE_SCALES[app_label][object_name]['image'])
+    except AttributeError:
+        image_scales = set()
     except KeyError:
         image_scales = set()
+
+    # recurse through the base classes and collect
+    for base in bases:
+        if issubclass(base, models.Model):
+            image_scales |= get_image_scales(base)
+    
     return image_scales
 
 
