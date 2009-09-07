@@ -3,7 +3,11 @@ from django.db import models
 from broadcastcms.fields import modelfields
 from broadcastcms.base.models import slugify
 
+from managers import LabelManager
+
 class Label(models.Model):
+    objects = LabelManager()
+
     slug = models.SlugField(
         editable=False,
         max_length='275',
