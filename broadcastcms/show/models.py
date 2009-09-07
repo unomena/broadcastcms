@@ -80,13 +80,13 @@ class Show(ContentBase):
         verbose_name = 'Show'
         verbose_name_plural = 'Shows'
 
-
+CREDIT_CHOICES = [('1', 'DJ'), ('2', 'Contributor'), ('3', 'News Reader')]
 class Credit(models.Model):
     castmember = models.ForeignKey(CastMember, related_name='credits')
     show = models.ForeignKey(Show, related_name='credits')
     role = models.CharField(
         max_length=255, 
-        choices = [('1', 'DJ'), ('2', 'Contributor'), ('3', 'News Reader')],
+        choices = CREDIT_CHOICES,
         blank=True, 
         null=True)
 
