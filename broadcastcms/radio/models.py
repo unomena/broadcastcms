@@ -15,10 +15,22 @@ class Song(ContentBase):
     video_embed = models.TextField('Video Embed Tag', blank=True, null=True)
 
 
+CREDIT_CHOICES = [('1', 'Performer'), ('2', 'Contributor'), ('3', 'Writer'), ('4', 'Producer')]
 class Credit(models.Model):
-    artist = models.ForeignKey(Artist, related_name='credits')
-    song = models.ForeignKey(Song, related_name='credits')
-    role = models.CharField(max_length=255, blank=True, null=True)
+    artist = models.ForeignKey(
+        Artist, 
+        related_name='credits'
+    )
+    song = models.ForeignKey(
+        Song, 
+        related_name='credits'
+    )
+    role = models.CharField(
+        max_length=255, 
+        choices = CREDIT_CHOICES,
+        blank=True, 
+        null=True,
+    )
 
     def __unicode__(self):
         return "%s credit for %s" % (self.artist.title, self.song.title)
