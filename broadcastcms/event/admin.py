@@ -4,7 +4,12 @@ from django.contrib import admin
 
 from broadcastcms.calendar.admin import EntryInline
 from broadcastcms.base.admin import ModelBaseAdmin, ContentBaseAdmin, ModelBaseStackedInline, ModelBaseTabularInline
-from models import Event, City, Location, Province
+from models import Event, City, Location, Province, Appearance
+
+class AppearanceInline(ModelBaseTabularInline):
+    model = Appearance
+    fk_name = "event"
+    exclude = ['labels',]
 
 
 class LocationInline(ModelBaseTabularInline):
@@ -21,6 +26,7 @@ class EventAdmin(ContentBaseAdmin):
 
     inlines = (
         LocationInline, 
+        AppearanceInline,
         EntryInline
     )
     save_on_top = True
