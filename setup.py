@@ -14,6 +14,7 @@ setup(
     ],
     install_requires = [
         'PIL==1.1.6',
+        'django-voting==0.1-pre',
     ],
     include_package_data=True,    
 )
