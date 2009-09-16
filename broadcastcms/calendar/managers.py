@@ -57,6 +57,25 @@ class CalendarQuerySet(ModelBaseQuerySet):
         end = now + timedelta(6 - now.weekday())
         return self.range(start, end)
 
+    def day(self, offset=0):
+        """
+        Returns entries for a today.
+        If an offset is provided a future or past day is returned relative to today:
+        * offset of 0 returns entries for today (default).
+        * offset of 1 returns entries for tomorrow.
+        * offset of -1 returns entries for yesterday.
+        """
+        now = datetime.now()
+        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        start = start + timedelta(days=offset) 
+        end = start + timedelta(days=1)
+        
+        # to force inclusion offset start and end by 1 second
+        start = start + timedelta(seconds=1)
+        end = end - timedelta(seconds=1)
+
+        return self.range(start, end)
+
     def week(self, offset=0):
         """
         Returns entries for a week starting on Monday and ending on Sunday.
@@ -129,8 +148,11 @@ class CalendarManager(ModelBaseManager):
     def thisweekend(self):
         return self.get_query_set().thisweekend()
 
+    def day(self, offset=0):
+        return self.get_query_set().day(offset)
+    
     def week(self, offset=0):
-        return self.get_query_set().thisweek(offset)
+        return self.get_query_set().week(offset)
 
     def thismonth(self):
         return self.get_query_set().thismonth()
