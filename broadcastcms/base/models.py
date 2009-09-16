@@ -76,8 +76,8 @@ class ModelBase(PermissionBase):
     """
     ALL objects used on a BCMS system should inherit from ModelBase.
     ModelBase is a lightweight baseclass adding extra functionality not offered natively by Django.
-    It should be seen as adding value to child classes primaraly through functions, base classes 
-    should provide model fields specific to their requirements.  
+    It should be seen as adding value to child classes primarily through functions.
+    Child classes should provide model fields specific to their requirements.  
     """
     objects = ModelBaseManager()
 
