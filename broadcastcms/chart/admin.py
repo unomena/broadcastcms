@@ -7,7 +7,7 @@ from broadcastcms.chart.models import Chart, ChartEntry
 class ChartEntryInline(ModelBaseTabularInline):
     model = ChartEntry
     fk_name = 'chart'
-    exclude = ['labels',]
+    exclude = ['labels', 'created']
 
 
 class ChartAdmin(ContentBaseAdmin):
