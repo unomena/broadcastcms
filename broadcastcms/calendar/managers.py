@@ -55,7 +55,15 @@ class CalendarQuerySet(ModelBaseQuerySet):
         now = datetime.now()
         start = now + timedelta(4 - now.weekday())
         end = now + timedelta(6 - now.weekday())
-        return self.range(start, end)
+        result = self.range(start, end)
+
+        # set the entry start and end dates to be contained within the weekend
+        for item in result:
+            if item.start < start:
+                item.start = start
+            if item.end > end:
+                item.end = end 
+        return result
 
     def day(self, offset=0):
         """
