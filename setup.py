@@ -15,6 +15,9 @@ setup(
     install_requires = [
         'PIL==1.1.6',
         'django-voting==0.1-pre',
+        'mysql-python==1.2.3c1',
+        'pexpect==2.4',
+        'simplejson==2.0.9',
     ],
     include_package_data=True,    
 )
