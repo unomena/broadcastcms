@@ -226,7 +226,7 @@ def create_profiles():
     profiles = []
     for i in range(1, CASTMEMBER_COUNT + 1):
         profiles.append({
-            "model": "broadcastcmslite.userprofile", 
+            "model": "lite.userprofile", 
             "fields": {
                 "facebook_url": "http://www.facebook.com/kabelom?_fb_noscript=1",
                 "twitter_url": "http://twitter.com/gustavp",
@@ -468,7 +468,7 @@ def create_locations():
 def create_settings():
     labels = Label.objects.filter(is_visible=False)
     settings = [{
-        "model": "broadcastcmslite.settings",
+        "model": "lite.settings",
         "fields": {
             "id": "1",
             "homepage_featured_labels": [str(label.pk) for label in labels[:3]],
