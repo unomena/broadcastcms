@@ -1,0 +1,7 @@
+{% extends "sections/base_section.html" %}
+{% load inclusion_tags public_tags %}
+
+{% block left %}
+    {% dj_header %}
+    {% call_view content render_article %}
+{% endblock %}

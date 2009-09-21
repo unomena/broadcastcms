@@ -1,0 +1,37 @@
+{% extends "sections/base.html" %}
+{% load inclusion_tags %}
+
+{% block head %}
+	<!--Slider-->
+	<script type="text/javascript" src="/media/bcms/includes/jquery.scrollTo-1.4.2-min.js"></script>
+	<script type="text/javascript" src="/media/bcms/includes/jquery.localscroll-1.2.7-min.js"></script>
+	<script type="text/javascript" src="/media/bcms/includes/jquery.serialScroll-1.2.2-min.js"></script>
+	<script type="text/javascript" src="/media/bcms/includes/coda-slider.js"></script>
+	<!--Promo-->
+	<script type="text/javascript" src="/media/bcms/includes/jquery.flow.1.1.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+		    jQuery("#controller").jFlow({
+		        slides: "#slides",
+		        width: "424px",
+		        height: "260px"
+		    });
+		});
+	</script>
+{% endblock %}
+
+{% block content_body %}
+
+    {% on_air %}
+
+    <div class="mast_left">
+	    {% features %}
+	</div><!--/MAST_LEFT-->
+		
+	<div class="mast_right">
+	    {% home_advert %}
+	</div><!--/MAST_RIGHT-->
+	
+    {% home_updates %}
+
+{% endblock %}

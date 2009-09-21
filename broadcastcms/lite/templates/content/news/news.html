@@ -1,0 +1,15 @@
+{% extends "sections/base_section.html" %}
+{% load inclusion_tags public_tags %}
+
+{% block left %}	
+    <div class="page_head">
+	    <h1>News &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+        {% sorting sorter %}
+	</div><!--/head-->
+    {% with pager.object_list as instances %}
+        {% for instance in instances %}
+            {% call_view instance render_listing %}
+        {% endfor %}
+    {% endwith %}
+    {% paging pager %}
+{% endblock %}

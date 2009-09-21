@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+	<title>Register - Broadcast CMS</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+	    $().ready(function() {
+	        bindForm();
+            validateRegistration();
+    	});
+	</script>
+	<div class="modal">
+	
+		<div class="modal_title">
+			<h1>Create your Free Profile</h1>
+			<p><a href="javascript: void(0);" onclick="tb_remove()" id="TB_closeWindowButton" class="close">Close</a></p>
+			<p class="modal_intro">Sign up using the form below.</p>
+		</div>
+		
+		<p class="thanks">Thank you for submitting your message.</p>
+		
+		<form id="frmRegister" action="{% url modals_register %}" class="cmxform" method="post">
+            {% with form.username as field %}
+    			<div class="modal_row">
+                        {{ field.label_tag }}
+    	    			<p class="text_input shift">
+                            {{ field }}
+                        </p>
+			    	    {% if field.help_text %}<p class="text_idea">{{ field.help_text }}</p>{% endif %}
+    	    	</div>
+            {% endwith %}
+            {% with form.first_name as field %}
+    			<div class="modal_row">
+                        {{ field.label_tag }}
+    	    			<p class="text_input_short shift">{{ field }}</p>
+				        <p class="text_input_short no-marg shift">{{ form.last_name }}</p>
+			    	    {% if field.help_text %}<p class="text_idea">{{ field.help_text }}</p>{% endif %}
+    	    	</div>
+            {% endwith %}
+            {% with form.email_address as field %}
+    			<div class="modal_row">
+                        {{ field.label_tag }}
+    	    			<p class="text_input shift">{{ field }}</p>
+			    	    {% if field.help_text %}<p class="text_idea">{{ field.help_text }}</p>{% endif %}
+    	    	</div>
+            {% endwith %}
+            {% with form.recaptcha_response_field as field %}
+                <div class="modal_row">
+                    {{ field.label_tag }}
+                    <div id="recaptcha_image" style="width: 300px; height: 57px;"></div>
+	    			<label> &nbsp; </label>
+    	        	<p class="text_input shift">
+                        {{ field }}
+                    </p>
+			        {% if field.help_text %}<p class="text_idea">{{ field.help_text }}</p>{% endif %}
+                    <script type="text/javascript">
+                        Recaptcha.create(
+                            "6LdcYgcAAAAAAEq2mn0KoUfM18BsgjSkuyLu-Pzk",
+                            "", 
+                            { theme: "custom" }
+                        );
+                    </script>
+                </div>
+            {% endwith %}
+            {% with form.email_subscribe as field %}
+    			<div class="modal_row">
+				    <label for="email_alerts">Opt Ins:</label>
+    	    		<p class="checkbox_short">{{ field }} {{ field.help_text }}</p>
+    	    		<p class="checkbox_short no-marg">{{ form.sms_subscribe }} {{ form.sms_subscribe.help_text }}</p>
+    	    	</div>
+            {% endwith %}
+            {% with form.accept_terms as field %}
+    			<div class="modal_row check">
+                    {{ field.label_tag }}
+    	    		<p class="checkbox">{{ field }} {{ field.help_text }}</p>
+    	    	</div>
+            {% endwith %}
+			<ul id="register_buttons" class="modal_buttons">
+				<li><input id="register_submit" type="image" src="/media/bcms/images/forms/btn-sign_in.jpg" name="submit" /></li>
+				<li><a href="javascript: document.getElementById('frmRegister').reset();"><img src="/media/bcms/images/forms/btn-clear.jpg" width="76" height="27" alt="" /></a></li>
+                {% with settings.terms_post as terms_post %}
+				    {% if terms_post.is_public %}
+                        <li class="mb_link"><a href="{{ terms_post.url }}">{{ terms_post.title }}</a></li>
+                    {% endif %}
+                {% endwith %}
+			</ul>
+			<ul id="register_progress" class="modal_buttons" style="display: none">
+				<li>
+                    <img src="/media/bcms/images/loading.gif" />
+                </li>
+            </ul>
+		</form>
+	
+	</div><!--/MODAL-->
+</body>
+</html>

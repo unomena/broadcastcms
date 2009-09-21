@@ -1,0 +1,19 @@
+{% extends "sections/base_section.html" %}
+{% load inclusion_tags public_tags %}
+
+{% block left %}	
+    <div class="page_head">
+	    <h1>Galleries &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+        {% sorting sorter %}
+	</div><!--/head-->
+	<div class="page_container">
+	    <div class="block_container">
+            {% with pager.object_list as galleries %}
+                {% for gallery in galleries %}
+                    {% call_view gallery render_block %}
+                {% endfor %}
+            {% endwith %}
+		</div>
+	</div><!--/container-->
+    {% paging pager %}
+{% endblock %}

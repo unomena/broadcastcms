@@ -1,0 +1,25 @@
+{% load inclusion_tags %}
+
+<div class="mast_head">
+    <div class="logo"><a href="{% url home %}"></a></div>	
+	
+	<div class="nav">
+	    <ul>
+            {% for item in items %}
+    		    <li {% if item.current %}class="on"{% endif %}><a href="{{ item.url }}">{{ item.title|safe }}</a></li>
+            {% endfor %}
+		</ul>
+	</div>
+		
+	<div id="account_links" class="logged">
+        {% account_links %}
+	</div>
+		
+	<div class="search">
+	    <form id="frmSearch" action="search-results.html" method="post">
+		    <p class="field"><input type="text" name="search_term" value="Search"  onfocus="if (this.value == 'Search') {this.value = '';}" onblur="if (this.value == '') {this.value = 'Search';}" /></p>
+			<p><input type="submit" value="" class="btn" /></p>
+		</form>
+	</div>
+	
+</div><!--/MAST_HEAD-->

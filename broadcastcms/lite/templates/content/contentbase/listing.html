@@ -1,0 +1,11 @@
+{% load scaled_image_tags comments voting_tags public_tags %}
+
+{% get_comment_count for self as comment_count %}
+{% score_for_object self.contentbase as score %}
+<div class="post_intro">
+    <p class="pi_pic"><a href="{% call_view self url %}"><img src="{% scaled_image_url self 107 60 %}" width="107" height="60" alt="" /></a></p>
+	<p class="pi_meta">By {{ self.owner.username }} on {{ self.created|date:"j F Y" }}</p>
+	<p class="pi_social"><span class="pi_likes">{{ score.score }} Likes</span><span class="pi_comments"><a href="{% call_view self url %}#comments">{{ comment_count }} Comments</a></span></p>
+	<h2><a href="{% call_view self url %}">{{ self.title }}</a></h2>
+	<p class="pi_blurb">{{ self.description|truncatewords:10 }} <a href="{% call_view self url %}">More</a></p>
+</div><!--/intro-->

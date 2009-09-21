@@ -1,0 +1,20 @@
+{% load scaled_image_tags public_tags %}
+<div class="promo">
+    <div id="controller">
+        {% for feature in features %}
+    	    <div class="jFlowControl">
+	    	    <a href="javascript: void(0);" class="promo_on">{{ feature.label.title }}</a>
+				<p class="promo_title"><a href="{% call_view feature.content url %}"> {{ feature.content.title }}</a></p>
+				<p class="promo_detail">{{ feature.content.description }}</p>
+			</div>
+        {% endfor %}
+	</div>
+	<div id="slides">
+        {% for feature in features %}
+	        <div>
+			    <p><img src="{% scaled_image_url feature.content 424 260 %}" width="424" height="260" alt="" /></p>
+				<p class="btn"><a href="{% call_view feature.content url %}">View Details</a></p>
+			</div>
+        {% endfor %}
+	</div>
+</div><!--/Promo-->

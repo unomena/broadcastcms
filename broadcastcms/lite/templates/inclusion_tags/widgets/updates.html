@@ -1,0 +1,9 @@
+{% load public_tags %}
+
+<div class="box dark">
+    <h1>Station Updates &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+	{% for instance in instances %}
+        {% call_view instance render_updates_widget %}
+    {% endfor %}
+	<p class="box_bottom"><a href="{% url news %}">View all Station Updates</a></p>
+</div><!--/box-->

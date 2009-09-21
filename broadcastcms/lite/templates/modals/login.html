@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+	<title>Login - Broadcast CMS</title>
+</head>
+
+<body>
+	<script type="text/javascript">
+	    $().ready(function() {
+	        bindForm();
+    	});
+	</script>
+	<div class="modal">
+	
+		<div class="modal_title">
+			<h1>Sign In</h1>
+			<p><a href="javascript: void(0);" onclick="tb_remove()" id="TB_closeWindowButton" class="close">Close</a></p>
+			<p class="modal_intro">Not Registered? <a href="{% url modals_register %}?height=580&amp;width=515" class="thickbox">Create your free profile now</a></p>
+		</div>
+		
+		<form id="frmLogin" action="{% url modals_login %}" method="post" class="cmxform">
+            {% for field in form %}
+			    <div class="modal_row">
+                    {{ field.label_tag }}
+    				<p class="text_input shift">{{ field }}</p>
+	    		</div>
+            {% endfor %}
+			<ul class="modal_buttons">
+				<li><input id="login_submit" type="image" src="/media/bcms/images/forms/btn-sign_in.jpg" name="submit" /></li>
+				<li class="mb_link"><a href="{% url modals_password_reset %}?height=230&amp;width=499" class="thickbox">Forgot your Password?</a></li>
+			</ul>
+		</form>
+	
+	</div><!--/MODAL-->
+</body>
+</html>

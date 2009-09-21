@@ -1,0 +1,13 @@
+{% load scaled_image_tags %}
+
+<div class="box">
+    <h1>Now Playing &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+	<div class="box_show_info">
+	    {% if castmember %}<p class="bsi_thumb"><img src="{% scaled_image_url castmember 81 81 %}" width="81" height="81" alt="" /></p>{% endif %}
+		<p class="bsi_time">On Air: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</p
+		<p class="bsi_name"><a href="{{ castmember.url }}">{{ show.title }}</a><br />{% if castmember %} with {{ castmember.title }}{% endif %}</p>
+	</div>
+	{% if song %}<p class="box_playing"><strong>Now Playing:</strong> {% if artist %} {{ artist.title }} -{% endif %} {{ song.title }}</p>{% endif %}
+	<p class="box_links"><a href="javascript: openPlayer({% url listen_live %});" class="listen_live">Listen Live</a><a href="javascript: openCam({% url studio_cam %});" class="studio_cam">Studio Cam</a><a href="{{ castmember.url }}" class="my_blog">My Blog</a></p>
+	{% if next_show %}<p class="box_bottom"><strong>Next:</strong> {{ next_show.title }}{% if next_castmember %} with {{ next_castmember.title }}{% endif %}</p>{% endif %}
+</div><!--/box-->

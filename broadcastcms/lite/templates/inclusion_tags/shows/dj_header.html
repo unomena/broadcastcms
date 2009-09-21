@@ -1,0 +1,23 @@
+{% load scaled_image_tags %}
+
+<div class="page_head expanded">
+    <h1><a href="javascript: void(0);">Shows &amp; DJs &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></a></h1>
+	<div class="dj_info">
+	    <p class="dj_info_mug"><img src="{% scaled_image_url castmember 193 109 %}" width="193" height="109" alt="" /></p>
+		<p class="dj_info_time">On Air: 
+            {% for show_time in show_times %}
+                {{ show_time.days|join:", "|title }}: {{ show_time.start_time|time:"H:i" }} - {{ show_time.end_time|time:"H:i" }}{% if forloop.last %}{% else %}, {% endif %}
+            {% endfor %}
+        </p>
+		<p class="dj_info_name">{{ castmember.title }}</p>
+		{% if profile %}<p class="dj_info_social">{% if profile.facebook_url %}<a href="{{ profile.facebook_url }}" class="facebook">Facebook</a>{% endif %}{% if profile.facebook_url and profile.twitter_url %} &nbsp;|&nbsp; {% endif %}{% if profile.twitter_url %}<a href="{{ profile.twitter_url }}" class="twitter">Twitter</a>{% endif %}</p>{% endif %}
+	</div>
+	<div class="page_menu">
+	    <h2>{{ current_section.title }}</h2>
+		<ul>
+            {% for s in sections %}
+			    <li {% ifequal current_section s %}class="on"{% endifequal %}><span class="pm_left"></span><a href="{{ s.url }}">{{ s.title }}</a><span class="pm_right"></span></li>
+            {% endfor %}
+		</ul>
+	</div>
+</div><!--/head-->

@@ -1,0 +1,11 @@
+{% extends "sections/base_section.html" %}
+{% load inclusion_tags %}
+
+{% block left %}
+    {% dj_header %}
+	<div class="page_container rich">
+		<p>
+            {{ castmember.content|safe }}
+        </p>
+	</div><!--/container-->
+{% endblock %}

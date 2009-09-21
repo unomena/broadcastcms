@@ -1,0 +1,12 @@
+<div class="page_menu">
+    {% if self.sorter %}
+        <h2>{{ self.sorter.title }}</h2>
+    {% else %}
+        <h2>Order By</h2>
+    {% endif %}
+	<ul>
+        {% for sorter in self.sorters %}
+	        <li {% ifequal sorter self.sorter %}class="on"{% endifequal %}><span class="pm_left"></span><a href="{{ self.view_url }}?{{ self.key }}={{ sorter.slug }}">{{ sorter.title }}</a><span class="pm_right"></span></li>
+        {% endfor %}
+	</ul>
+</div>

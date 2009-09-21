@@ -1,0 +1,11 @@
+{% load scaled_image_tags %}
+
+<div class="chart_item">
+    <p class="ci_pos">{{ self.current_position }}</p>
+    <p class="ci_art">
+	    <span class="ci_art_pic"><img src="{% scaled_image_url song 89 50 %}" width="89" height="50" alt="" /></span>
+		<span class="ci_art_tit">{{ artist.title }}<br />{{ song.title }}</span>
+	</p>
+	<p class="ci_his">{{ self.previous_position }} Last Week<br />{{ weeks_on }} Weeks On</p>
+	<p class="ci_vid"><a href="{% url modals_content song.slug %}?height=520&amp;width=540" class="thickbox"></a></p>
+</div><!--/item-->

@@ -1,0 +1,29 @@
+{% load public_tags %}
+<div class="updates">
+    <div id="slider">    
+	    <h1>Updates</h1>
+		<p class="updates_more"><a href="{% url news %}">View all Updates &raquo;</a></p>
+		<div class="scroll_nav">
+	        <ul class="navigation">
+                {% for panel in panels %}
+    	            <li><a href="#panel{{ forloop.counter }}"></a></li>
+                {% endfor %}
+	        </ul>
+		</div>
+	    <div class="scroll">
+	        <div class="scroll_container">
+                {% for panel in panels %}        
+    		        <div class="panel" id="panel{{ forloop.counter }}">
+                        {% for tray in panel %}
+        				    <div class="chunk_tray">
+                                {% for instance in tray %}
+                                    {% call_view instance render_home_updates %}
+                                {% endfor %}
+							</div><!--/tray-->
+                        {% endfor %}
+					</div>
+                {% endfor %}
+	        </div>
+        </div>
+ 	</div><!--/slider-->
+</div><!--/Updates-->

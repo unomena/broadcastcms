@@ -1,0 +1,24 @@
+{% extends "sections/base_section.html" %}
+{% load inclusion_tags public_tags %}
+
+{% block left %}	
+    <div class="page_head">
+	    <h1>Events &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+        {% sorting sorter %}
+	</div><!--/head-->
+    {% for entry in pager.object_list %}
+        {% with entry.day as day %}
+    	    <div class="page_stamp">
+	            <p class="page_stamp_date">
+		            <span class="month">{{ day|date:"M" }}</span>
+    		    	<span class="day">{{ day|date:"j" }}</span>
+    	    	</p>
+	    	    <p class="page_stamp_title">{{ day|date:"l j F Y" }} {% ifequal day.date today %}<span>(Today)</span>{% endifequal %}</p>
+    	    </div><!--/stamp-->
+        {% endwith %}
+        {% for event in entry.events %}
+            {% call_view event render_listing %}
+        {% endfor %}
+    {% endfor %}
+    {% paging pager %}
+{% endblock %}

@@ -1,0 +1,6 @@
+{% load inclusion_tags %}
+<div class="page_container">
+    {% post_head self %}
+    {{ self.render_article_body }}
+</div><!--/container-->
+{% comments %}

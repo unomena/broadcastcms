@@ -1,0 +1,29 @@
+<div class="post_body rich">
+    <p>
+        {{ self.content|safe }}
+    </p>
+</div>
+<div class="page_form">
+    <h1>Optional Simple Entry Question Goes Here?</h1>
+	<p class="thanks">Thank you for entering this competition. Good luck!</p>
+	<p class="blurb">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperia,eaque ipsa quae ab illo inventore veritatis et quasi architec to beatae vitae dicta sunt explicabo. </p>
+	<form id="frmEnterCompetition" action="#" class="cmxform">
+	    <div class="page_form_row">
+		    <label for="your_answer">Your Answer:</label>
+			<p class="text_input shift"><input name="your_answer" id="your_answer" class="required" /></p>
+		</div>
+		<div class="page_form_row no-pad">
+		    <p class="label">&nbsp;</p>
+			<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-submit_entry.jpg" name="submit" /></p>
+		</div>
+	</form>
+	<p class="clearfix"></p>
+</div><!--/form-->
+{% if self.rules %}
+    <div class="page_container rich">
+        <h2>Competition Rules</h2>
+        <p>
+            {{ self.rules|safe }}
+        </p>
+    </div><!--/container-->
+{% endif %}
