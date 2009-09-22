@@ -7,6 +7,7 @@ from broadcastcms.base.models import ContentBase
 from broadcastcms.label.models import Label
 from broadcastcms.post.models import Post
 from broadcastcms.richtext.fields import RichTextField
+from broadcastcms.scaledimage import ScaledImageField
 
 def get_update_choices():
     choices = []
@@ -129,6 +130,7 @@ class UserProfile(models.Model):
         blank=True,
         null=True,
     )
+    image = ScaledImageField()
 
     def __unicode__(self):
         return self.user.username
