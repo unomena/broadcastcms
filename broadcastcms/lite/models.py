@@ -51,6 +51,13 @@ class Settings(models.Model):
         blank=True, 
         null=True,
     )
+    gcs_partner_id = models.CharField(
+        max_length=128,
+        verbose_name='Search Partner ID',
+        help_text='Google Custom Search Partner ID (cx form field value).',
+        blank=True, 
+        null=True,
+    )
    
     # Adds
     banner_section_home = models.ManyToManyField(Banner, 
