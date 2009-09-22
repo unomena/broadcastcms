@@ -129,6 +129,8 @@ class OnAirNode(template.Node):
     def render(self, context):
         show_entry = self.get_on_air_entry(Show)
         show = show_entry.content.as_leaf_class() if show_entry else None
+        if not show:
+            return ''
         castmember = self.get_primary_castmember(show) if show else None
         
         song_entry = self.get_on_air_entry(Song)
