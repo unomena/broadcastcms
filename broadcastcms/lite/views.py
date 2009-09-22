@@ -216,6 +216,10 @@ def home(request):
     context = RequestContext(request, {})
     return render_to_response('content/home.html', context)
 
+def search_results(request):
+    context = RequestContext(request, {})
+    return render_to_response('content/search_results.html', context)
+
 
 # Mailers
 def mailer_new_user(request, username, password):
