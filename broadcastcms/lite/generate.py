@@ -527,6 +527,7 @@ def create_settings():
                     "title": "Banner %s Title" % random.randint(1, BANNER_COUNT),
                 }
             },
+            "gcs_partner_id": "partner-pub-7837760522231511:xryca-9vmsb",
             "competition_general_rules": "Competition General Rules",
             "studio_cam_urls": "http://mailers.trufm.co.za/cam/studio1.jpg\nhttp://mailers.trufm.co.za/cam/studio2.jpg\nhttp://mailers.trufm.co.za/cam/studio1.jpg\nhttp://mailers.trufm.co.za/cam/studio2.jpg\nhttp://mailers.trufm.co.za/cam/studio1.jpg",
         }
