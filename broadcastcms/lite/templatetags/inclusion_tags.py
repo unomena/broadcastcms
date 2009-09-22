@@ -20,9 +20,16 @@ def account_links(parser, token):
 
 class AccountLinksNode(template.Node):
     def render(self, context):
-        user = context['request'].user
+        request = context['request']
+        user = request.user
+        profile = None
+        if user:
+            if not user.is_anonymous():
+                profile = get_or_create_profile(request.user)
+
         context.update({
-            'user': user
+            'user': user,
+            'profile': profile,
         })
         return render_to_string('inclusion_tags/skeleton/account_links.html', context)
 
@@ -291,6 +298,41 @@ class SortingNode(template.Node):
             'self': sorter,
         })
         return render_to_string('inclusion_tags/misc/sorting.html', context)
+
+@register.tag
+def account_menu(parser, token):
+    return AccountMenuNode()
+
+class AccountMenuNode(template.Node):
+    def render(self, context):
+        request = context['request']
+
+        menu_items = [{
+                'title': 'Profile',
+                'section': 'profile',
+                'url': reverse('account_profile'),
+            },
+            {
+                'title': 'Picture',
+                'section': 'picture',
+                'url': reverse('account_picture'),
+            },
+            {
+                'title': 'Subscriptions',
+                'section': 'subscriptions',
+                'url': reverse('account_subscriptions'),
+            },
+        ]
+        account_section = request.path.split('/')[-2]
+       
+        profile = get_or_create_profile(request.user)
+        context.update({
+            'menu_items': menu_items,
+            'account_section': account_section,
+            'profile': profile,
+        })
+        return render_to_string('inclusion_tags/account/menu.html', context)
+
 
 # Widgets
 
