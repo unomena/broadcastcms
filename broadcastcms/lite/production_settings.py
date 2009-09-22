@@ -80,7 +80,7 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-AUTH_PROFILE_MODULE = "broadcastcmslite.UserProfile"
+AUTH_PROFILE_MODULE = "lite.UserProfile"
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -143,6 +143,14 @@ IMAGE_SCALES = {
                 (80, 53),
             )
         },
+    },
+    'lite': {
+        'UserProfile': {
+            'image': (
+                (33, 33), 
+                (41, 41),
+            )
+        }
     },
     'radio': {
         'Song': {
