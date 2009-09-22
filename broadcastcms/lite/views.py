@@ -28,6 +28,29 @@ from forms import LoginForm, RegistrationForm
 from templatetags.inclusion_tags import AccountLinksNode
 import utils
 
+# Account
+
+def account_picture(request):
+    if not request.user.is_authenticated():
+       raise Http404
+
+    context = RequestContext(request, {})
+    return render_to_response('content/account/picture.html', context)
+
+def account_profile(request):
+    if not request.user.is_authenticated():
+       raise Http404
+    
+    context = RequestContext(request, {})
+    return render_to_response('content/account/profile.html', context)
+
+def account_subscriptions(request):
+    if not request.user.is_authenticated():
+       raise Http404
+    
+    context = RequestContext(request, {})
+    return render_to_response('content/account/subscriptions.html', context)
+
 # Chart
 
 def chart(request, slug):
