@@ -1,0 +1,20 @@
+{% extends "sections/base_section.html" %}
+
+{% block left %}
+    <div class="page_head">
+	    <h1>Search Results &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+		<div class="page_menu">
+		    <h2>You searched for "{{ request.GET.q }}"</h2>
+		</div>
+	</div><!--/head-->
+	<div class="page_container rich">
+        <div id="cse-search-results" style="width: 600px;"></div>
+            <script type="text/javascript">
+                var googleSearchIframeName = "cse-search-results";
+                var googleSearchFormName = "cse-search-box";
+                var googleSearchFrameWidth = 600;
+                var googleSearchDomain = "www.google.com";
+                var googleSearchPath = "/cse";
+            </script><script type="text/javascript" src="http://www.google.com/afsonline/show_afs_search.js"></script>
+	</div><!--/container-->
+{% endblock %}
