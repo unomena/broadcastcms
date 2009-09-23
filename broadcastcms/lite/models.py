@@ -23,7 +23,7 @@ class Settings(models.Model):
         Label, 
         null=True, 
         blank=True, 
-        limit_choices_to={'is_visible': False},
+        limit_choices_to={'is_visible': True},
         verbose_name='Homepage Featured Labels',
         help_text='Content labeled with these labels will be featured on the homepage.',
     )
@@ -134,7 +134,9 @@ class UserProfile(models.Model):
 
     def __unicode__(self):
         return self.user.username
-   
+  
+# Create User profile property which either gets or creates an empty profile for the given user
+User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
     
     #def save(self, *args, **kwargs):
     #    settings = Settings.objects.all()
