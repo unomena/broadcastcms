@@ -22,7 +22,7 @@ from broadcastcms.gallery.models import Gallery
 from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.post.models import Post
 from broadcastcms.show.models import Show, CastMember
-from broadcastcms.utils import get_or_create_profile, mail_user
+from broadcastcms.utils import mail_user
 
 from forms import LoginForm, RegistrationForm
 from templatetags.inclusion_tags import AccountLinksNode
@@ -33,8 +33,14 @@ import utils
 def account_picture(request):
     if not request.user.is_authenticated():
        raise Http404
-
+        
     context = RequestContext(request, {})
+    user = request.user
+    profile = request.user.profile
+
+    context.update({
+        'profile': profile,
+    })
     return render_to_response('content/account/picture.html', context)
 
 def account_profile(request):
@@ -320,7 +326,7 @@ def modals_register(request):
             user.save()
 
             # Create profile
-            profile = get_or_create_profile(user)
+            profile = user.profile
             profile.email_subscribe = email_subscribe
             profile.sms_subscribe = sms_subscribe
             profile.save()
@@ -477,27 +483,31 @@ class ImageBannerViews(object):
 
 class ContentBaseViews(object):
     def render_home_updates(self, context):
-        context.update({
+        context = {
             'self': self,
-        })
+            'url': self.url(context),
+        }
         return render_to_string('content/contentbase/home_updates.html', context)
     
     def render_updates_widget(self, context):
         labels = self.labels.visible()
         label = labels[0] if labels else None
-        context.update({
+        context = {
             'self': self,
             'label': label,
-        })
+            'url': self.url(context),
+        }
         return render_to_string('content/contentbase/updates_widget.html', context)
     
     def render_listing(self, context):
-        context.update({
+        context = {
             'self': self,
-        })
+            'url': self.url(context),
+        }
         return render_to_string('content/contentbase/listing.html', context)
 
     def render_article(self, context):
+        context = RequestContext(context['request'], {})
         context.update({
             'self': self,
         })
@@ -569,12 +579,12 @@ class ChartEntryViews(object):
         else:
             weeks_on = 0
 
-        context = ({
+        context = {
             'self': self, 
             'song': self.song,
             'artist': self.get_primary_artist(),
             'weeks_on': weeks_on,
-        })
+        }
         return render_to_string('content/charts/entry.html', context)
     
     def get_primary_artist(self):
@@ -589,9 +599,10 @@ class ChartEntryViews(object):
         
 class CompetitionViews(object):
     def render_listing(self, context):
-        context.update({
-            'self': self
-        })
+        context = {
+            'self': self,
+            'url': self.url(context),
+        }
         return render_to_string('content/competitions/listing.html', context)
     
     def render_article_body(self):
@@ -606,11 +617,11 @@ class EntryViews(object):
         credits = content.credits.order_by('role')
         castmember_url = credits[0].castmember.url() if credits else ''
 
-        context.update({
+        context = {
             'self': self,
             'content': content,
             'castmember_url': castmember_url,
-        })
+        }
         return render_to_string('content/entry/block.html', context)
     
 class EventViews(object):
@@ -621,22 +632,22 @@ class EventViews(object):
         return render_to_string('content/events/article_body.html', context)
     
     def render_listing(self, context):
-        url = self.url(context)
         locations = self.locations.permitted()
         location = locations[0] if locations else None
         
-        context.update({
+        context = {
             'self': self,
-            'url': url,
+            'url': self.url(context),
             'location': location,
-        })
+        }
         return render_to_string('content/events/listing.html', context)
 
 class GalleryViews(object):
     def render_block(self, context):
-        context.update({
+        context = {
             'self': self,
-        })
+            'url': self.url(context),
+        }
         return render_to_string('content/galleries/block.html', context)
     
     def render_article_body(self):
