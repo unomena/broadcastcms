@@ -3,7 +3,7 @@
 {% get_comment_count for self as comment_count %}
 {% score_for_object self.contentbase as score %}
 <div class="box_update_item">
-    <p class="bui_pic"><a href="{% call_view self url %}"><img src="{% scaled_image_url self 80 46 %}" width="80" height="46" alt="" /></a></p>
-	<p class="bui_cat">{% if label %}<span class="bui_catname">{{ label.title }}</span>{% endif %}<span class="bui_meta">{% if label %} | {% endif %}{{ score.score }} Likes | <a href="{% call_view self url %}#comments">{{ comment_count }} Comments</a></span></p>
-	<h2><a href="{% call_view self url %}">{{ self.title }}</a></h2>
+    <p class="bui_pic"><a href="{{ url }}"><img src="{% scaled_image_url self 80 46 %}" width="80" height="46" alt="" /></a></p>
+	<p class="bui_cat">{% if label %}<span class="bui_catname">{{ label.title }}</span>{% endif %}<span class="bui_meta">{% if label %} | {% endif %}{{ score.score }} Likes | <a href="{{ url }}#comments">{{ comment_count }} Comments</a></span></p>
+	<h2><a href="{{ url }}">{{ self.title }}</a></h2>
 </div>

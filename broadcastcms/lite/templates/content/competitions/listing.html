@@ -1,8 +1,8 @@
 {% load scaled_image_tags public_tags %}
 
 <div class="post_intro">
-    <p class="pi_pic"><a href="{% call_view self url %}"><img src="{% scaled_image_url self 107 60 %}" width="107" height="60" alt="" /></a></p>
+    <p class="pi_pic"><a href="{{ url }}"><img src="{% scaled_image_url self 107 60 %}" width="107" height="60" alt="" /></a></p>
 	{% if self.end %}<p class="pi_meta">Closes: {{ self.end|date:"j F Y" }}</p>{% endif %}
-	<h2><a href="{% call_view self url %}">{{ self.title }}</a></h2>
-	<p class="pi_blurb">{{ self.description|truncatewords:10 }} <a href="{% call_view self url %}">More</a></p>
+	<h2><a href="{{ url }}">{{ self.title }}</a></h2>
+	<p class="pi_blurb">{{ self.description|truncatewords:10 }} <a href="{{ url }}">More</a></p>
 </div><!--/intro-->

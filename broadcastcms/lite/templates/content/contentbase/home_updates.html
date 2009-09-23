@@ -4,8 +4,8 @@
 {% score_for_object self.contentbase as score %}
 <div class="chunk_item">
     <div class="chunk_body">
-	    <p class="upd_pic"><a href="{% call_view self url %}"><img src="{% scaled_image_url self 107 60 %}" width="107" height="60" alt="" /></a></p>
-    	<p class="upd_cat"><span class="upd_catname">{{ self.labels.visible.0.title }}</span><span class="upd_meta">{{ score.score }} Likes | <a href="{% call_view self url %}#comments">{{ comment_count }} Comments</a> | <a href="{% url modals_content self.slug %}?height=600&amp;width=720" class="thickbox">Peek &raquo;</a></span></p>
-	    <h2><a href="{% call_view self url %}">{{ self.title }}</a></h2>
+	    <p class="upd_pic"><a href="{{ url }}"><img src="{% scaled_image_url self 107 60 %}" width="107" height="60" alt="" /></a></p>
+    	<p class="upd_cat"><span class="upd_catname">{{ self.labels.visible.0.title }}</span><span class="upd_meta">{{ score.score }} Likes | <a href="{{ url }}#comments">{{ comment_count }} Comments</a> | <a href="{% url modals_content self.slug %}?height=600&amp;width=720" class="thickbox">Peek &raquo;</a></span></p>
+	    <h2><a href="{{ url }}">{{ self.title }}</a></h2>
     </div>
 </div>

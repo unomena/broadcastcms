@@ -1,6 +1,25 @@
 {% extends "sections/base_section.html" %}
-{% load inclusion_tags %}
+{% load inclusion_tags scaled_image_tags %}
 
 {% block left %}
     {% account_menu %}
+	<div class="page_form">
+	    <h2 class="smaller">Update your details using the form below.</h2>
+		<form id="frmUserProfileUpdate" action="#" method="post">
+		    <div class="page_form_row">
+			    <p class="label"><img src="{% if profile.image %}{% scaled_image_url profile 50 50 %}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="50" height="50" alt="" /></p>
+				<p class="text_input no-bg"><input type="file" id="avatar" name="avatar" /></p>
+				<p class="note no-marg"><strong>Profile Picture Tips:</strong><br />
+1. Maximum size: 1MB.<br />
+2. Only JPG, GIF or PNG allowed<br />
+3. You can upload full-size pictures, we'll create thumbnails for you<br />
+4. No obscene photos please<br />
+5. Make sure you have permission to use the photo</p>
+			</div>
+			<div class="page_form_row no-pad">
+			    <p class="label">&nbsp;</p>
+				<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-sign_up.jpg" name="submit" /></p>
+			</div>
+		</form>
+	</div><!--/form-->
 {% endblock %}
