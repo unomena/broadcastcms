@@ -8,7 +8,6 @@ from broadcastcms.calendar.models import Entry
 from broadcastcms.show.models import Show
 from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.radio.models import Song
-from broadcastcms.utils import get_or_create_profile
 
 register = template.Library()
 
@@ -25,7 +24,7 @@ class AccountLinksNode(template.Node):
         profile = None
         if user:
             if not user.is_anonymous():
-                profile = get_or_create_profile(request.user)
+                profile = request.user.profile
 
         context.update({
             'user': user,
@@ -185,7 +184,7 @@ class HomeUpdatesNode(template.Node):
     def render(self, context):
         instances = [instance.as_leaf_class() for instance in self.get_instances(context)[:self.count]]
         panels = self.build_panels(instances)
-        
+       
         context.update({
             'panels': panels,
         })
@@ -325,7 +324,8 @@ class AccountMenuNode(template.Node):
         ]
         account_section = request.path.split('/')[-2]
        
-        profile = get_or_create_profile(request.user)
+        profile = request.user.profile
+
         context.update({
             'menu_items': menu_items,
             'account_section': account_section,
@@ -453,7 +453,7 @@ class DJHeaderNode(template.Node):
         sections, current_section = self.get_sections(request, castmember)
         
         owner = castmember.owner
-        profile = get_or_create_profile(owner) if owner else None
+        profile = owner.profile if owner else None
 
         shows = castmember.show_set.permitted()
         show_times = []
