@@ -83,15 +83,13 @@ def create_labels():
             "model": "label.label", 
             "fields": {
                 "title": "Label %s Title" % i, 
-                "is_visible": random.randint(0, 1) == 1,
+                "is_visible": True,
                 "restricted_to": random.sample(restricted_to_choices, random.randint(0, len(restricted_to_choices))),
             }
         })
     return labels
 
 def create_posts():
-    labels = Label.objects.filter(restricted_to__contains='post-labels')
-
     posts = []
     for i in range(1, POST_COUNT + 1):
         posts.append({
@@ -101,7 +99,7 @@ def create_posts():
                 "description": "Post %s Description" % i,
                 "content": "Post %s Content" % i,
                 "is_public": True,
-                "labels": [str(label.pk) for label in random.sample(labels, random.randint(0, len(labels)))],
+                "labels": [str(pk) for pk in random.sample(range(1, LABEL_COUNT + 1), random.randint(0, LABEL_COUNT))],
                 "image": random.sample(IMAGES, 1)[0],
                 "owner": {
                     "model": "auth.user",
@@ -467,12 +465,11 @@ def create_locations():
     return locations
 
 def create_settings():
-    labels = Label.objects.filter(is_visible=False)
     settings = [{
         "model": "lite.settings",
         "fields": {
             "id": "1",
-            "homepage_featured_labels": [str(label.pk) for label in labels[:3]],
+            "homepage_featured_labels": [str(pk) for pk in random.sample(range(1, LABEL_COUNT + 1), random.randint(0, LABEL_COUNT))],
             "terms_post": {
                 "model": "post.post",
                 "fields": {
@@ -559,14 +556,6 @@ def generate():
     objects += create_events()
     objects += create_locations()
     objects += create_entries()
+    objects += create_settings()
     
     load_json(objects)
-   
-    # Create post labels
-    labels = Label.objects.filter(restricted_to__contains='post-labels')
-    for i in range(1, POST_COUNT + 1):
-        post = Post.objects.get(title__exact="Post %s Title" % i)
-        post.labels = [str(label.pk) for label in random.sample(labels, random.randint(0, len(labels)))]
-        post.save()
-    
-    load_json(create_settings())
