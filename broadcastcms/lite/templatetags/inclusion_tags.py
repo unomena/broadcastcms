@@ -60,8 +60,56 @@ def mastfoot(parser, token):
 
 class MastfootNode(template.Node):
     def render(self, context):
+        settings = context['settings']
+        terms_post = settings.terms_post
+        privacy_post = settings.privacy_post
+        about_post = settings.about_post
+        advertise_post = settings.advertise_post
+        
+        sitemap_items = [
+            {'title': 'Shows &amp; DJs', 'url': reverse('shows_line_up')},
+            {'title': 'Listen Live', 'url': "javascript: openPlayer(%s);" % reverse('listen_live')},
+            {'title': 'Music Chart', 'url': reverse('chart')},
+            {'title': 'Competitions', 'url': reverse('competitions')},
+            {'title': 'News Updates', 'url': reverse('news')},
+            {'title': 'Events Calendar', 'url': reverse('events')},
+            {'title': 'Contact Us', 'url': reverse('contact')},
+        ]
+
+        if about_post: sitemap_items.append({'title': about_post.title, 'url': reverse('info_content', kwargs={'slug': about_post.slug})})
+        if advertise_post: sitemap_items.append({'title': advertise_post.title, 'url': reverse('info_content', kwargs={'slug': advertise_post.slug})})
+        
+        sitemap_columns = []
+        rows = 3
+        slices = range(0, len(sitemap_items), rows)
+        for slice_start in slices:
+            sitemap_columns.append(sitemap_items[slice_start: slice_start + rows])
+
+        context = {
+            'terms_post': terms_post,
+            'privacy_post': privacy_post,
+            'about_post': about_post,
+            'advertise_post': advertise_post,
+            'terms_and_privacy': (terms_post and privacy_post),
+            'terms_or_privacy': (terms_post or privacy_post),
+            'sitemap_columns': sitemap_columns,
+        }
         return render_to_string('inclusion_tags/skeleton/mastfoot.html', context)
 
+@register.tag
+def metrics(parser, token):
+    return MetricsNode()
+
+class MetricsNode(template.Node):
+    def render(self, context):
+        settings = context['settings']
+        metrics = settings.metrics
+        if metrics:
+            context = {
+                'metrics': settings.metrics,
+            }
+            return render_to_string('inclusion_tags/skeleton/metrics.html', context)
+        return ''
 
 # Home
 
@@ -84,10 +132,10 @@ class FeaturesNode(template.Node):
     def render(self, context):
         features = []
         settings = context['settings']
-        homepage_featured_labels = settings.homepage_featured_labels.all()
+        homepage_featured_labels = settings.homepage_featured_labels.all()[:3]
         
         for label in homepage_featured_labels:
-            content = ContentBase.objects.permitted().filter(labels__exact=label)
+            content = ContentBase.objects.permitted().filter(labels__exact=label).order_by('-created')
             if content: features.append({'label': label, 'content': content[0]})
 
         context.update({
