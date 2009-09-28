@@ -29,12 +29,16 @@ urlpatterns = patterns('',
     url(r'competitions/rules/$', competitions_rules, name='competitions_rules'),
     url(r'competitions/(?P<slug>[\w-]+)/$', competitions_content, name='competitions_content'),
     
+    url(r'contact/$', contact, name='contact'),
+    
     url(r'events/$', events, name='events'),
     url(r'events/(?P<slug>[\w-]+)/$', events_content, name='events_content'),
     
     url(r'galleries/$', galleries, name='galleries'),
     url(r'galleries/(?P<slug>[\w-]+)/$', galleries_content, name='galleries_content'),
    
+    url(r'info/(?P<slug>[\w-]+)/$', info_content, name='info_content'),
+    
     url(r'listen-live/$', listen_live, name='listen_live'),
     url(r'studio-cam/$', studio_cam, name='studio_cam'),
     
