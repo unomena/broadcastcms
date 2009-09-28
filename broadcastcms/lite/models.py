@@ -27,41 +27,29 @@ class Settings(models.Model):
         verbose_name='Homepage Featured Labels',
         help_text='Content labeled with these labels will be featured on the homepage.',
     )
-    terms_post = models.ForeignKey(
-        Post, 
-        related_name='terms_post', 
+    terms = RichTextField(
         null=True, 
         blank=True, 
-        limit_choices_to={'is_public': True},
-        verbose_name='Terms and Conditions Post',
-        help_text='A post to be used for the Terms and Conditions page.',
+        verbose_name='Terms & Conditions',
+        help_text='Content used for the Terms and Conditions page.',
     )
-    privacy_post = models.ForeignKey(
-        Post, 
-        related_name='privacy_post', 
+    privacy = RichTextField(
         null=True, 
         blank=True, 
-        limit_choices_to={'is_public': True},
-        verbose_name='Privacy Policy Post',
-        help_text='A post to be used for the Privacy Policy page.',
+        verbose_name='Privacy Policy',
+        help_text='Content used for the Privacy Policy page.',
     )
-    about_post = models.ForeignKey(
-        Post, 
-        related_name='about_post', 
+    about = RichTextField(
         null=True, 
         blank=True, 
-        limit_choices_to={'is_public': True},
-        verbose_name='About Post',
-        help_text='A post to be used for the About page.',
+        verbose_name='About Us',
+        help_text='Content used for the About Us page.',
     )
-    advertise_post = models.ForeignKey(
-        Post, 
-        related_name='advertise_post', 
+    advertise = RichTextField(
         null=True, 
         blank=True, 
-        limit_choices_to={'is_public': True},
-        verbose_name='Advertise Post',
-        help_text='A post to be used for the Advertise page.',
+        verbose_name='Advertise',
+        help_text='Content used for the Advertise page.',
     )
     update_types = models.ManyToManyField(
         ContentType, 
