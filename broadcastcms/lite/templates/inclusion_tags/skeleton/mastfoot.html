@@ -1,25 +1,17 @@
-    <div class="logo bottom_logo"><a href="{% url home %}"></a></div>
+<div class="logo bottom_logo"><a href="{% url home %}"></a></div>
 	
-	<div class="legal">
-		<p>&copy; 2009 Powered by <a href="http://www.praekelt.com/">BroadcastCMS</a></p>
-		<p>All rights reserved. <a href="#mobile">View mobile version</a></p>
-		<p>Please read our <a href="terms.html">Terms and Conditions</a> and <a href="privacy.html">Privacy Policy</a></p>
-	</div>
+<div class="legal">
+    <p>&copy; {% now "Y" %} Powered by <a href="http://www.broadcastcms.com/">BroadcastCMS</a></p>
+	<p>All rights reserved. <a href="#mobile">View mobile version</a></p>
+	{% if terms_or_privacy %}<p>Please read our {% if terms_post %}<a href="{% url info_content terms_post.slug %}">Terms and Conditions</a>{% endif %}{% if terms_and_privacy %} and {% endif %}{% if privacy_post %}<a href="{% url info_content privacy_post.slug %}">Privacy Policy</a></p>{% endif %}{% endif %}
+</div>
 	
-	<div class="link_list">
-		<ul>
-		<li><a href="shows-djs.html">Shows &amp; DJs</a></li>
-		<li><a href="listen-live.html">Listen Live</a></li>
-		<li><a href="chart.html">Music Chart</a></li>
-		</ul>
-		<ul>
-		<li><a href="competitions.html">Competitions</a></li>
-		<li><a href="news.html">News Updates</a></li>
-		<li><a href="events.html">Events Calendar</a></li>
-		</ul>
-		<ul>
-		<li><a href="contact.html">Contact Us</a></li>
-		<li><a href="about.html">About Us</a></li>
-		<li><a href="advertise.html">Advertise</a></li>
-		</ul>
-	</div>
+<div class="link_list">
+    {% for column in sitemap_columns %}
+        <ul>
+            {% for item in column %}
+    	        <li><a href="{{ item.url }}">{{ item.title|safe }}</a></li>
+            {% endfor %}
+	    </ul>
+    {% endfor %}
+</div>
