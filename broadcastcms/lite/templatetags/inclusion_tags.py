@@ -61,10 +61,10 @@ def mastfoot(parser, token):
 class MastfootNode(template.Node):
     def render(self, context):
         settings = context['settings']
-        terms_post = settings.terms_post
-        privacy_post = settings.privacy_post
-        about_post = settings.about_post
-        advertise_post = settings.advertise_post
+        terms = settings.terms
+        privacy = settings.privacy
+        about = settings.about
+        advertise = settings.advertise
         
         sitemap_items = [
             {'title': 'Shows &amp; DJs', 'url': reverse('shows_line_up')},
@@ -76,8 +76,8 @@ class MastfootNode(template.Node):
             {'title': 'Contact Us', 'url': reverse('contact')},
         ]
 
-        if about_post: sitemap_items.append({'title': about_post.title, 'url': reverse('info_content', kwargs={'slug': about_post.slug})})
-        if advertise_post: sitemap_items.append({'title': advertise_post.title, 'url': reverse('info_content', kwargs={'slug': advertise_post.slug})})
+        if about: sitemap_items.append({'title': "About Us", 'url': reverse('info_content', kwargs={'section': "about"})})
+        if advertise: sitemap_items.append({'title': "Advertise", 'url': reverse('info_content', kwargs={'section': "advertise"})})
         
         sitemap_columns = []
         rows = 3
@@ -86,12 +86,10 @@ class MastfootNode(template.Node):
             sitemap_columns.append(sitemap_items[slice_start: slice_start + rows])
 
         context = {
-            'terms_post': terms_post,
-            'privacy_post': privacy_post,
-            'about_post': about_post,
-            'advertise_post': advertise_post,
-            'terms_and_privacy': (terms_post and privacy_post),
-            'terms_or_privacy': (terms_post or privacy_post),
+            'terms': terms,
+            'privacy': privacy,
+            'terms_and_privacy': (terms and privacy),
+            'terms_or_privacy': (terms or privacy),
             'sitemap_columns': sitemap_columns,
         }
         return render_to_string('inclusion_tags/skeleton/mastfoot.html', context)
