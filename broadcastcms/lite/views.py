@@ -5,6 +5,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.db import models
 from django.forms.util import ValidationError
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
@@ -21,6 +22,7 @@ from broadcastcms.event.models import Event
 from broadcastcms.gallery.models import Gallery
 from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.post.models import Post
+from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.utils import mail_user
 
@@ -253,9 +255,35 @@ def search_results(request):
     context = RequestContext(request, {})
     return render_to_response('content/search_results.html', context)
 
-def info_content(request, slug):
+def info_content(request, section):
     context = RequestContext(request, {})
-    return render_to_response('content/search_results.html', context)
+    settings = context['settings']
+
+    # Check is section is valid and has content
+    try:
+        field = settings._meta.get_field_by_name(section)
+    except models.FieldDoesNotExist:
+        raise Http404
+    
+    if not isinstance(field[0], RichTextField):
+        raise Http404
+
+    section_verbose_name = field[0].verbose_name
+    content = getattr(settings, section)
+    if not content:
+        raise Http404
+        
+    menu_items = []
+    if settings.about: menu_items.append({'title': 'About Us', 'current': (section == 'about'), 'url': reverse('info_content', kwargs={'section': 'about'})})
+    if settings.advertise: menu_items.append({'title': 'Advertise', 'current': (section == 'advertise'), 'url': reverse('info_content', kwargs={'section': 'advertise'})})
+    if settings.terms: menu_items.append({'title': 'Terms &amp; Conditions', 'current': (section == 'terms'), 'url': reverse('info_content', kwargs={'section': 'terms'})})
+    if settings.privacy: menu_items.append({'title': 'Privacy Policy', 'current': (section == 'privacy'), 'url': reverse('info_content', kwargs={'section': 'privacy'})})
+    context.update({
+        'content': content,
+        'section_verbose_name': section_verbose_name,
+        'menu_items': menu_items,
+    })
+    return render_to_response('content/info/content.html', context)
     
 
 # Mailers
