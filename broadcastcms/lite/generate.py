@@ -476,6 +476,24 @@ def create_settings():
                     "title": "Post 1 Title",
                 }
             },
+            "privacy_post": {
+                "model": "post.post",
+                "fields": {
+                    "title": "Post 2 Title",
+                }
+            },
+            "about_post": {
+                "model": "post.post",
+                "fields": {
+                    "title": "Post 3 Title",
+                }
+            },
+            "advertise_post": {
+                "model": "post.post",
+                "fields": {
+                    "title": "Post 4 Title",
+                }
+            },
             "update_types": {
                 "model": "contenttypes.contenttype",
                 "fields": {
