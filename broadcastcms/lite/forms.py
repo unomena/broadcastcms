@@ -72,3 +72,25 @@ class RegistrationForm(forms.Form):
         widget=forms.CheckboxInput(attrs={'class':'required'}),
         error_messages={'required': 'Please accept our terms &amp; conditions</a> to complete registration.'}
     )
+
+class ProfilePictureForm(forms.Form):
+    image = forms.ImageField(
+        required=False,
+        label="Profile Picture",
+        help_text="GIF, JPG &amp; PNG image format are accepted. (Maximum 1MB.)<br />Square images will look best.",
+        widget=forms.FileInput(attrs={'id':'avatar'})
+    )
+    
+    def is_valid(self):
+        # Base validate
+        valid = super(ProfilePictureForm, self).is_valid()
+
+        # Validate image size
+        if not self._errors.has_key('image'):
+            image = self.fields['image'].widget.value_from_datadict(self.data, self.files, self.add_prefix('image'))
+            if image:
+                if (image.size / 1048576.0) >= 1:
+                    self._errors['image'] = ['The image you uploaded is too big.',]
+                    valid = False
+       
+        return valid
