@@ -57,8 +57,8 @@ urlpatterns = patterns('',
 
     url(r'search-results/$', search_results, name='search_results'),
     
-    url(r'validate/username/$', validate_username,  name='validate_username'),
     url(r'validate/captcha/$',  validate_captcha,   name='validate_captcha'),
+    url(r'validate/username/$', validate_username,  name='validate_username'),
 
     url(r'voting/(?P<slug>[\w-]+)/$', xmlhttprequest_vote_on_object, {'model': ContentBase, 'slug_field': 'slug', 'direction': 'up'}, name='xmlhttprequest_vote_on_object'),
 )
