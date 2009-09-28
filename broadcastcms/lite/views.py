@@ -23,10 +23,12 @@ from broadcastcms.gallery.models import Gallery
 from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.post.models import Post
 from broadcastcms.richtext.fields import RichTextField
+from broadcastcms.scaledimage.fields import get_image_scales
+from broadcastcms.scaledimage.storage import ScaledImageStorage
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.utils import mail_user
 
-from forms import LoginForm, RegistrationForm
+from forms import LoginForm, ProfilePictureForm, RegistrationForm
 from templatetags.inclusion_tags import AccountLinksNode
 import utils
 
@@ -39,9 +41,22 @@ def account_picture(request):
     context = RequestContext(request, {})
     user = request.user
     profile = request.user.profile
+        
+    if request.method == "POST":
+        form = ProfilePictureForm(request.POST, request.FILES)
+        if form.is_valid():
+            image = form.cleaned_data['image']
+            if image:
+                saver = ScaledImageStorage(scales=get_image_scales(profile))
+                image = saver.save(profile.image.field.upload_to(profile, image.name), image)
+                profile.image = image
+                profile.save()
+    else:
+        form = ProfilePictureForm()
 
     context.update({
         'profile': profile,
+        'form': form,
     })
     return render_to_response('content/account/picture.html', context)
 
