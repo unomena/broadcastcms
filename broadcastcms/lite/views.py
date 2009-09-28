@@ -236,6 +236,10 @@ def account_links(request):
     context = RequestContext(request, {})
     return HttpResponse(AccountLinksNode().render(context))
 
+def contact(request):
+    context = RequestContext(request, {})
+    return render_to_response('content/search_results.html', context)
+
 def logout(request):
     if request.user.is_authenticated():
         auth.logout(request)
@@ -249,6 +253,10 @@ def search_results(request):
     context = RequestContext(request, {})
     return render_to_response('content/search_results.html', context)
 
+def info_content(request, slug):
+    context = RequestContext(request, {})
+    return render_to_response('content/search_results.html', context)
+    
 
 # Mailers
 def mailer_new_user(request, username, password):
