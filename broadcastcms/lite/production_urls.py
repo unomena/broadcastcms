@@ -37,7 +37,7 @@ urlpatterns = patterns('',
     url(r'galleries/$', galleries, name='galleries'),
     url(r'galleries/(?P<slug>[\w-]+)/$', galleries_content, name='galleries_content'),
    
-    url(r'info/(?P<slug>[\w-]+)/$', info_content, name='info_content'),
+    url(r'info/(?P<section>[\w-]+)/$', info_content, name='info_content'),
     
     url(r'listen-live/$', listen_live, name='listen_live'),
     url(r'studio-cam/$', studio_cam, name='studio_cam'),
