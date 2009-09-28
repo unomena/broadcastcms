@@ -29,11 +29,39 @@ class Settings(models.Model):
     )
     terms_post = models.ForeignKey(
         Post, 
+        related_name='terms_post', 
         null=True, 
         blank=True, 
         limit_choices_to={'is_public': True},
         verbose_name='Terms and Conditions Post',
         help_text='A post to be used for the Terms and Conditions page.',
+    )
+    privacy_post = models.ForeignKey(
+        Post, 
+        related_name='privacy_post', 
+        null=True, 
+        blank=True, 
+        limit_choices_to={'is_public': True},
+        verbose_name='Privacy Policy Post',
+        help_text='A post to be used for the Privacy Policy page.',
+    )
+    about_post = models.ForeignKey(
+        Post, 
+        related_name='about_post', 
+        null=True, 
+        blank=True, 
+        limit_choices_to={'is_public': True},
+        verbose_name='About Post',
+        help_text='A post to be used for the About page.',
+    )
+    advertise_post = models.ForeignKey(
+        Post, 
+        related_name='advertise_post', 
+        null=True, 
+        blank=True, 
+        limit_choices_to={'is_public': True},
+        verbose_name='Advertise Post',
+        help_text='A post to be used for the Advertise page.',
     )
     update_types = models.ManyToManyField(
         ContentType, 
@@ -104,6 +132,13 @@ class Settings(models.Model):
                                                  limit_choices_to={'is_public': True},
                                                  verbose_name='Galleries')
     
+    # Metrics
+    metrics = models.TextField(
+        verbose_name="Metrics", 
+        help_text="HTML/Javascript code snippet appended to each page just before the closing body tag.",
+        blank=True, 
+        null=True,
+    )
     class Meta:
         verbose_name = 'Settings'
         verbose_name_plural = 'Settings'
@@ -114,6 +149,9 @@ class Settings(models.Model):
             banners = banners.permitted() if permitted else banners.all()
             banners = [banner.as_leaf_class() for banner in banners]
         return banners
+
+    def __unicode__(self):
+        return 'Settings'
 
 class UserProfile(models.Model):
     user = models.ForeignKey(
