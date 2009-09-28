@@ -379,6 +379,18 @@ class AccountMenuNode(template.Node):
         })
         return render_to_string('inclusion_tags/account/menu.html', context)
 
+@register.tag
+def account_thanks(parser, token):
+    return AccountThanksNode()
+
+class AccountThanksNode(template.Node):
+    def render(self, context):
+        try:
+            if context['form'].is_valid():
+                return render_to_string('inclusion_tags/account/thanks.html', context)
+        except:
+            pass
+        return ''
 
 # Widgets
 
