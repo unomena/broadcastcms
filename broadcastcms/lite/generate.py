@@ -470,30 +470,10 @@ def create_settings():
         "fields": {
             "id": "1",
             "homepage_featured_labels": [str(pk) for pk in random.sample(range(1, LABEL_COUNT + 1), random.randint(0, LABEL_COUNT))],
-            "terms_post": {
-                "model": "post.post",
-                "fields": {
-                    "title": "Post 1 Title",
-                }
-            },
-            "privacy_post": {
-                "model": "post.post",
-                "fields": {
-                    "title": "Post 2 Title",
-                }
-            },
-            "about_post": {
-                "model": "post.post",
-                "fields": {
-                    "title": "Post 3 Title",
-                }
-            },
-            "advertise_post": {
-                "model": "post.post",
-                "fields": {
-                    "title": "Post 4 Title",
-                }
-            },
+            "terms": "Terms Content",
+            "privacy": "Privacy Content",
+            "about": "About Content",
+            "advertise": "Advertise Content", 
             "update_types": {
                 "model": "contenttypes.contenttype",
                 "fields": {
