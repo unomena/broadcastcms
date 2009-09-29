@@ -28,7 +28,7 @@ from broadcastcms.scaledimage.storage import ScaledImageStorage
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.utils import mail_user
 
-from forms import LoginForm, ProfilePictureForm, RegistrationForm
+from forms import LoginForm, ProfileForm, ProfilePictureForm, RegistrationForm
 from templatetags.inclusion_tags import AccountLinksNode
 import utils
 
@@ -61,10 +61,121 @@ def account_picture(request):
     return render_to_response('content/account/picture.html', context)
 
 def account_profile(request):
+    """
+    TODO: This view seems very flimsy, refactor.
+    """
     if not request.user.is_authenticated():
        raise Http404
     
     context = RequestContext(request, {})
+    user = request.user
+    profile = request.user.profile
+        
+    if request.method == "POST":
+        form = ProfileForm(request.POST)
+
+        # If no password supplied remove the password fields thereby ignoring them and not changing the password
+        password = form.fields['password'].widget.value_from_datadict(form.data, form.files, form.add_prefix('password'))
+        password_confirm = form.fields['password_confirm'].widget.value_from_datadict(form.data, form.files, form.add_prefix('password_confirm'))
+        if not password:
+            password_field = form.fields['password']
+            del form.fields['password']
+            password_confirm_field = form.fields['password_confirm']
+            del form.fields['password_confirm']
+        
+        # Prevent user's own username triggering an error
+        username = form.fields['username'].widget.value_from_datadict(form.data, form.files, form.add_prefix('username'))
+        if user.username == username:
+            username_field = form.fields['username']
+            del form.fields['username']
+
+        if form.is_valid():
+            # Readd fields removed for validation
+            if user.username == username:
+                form.fields['username'] = username_field
+                form.cleaned_data['username'] = username
+            
+            if not password:
+                form.fields['password'] = password_field
+                form.cleaned_data['password'] = password
+                form.fields['password_confirm'] = password_confirm_field
+                form.cleaned_data['password_confirm'] = password_confirm
+            
+            # Get cleaned form values
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            email_address = form.cleaned_data['email_address']
+            mobile_number = form.cleaned_data['mobile_number']
+            city = form.cleaned_data['city']
+            province = form.cleaned_data['province']
+            birth_date_day = form.cleaned_data['birth_date_day']
+            birth_date_month = form.cleaned_data['birth_date_month']
+            birth_date_year = form.cleaned_data['birth_date_year']
+                
+            # Create birth_date
+            try:
+                birth_date = datetime(
+                    year=int(birth_date_year),
+                    month=int(birth_date_month),
+                    day=int(birth_date_day),
+                    hour=0,
+                    minute=0
+                )
+            except ValueError:
+                birth_date = None
+
+            # Update user
+            user.username = username
+            user.email = email_address
+            user.first_name = first_name
+            user.last_name = last_name
+            if password:
+                user.set_password(password)
+            user.save()
+
+            # Update profile
+            profile.mobile_number = mobile_number
+            profile.city = city
+            profile.province = province
+            profile.birth_date = birth_date
+   
+            profile.save()
+        else:
+            # Readd fields removed for validation
+            if user.username == username:
+                form.fields['username'] = username_field
+            
+            if not password:
+                form.fields['password'] = password_field
+                form.fields['password_confirm'] = password_confirm_field
+    else:
+        province = profile.province
+        if province: province = province.id
+            
+        data = {
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email_address': user.email,
+            'mobile_number': profile.mobile_number,
+            'city': profile.city,
+            'province': province,
+        }
+        birth_date = profile.birth_date
+        if birth_date:
+            data.update({
+                'birth_date_day': birth_date.day,
+                'birth_date_month': birth_date.month,
+                'birth_date_year': birth_date.year,
+            })
+            
+        form = ProfileForm(initial=data)
+
+    context.update({
+        'form': form,
+    })
     return render_to_response('content/account/profile.html', context)
 
 def account_subscriptions(request):
@@ -203,10 +314,68 @@ def validate_username(request):
                 response = ("'%s'" % str(e.message))
             else:
                 response = "'Error, please try again'"
+
+            # don't fail if the user already has the username 
+            if request.user.is_authenticated():
+                user = request.user
+                if value == user.username:
+                    response = "true" 
+
             return HttpResponse(response)
 
         return HttpResponse("true")
     raise Http404
+
+def validate_password(request):
+    if not request.is_ajax():
+        raise Http404
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST)
+        password = form.fields['password'].widget.value_from_datadict(form.data, form.files, form.add_prefix('password'))
+
+        response = "true"
+        try:
+            form['password'].field.clean(password)
+        except ValidationError, e:
+            if e.messages:
+                response = "'%s'" % str(e.messages[0])
+            elif e.message:
+                response = ("'%s'" % str(e.message))
+            else:
+                response = "'Error, please try again'"
+
+        return HttpResponse(response)
+    
+    raise Http404
+
+def validate_password_confirm(request):
+    if not request.is_ajax():
+        raise Http404
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST)
+        password_confirm = form.fields['password_confirm'].widget.value_from_datadict(form.data, form.files, form.add_prefix('password_confirm'))
+        password = form.fields['password'].widget.value_from_datadict(form.data, form.files, form.add_prefix('password'))
+
+        response = "true"
+        try:
+            form['password_confirm'].field.clean(password_confirm)
+            if password != password_confirm:
+                response = "'Passwords do not match.'"
+                
+        except ValidationError, e:
+            if e.messages:
+                response = "'%s'" % str(e.messages[0])
+            elif e.message:
+                response = ("'%s'" % str(e.message))
+            else:
+                response = "'Error, please try again.'"
+
+        return HttpResponse(response)
+    
+    raise Http404
+
 
 def validate_captcha(request):
     if not request.is_ajax():
@@ -220,7 +389,6 @@ def validate_captcha(request):
 
     raise Http404
 
-    
 # Galleries
 def galleries(request):
     context = RequestContext(request, {})
