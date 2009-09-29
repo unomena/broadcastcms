@@ -2,6 +2,7 @@ from os import path
 import sys
 
 # Utility Constants
+SCRIPT_PATH =  path.abspath(path.dirname(__file__))
 BUILDOUT_PATH =  path.split(path.abspath(path.join(path.dirname(sys.argv[0]))))[0]
 
 # Django settings for broadcastcmslite project.
@@ -78,6 +79,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    '%s/templates' % SCRIPT_PATH,
 )
 
 AUTH_PROFILE_MODULE = "lite.UserProfile"
