@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     
     url(r'account-links/$', account_links, name='account_links'),
     url(r'logout/$', logout, name='logout'),
+    url(r'comment-add/$', comment_add, name='comment_add'),
     
     url(r'^admin/(.*)', admin.site.root),
 
