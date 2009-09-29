@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from broadcastcms.banner.models import Banner
 from broadcastcms.base.models import ContentBase
+from broadcastcms.event.models import Province
 from broadcastcms.label.models import Label
 from broadcastcms.post.models import Post
 from broadcastcms.richtext.fields import RichTextField
@@ -157,11 +158,19 @@ class UserProfile(models.Model):
         null=True,
     )
     image = ScaledImageField()
+    mobile_number = models.CharField(max_length=64)
+    city = models.CharField(max_length=100)
+    province = models.ForeignKey(
+        Province, 
+        blank=True, 
+        null=True,
+    )
+    birth_date= models.DateField(blank=True, null=True)
 
     def __unicode__(self):
         return self.user.username
   
-# Create User profile property which either gets or creates an empty profile for the given user
+# Create User profile property which gets or creates an empty profile for the given user
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
     
     #def save(self, *args, **kwargs):
