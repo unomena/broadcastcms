@@ -318,11 +318,18 @@ class PostHeadNode(template.Node):
 
 @register.tag
 def comments(parser, token):
-    return CommentsNode()
+    tag, instance = token.split_contents()
+    return CommentsNode(instance)
 
 class CommentsNode(template.Node):
+    def __init__(self, instance):
+        self.instance = template.Variable(instance)
+    
     def render(self, context):
-        context = {}
+        instance = self.instance.resolve(context)
+        context.update({
+            'instance': instance,
+        })
         return render_to_string('inclusion_tags/misc/comments.html', context)
 
 @register.tag
