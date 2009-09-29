@@ -464,6 +464,18 @@ def create_locations():
         })
     return locations
 
+def create_provinces():
+    provinces = []
+    for province in ['Western Cape', 'Gauteng', 'Kwazulu Natal', 'Mpumalanga', 'Eastern Cape', 'North West', 'Free State', 'Limpopo', 'Northern Cape']:
+        provinces.append({
+            "model": "event.province",
+            "fields": {
+                "name": province,
+                "is_public": True,
+            },
+        })
+    return provinces
+
 def create_settings():
     settings = [{
         "model": "lite.settings",
@@ -474,13 +486,36 @@ def create_settings():
             "privacy": "Privacy Content",
             "about": "About Content",
             "advertise": "Advertise Content", 
-            "update_types": {
-                "model": "contenttypes.contenttype",
-                "fields": {
-                    "app_label": "post",
-                    "model": "post",
-                }
-            },
+            "update_types": [
+                {
+                    "model": "contenttypes.contenttype",
+                    "fields": {
+                        "app_label": "post",
+                        "model": "post",
+                    },
+                },
+                {
+                    "model": "contenttypes.contenttype",
+                    "fields": {
+                       "app_label": "event",
+                        "model": "event",
+                    },
+                },
+                {
+                    "model": "contenttypes.contenttype",
+                    "fields": {
+                        "app_label": "gallery",
+                        "model": "gallery",
+                    },
+                },
+                {
+                    "model": "contenttypes.contenttype",
+                    "fields": {
+                        "app_label": "competition",
+                        "model": "competition",
+                    },
+                },
+            ],
             "banner_section_home": {
                 "model": "banner.banner",
                 "fields": {
@@ -554,6 +589,7 @@ def generate():
     objects += create_events()
     objects += create_locations()
     objects += create_entries()
+    objects += create_provinces()
     objects += create_settings()
     
     load_json(objects)
