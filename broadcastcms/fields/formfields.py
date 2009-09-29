@@ -9,12 +9,12 @@ class UsernameField(forms.CharField):
 
     def clean(self, value):
         """
-        Lowers value.
+        #Lowers value.
         Checks that value is at least 4 characters long.
         Checks that the value does not include non-alphanumeric characters, excluding "_".
         Checks that a username of the given value does not already exist.
         """
-        value = value.lower()
+        #value = value.lower()
         if len(value) < 4:
             raise ValidationError(self.error_messages['invalid_length'])
         
@@ -25,3 +25,20 @@ class UsernameField(forms.CharField):
             raise ValidationError(self.error_messages['existing'])
         
         return super(UsernameField, self).clean(value)
+
+class PasswordField(forms.CharField):
+
+    def clean(self, value):
+        """
+        #Lowers value.
+        Checks that value is at least 4 characters long.
+        Checks that the value does not include non-alphanumeric characters, excluding "_".
+        """
+        #value = value.lower()
+        if len(value) < 4:
+            raise ValidationError(self.error_messages['invalid_length'])
+        
+        if re.search(r'\W', value):
+            raise ValidationError(self.error_messages['invalid_characters'])
+
+        return super(PasswordField, self).clean(value)
