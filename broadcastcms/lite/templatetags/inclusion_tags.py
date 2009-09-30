@@ -294,29 +294,6 @@ class PagingNode(template.Node):
         return ''
 
 @register.tag
-def post_head(parser, token):
-    token = token.split_contents()
-    if not len(token) == 2:
-        raise template.TemplateSytaxError, '%r tag requires exactly 1 argument.' % token[0]
-    return PostHeadNode(token[1])
-
-class PostHeadNode(template.Node):
-    def __init__(self, instance):
-        self.instance = template.Variable(instance)
-
-    def render(self, context):
-        instance = self.instance.resolve(context)
-        host = "http://%s" % context['request'].META['HTTP_HOST']
-        vote_url = reverse('xmlhttprequest_vote_on_object', kwargs={'slug': instance.slug})
-        context.update({
-            'instance': instance,
-            'owner': instance.owner,
-            'host': host,
-            'vote_url': vote_url,
-        })
-        return render_to_string('inclusion_tags/misc/post_head.html', context)
-
-@register.tag
 def comments(parser, token):
     tag, instance = token.split_contents()
     return CommentsNode(instance)
