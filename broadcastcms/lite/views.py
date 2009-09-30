@@ -31,7 +31,7 @@ from broadcastcms.scaledimage.storage import ScaledImageStorage
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.utils import mail_user
 
-from forms import LoginForm, ProfileForm, ProfilePictureForm, RegistrationForm
+from forms import make_competition_form, LoginForm, ProfileForm, ProfilePictureForm, RegistrationForm
 from templatetags.inclusion_tags import AccountLinksNode
 import utils
 
@@ -939,10 +939,21 @@ class CompetitionViews(object):
         }
         return render_to_string('content/competitions/listing.html', context)
     
-    def render_article_body(self):
-        context = {
+    def render_article_body(self, context):
+        form_class = make_competition_form(self)
+        
+        request = context['request']
+        if request.method == "POST":
+            form = form_class(request.POST)
+            if form.is_valid():
+                form.create_entry(self, request.user)
+        else:
+            form = form_class()
+
+        context.update({
             'self': self,
-        }
+            'form': form,
+        })
         return render_to_string('content/competitions/article_body.html', context)
 
 class EntryViews(object):
@@ -959,7 +970,7 @@ class EntryViews(object):
         return render_to_string('content/entry/block.html', context)
     
 class EventViews(object):
-    def render_article_body(self):
+    def render_article_body(self, context):
         entries = Entry.objects.permitted().upcoming().filter(content=self).order_by('start')
         context = {
             'self': self,
@@ -986,7 +997,7 @@ class GalleryViews(object):
         }
         return render_to_string('content/galleries/block.html', context)
     
-    def render_article_body(self):
+    def render_article_body(self, context):
         context = {
             'self': self,
         }
@@ -997,7 +1008,7 @@ class CastMemberViews(object):
         return reverse('shows_dj_blog', kwargs={'slug': self.slug})
 
 class PostViews(object):
-    def render_article_body(self):
+    def render_article_body(self, context):
         context = {
             'self': self,
         }
