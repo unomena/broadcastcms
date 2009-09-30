@@ -1,4 +1,16 @@
 <div class="post_body rich">
+    <p> 
+        {% for entry in entries %}
+            {% with entry.content.as_leaf_class.locations.permitted as locations %}
+                <span>{{ entry.start|date:"D j M Y" }} - {{ entry.end|date:"D j M Y" }}{% if locations %}&nbsp; : &nbsp;{% endif %}</span>
+                    {% for location in locations %}
+                        <span>{{ location.venue }}{% if location.city %}, {{ location.city }}{% endif %}</span>
+                        {% if not forloop.last %}<span>&nbsp; | &nbsp;</span>{% endif %}
+                    {% endfor %}
+                <br />
+            {% endwith %}
+        {% endfor %}
+    </p>
     <p>
         {{ self.content|safe }}
     </p>
