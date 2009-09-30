@@ -890,6 +890,17 @@ class ContentBaseViews(object):
             
         return '/404'
 
+    def post_head(self, context):
+        host = "http://%s" % context['request'].META['HTTP_HOST']
+        vote_url = reverse('xmlhttprequest_vote_on_object', kwargs={'slug': self.slug})
+        context.update({
+            'instance': self,
+            'owner': self.owner,
+            'host': host,
+            'vote_url': vote_url,
+        })
+        return render_to_string('content/contentbase/post_head.html', context)
+
 class ChartEntryViews(object):
     def render_chart(self):
         song = self.song
@@ -949,8 +960,10 @@ class EntryViews(object):
     
 class EventViews(object):
     def render_article_body(self):
+        entries = Entry.objects.permitted().upcoming().filter(content=self).order_by('start')
         context = {
             'self': self,
+            'entries': entries,
         }
         return render_to_string('content/events/article_body.html', context)
     
@@ -964,7 +977,7 @@ class EventViews(object):
             'location': location,
         }
         return render_to_string('content/events/listing.html', context)
-
+    
 class GalleryViews(object):
     def render_block(self, context):
         context = {
