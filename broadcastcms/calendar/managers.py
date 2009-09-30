@@ -152,7 +152,7 @@ class CalendarManager(ModelBaseManager):
 
     def next14days(self):
         return self.get_query_set().next14days()
-
+    
     def thisweekend(self):
         return self.get_query_set().thisweekend()
 
