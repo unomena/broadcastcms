@@ -1,6 +1,6 @@
-{% load inclusion_tags %}
+{% load inclusion_tags public_tags %}
 <div class="page_container">
-    {% post_head self %}
+    {% call_view self post_head %}
     {{ self.render_article_body }}
 </div><!--/container-->
 {% comments self %}
