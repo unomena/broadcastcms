@@ -12,8 +12,26 @@ class Competition(ContentBase):
     content = RichTextField(help_text='Full article detailing this competition.')
     start = models.DateField(blank=True, null=True, help_text='Date on which this competition opens.')
     end = models.DateField(blank=True, null=True, help_text='Date on which this competition ends.')
-    rules = RichTextField(help_text='Rules specific to this competition.')
-    question = RichTextField(blank=True, null=True, help_text='Question to be answered by contestants.')
+    question = models.CharField(
+        max_length=255,
+        help_text='Short competition question',
+        )
+    question_blurb = RichTextField(
+        blank=True, 
+        null=True, 
+        help_text='Descriptive text elaborating on the question.'
+    )
+    correct_answer = models.CharField(
+        max_length=255,
+        blank=True, 
+        null=True, 
+        help_text='Answer used to determine winning entries.'
+    )
+    rules = RichTextField(
+        blank=True, 
+        null=True, 
+        help_text='Rules specific to this competition.',
+    )
 
     def is_active(self):
         now = datetime.now().date()
@@ -34,7 +52,7 @@ class Option(ModelBase):
 class CompetitionEntry(models.Model):
     competition = models.ForeignKey(Competition, related_name='competition_entries')
     user = models.ForeignKey(User, related_name='competition_entries')
-    option = models.ForeignKey(Option, related_name='competition_entries')
+    answer = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -42,7 +60,7 @@ class CompetitionEntry(models.Model):
         verbose_name_plural = 'Competition Entries'
 
     def __unicode__(self):
-        return "%s chose %s" % (self.user.username, self.option.title)
+        return "%s answered %s" % (self.user.username, self.answer)
 
 
 class Winner(ModelBase):
