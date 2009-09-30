@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django import forms
 
+from broadcastcms.competition.models import CompetitionEntry
 from broadcastcms.event.models import Province
 from broadcastcms.fields import formfields
 
@@ -206,3 +207,40 @@ class ProfilePictureForm(forms.Form):
                     valid = False
        
         return valid
+
+class _BaseCompetitionForm(forms.Form):
+    def create_entry(self, competition, user):
+        answer = self.get_answer()
+        CompetitionEntry(
+            competition = competition,
+            user = user,
+            answer = answer,
+        ).save()
+
+def make_competition_form(competition):
+    options = competition.options.permitted()
+    label = "Your Answer: "
+
+    if options:
+        class _OptionsCompetitionForm(_BaseCompetitionForm):
+            answer = forms.ModelChoiceField(
+                label=label,
+                queryset=options,
+                empty_label=None,
+                widget=forms.Select(attrs={'class':'compchoice'}),
+            )
+            def get_answer(self):
+                return self.cleaned_data['answer'].title
+
+        return _OptionsCompetitionForm
+    else:
+        class _AnswerCompetitionForm(_BaseCompetitionForm):
+            answer = forms.CharField(
+                max_length=255,
+                label=label,
+                required=True,
+            )
+            def get_answer(self):
+                return self.cleaned_data['answer']
+
+        return _AnswerCompetitionForm
