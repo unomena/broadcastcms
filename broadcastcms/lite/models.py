@@ -6,6 +6,7 @@ from broadcastcms.banner.models import Banner
 from broadcastcms.base.models import ContentBase
 from broadcastcms.event.models import Province
 from broadcastcms.label.models import Label
+from broadcastcms.integration.mailinglists import PMailer
 from broadcastcms.post.models import Post
 from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.scaledimage import ScaledImageField
@@ -128,6 +129,26 @@ class Settings(models.Model):
         blank=True, 
         null=True,
     )
+    
+    # Messaging
+    pmailer_list_id = models.CharField(
+        max_length="64", 
+        verbose_name="Mailing List ID", 
+        help_text="Portal's pmailer mailing list id.",
+        blank=True, null=True,
+    )
+    pmailer_form_id = models.CharField(
+        max_length="64", 
+        verbose_name="Mailing List Form ID", 
+        help_text="Pmailer form id through which to interact with pmailer.",
+        blank=True, null=True,
+    )
+    contact_email_recipients = models.TextField(
+        'Contact Email Recipients', 
+        help_text='Email addresses that will recieve user contact emails.',
+        blank=True, null=True,
+        )
+
     class Meta:
         verbose_name = 'Settings'
         verbose_name_plural = 'Settings'
@@ -170,21 +191,21 @@ class UserProfile(models.Model):
     def __unicode__(self):
         return self.user.username
   
+    def save(self, *args, **kwargs):
+        settings = Settings.objects.all()
+        if settings:
+            settings = settings[0]
+            list_id = settings.pmailer_list_id
+            form_id = settings.pmailer_form_id
+            email = self.user.email
+            if email and list_id and form_id:
+                pmailer = PMailer(list_id=list_id, form_id=form_id, email=email)
+                if self.email_subscribe:
+                    pmailer.subscribe()
+                else:
+                    pmailer.unsubscribe()
+
+        super(UserProfile, self).save(*args, **kwargs)
+
 # Create User profile property which gets or creates an empty profile for the given user
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
-    
-    #def save(self, *args, **kwargs):
-    #    settings = Settings.objects.all()
-    #    if settings:
-    #        settings = settings[0]
-    #        list_id = settings.pmailer_list_id
-    #        form_id = settings.pmailer_form_id
-    #        email = self.user.email
-    #        if email and list_id and form_id:
-    #            pmailer = PMailer(list_id=list_id, form_id=form_id, email=email)
-    #            if self.newsletter_subscribe:
-    #                pmailer.subscribe()
-    #            else:
-    #                pmailer.unsubscribe()
-
-    #    super(UserProfile, self).save(*args, **kwargs)
