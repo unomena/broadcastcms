@@ -33,7 +33,7 @@ from broadcastcms.scaledimage.storage import ScaledImageStorage
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.utils import mail_user
 
-from forms import make_competition_form, LoginForm, ProfileForm, ProfilePictureForm, RegistrationForm
+from forms import make_competition_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
 from templatetags.inclusion_tags import AccountLinksNode
 import utils
 
@@ -188,6 +188,25 @@ def account_subscriptions(request):
        raise Http404
     
     context = RequestContext(request, {})
+    user = request.user
+    profile = request.user.profile
+        
+    if request.method == "POST":
+        form = ProfileSubscriptionsForm(request.POST)
+        if form.is_valid():
+            profile.email_subscribe = form.cleaned_data['email_subscribe']
+            profile.sms_subscribe = form.cleaned_data['sms_subscribe']
+            profile.save()
+    else:
+        data = {
+            'email_subscribe': profile.email_subscribe,
+            'sms_subscribe': profile.sms_subscribe,
+        }
+        form = ProfileSubscriptionsForm(initial=data)
+
+    context.update({
+        'form': form,
+    })
     return render_to_response('content/account/subscriptions.html', context)
 
 # Chart
