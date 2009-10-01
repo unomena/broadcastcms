@@ -185,7 +185,6 @@ class ProfileForm(forms.Form):
 
         return valid
 
-
 class ProfilePictureForm(forms.Form):
     image = forms.ImageField(
         required=False,
@@ -207,6 +206,18 @@ class ProfilePictureForm(forms.Form):
                     valid = False
        
         return valid
+
+class ProfileSubscriptionsForm(forms.Form):
+    email_subscribe = forms.BooleanField(
+        required=False,
+        label='Email<br />Alerts:',
+        help_text='Send Me Email Alerts',
+    )
+    sms_subscribe = forms.BooleanField(
+        required=False,
+        label='Mobile<br />Alerts:',
+        help_text='Send Me SMS Alerts',
+    )
 
 class _BaseCompetitionForm(forms.Form):
     def create_entry(self, competition, user):
