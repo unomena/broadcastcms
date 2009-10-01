@@ -1,6 +1,7 @@
 from datetime import date, datetime, timedelta
 import calendar
 
+from django.conf import settings
 from django.contrib import auth
 from django.contrib import comments
 from django.contrib.auth.models import User
@@ -10,10 +11,11 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.forms.util import ValidationError
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.loader import render_to_string
+from django.utils.http import urlencode
 
 from broadcastcms import public
 from broadcastcms.banner.models import CodeBanner, ImageBanner
@@ -542,6 +544,11 @@ def search_results(request):
     context = RequestContext(request, {})
     return render_to_response('content/search_results.html', context)
 
+def short_redirect(request, pk):
+    context = RequestContext(request, {})
+    content = get_object_or_404(ContentBase, pk=pk, is_public=True)
+    return HttpResponseRedirect(content.url(context))
+    
 def info_content(request, section):
     context = RequestContext(request, {})
     settings = context['settings']
@@ -891,13 +898,47 @@ class ContentBaseViews(object):
         return '/404'
 
     def post_head(self, context):
+
+        # create a short sharing url
         host = "http://%s" % context['request'].META['HTTP_HOST']
+        share_url = "%s/%s" % (host, self.pk)
+
+        # create voting url
         vote_url = reverse('xmlhttprequest_vote_on_object', kwargs={'slug': self.slug})
+
+        # get site name
+        site_pk = settings.SITE_ID
+        site_name = Site.objects.get(pk=site_pk).name
+        
+        # build mailto url
+        mailto_url = "mailto:?%s" % urlencode({
+            'subject': "%s: %s" % (site_name, self.title),
+            'body': """I wanted to share this story with you: %s
+---
+%s
+%s""" % (share_url, self.title, self.description),
+        })
+
+        # build facebook url
+        facebook_url = "http://www.facebook.com/sharer.php?%s" % urlencode({'u': share_url})
+
+        # build twitter url
+        twitter_status = "RT %s" % self.title
+        twitter_status = "%s...: %s" % (twitter_status[:140 - len(share_url) - 5], share_url)
+        twitter_url = "http://twitter.com/home?%s" % urlencode({
+            'status': twitter_status,
+            'source': site_name
+        })
+
         context.update({
             'instance': self,
             'owner': self.owner,
             'host': host,
             'vote_url': vote_url,
+            'share_url': share_url,
+            'mailto_url': mailto_url,
+            'facebook_url': facebook_url,
+            'twitter_url': twitter_url,
         })
         return render_to_string('content/contentbase/post_head.html', context)
 
