@@ -189,13 +189,13 @@ class OnAirNode(template.Node):
         song = song_entry.content.as_leaf_class() if song_entry else None
         artist = self.get_primary_artist(song) if song else None
 
-        context = {
+        context.update({
             'entry': show_entry,
             'show': show,
             'castmember': castmember,
             'song': song,
             'artist': artist,
-        }
+        })
         return render_to_string('inclusion_tags/home/on_air.html', context)
 
         return ''
@@ -423,7 +423,7 @@ class NowPlayingNode(OnAirNode):
         next_show = next_entry.content.as_leaf_class() if next_entry else None
         next_castmember = self.get_primary_castmember(next_show) if next_show else None
 
-        context = {
+        context.update({
             'entry': show_entry,
             'show': show,
             'castmember': castmember,
@@ -431,7 +431,7 @@ class NowPlayingNode(OnAirNode):
             'artist': artist,
             'next_show': next_show,
             'next_castmember': next_castmember,
-        }
+        })
         return render_to_string('inclusion_tags/widgets/now_playing.html', context)
 
 @register.tag
