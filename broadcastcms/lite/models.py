@@ -130,6 +130,14 @@ class Settings(models.Model):
         null=True,
     )
     
+    # Player Controls
+    player_controls = models.TextField(
+        verbose_name="Listen Live Player Controls", 
+        help_text="HTML/Javascript code snippet providing player controls for the listen live popup.",
+        blank=True, 
+        null=True,
+    )
+    
     # Messaging
     pmailer_list_id = models.CharField(
         max_length="64", 
