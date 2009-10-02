@@ -564,6 +564,12 @@ def create_settings():
             "gcs_partner_id": "partner-pub-7837760522231511:xryca-9vmsb",
             "competition_general_rules": "Competition General Rules",
             "studio_cam_urls": "http://mailers.trufm.co.za/cam/studio1.jpg\nhttp://mailers.trufm.co.za/cam/studio2.jpg\nhttp://mailers.trufm.co.za/cam/studio1.jpg\nhttp://mailers.trufm.co.za/cam/studio2.jpg\nhttp://mailers.trufm.co.za/cam/studio1.jpg",
+            "phone": "phone",
+            "fax": "fax",
+            "email": "email",
+            "sms": "sms",
+            "physical_address": "physical address line 1\nphysical address line 2\nphysical address line 3",
+            "postal_address": "postal address line 1\npostal address line 2\npostal address line 3",
         }
     }]
     return settings

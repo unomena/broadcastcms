@@ -149,6 +149,48 @@ class Settings(models.Model):
         blank=True, null=True,
         )
 
+    # Contact
+    phone = models.CharField(
+        max_length="64", 
+        verbose_name="Phone", 
+        help_text="Phone number displayed on the Contact Us page.",
+        blank=True, 
+        null=True,
+    )
+    fax = models.CharField(
+        max_length="64", 
+        verbose_name="Fax", 
+        help_text="Fax number displayed on the Contact Us page.",
+        blank=True, 
+        null=True,
+    )
+    email = models.EmailField(
+        max_length="64", 
+        verbose_name="Email", 
+        help_text="Email address displayed on the Contact Us page.",
+        blank=True, 
+        null=True,
+    )
+    sms = models.CharField(
+        max_length="64", 
+        verbose_name="SMS", 
+        help_text="SMS details displayed on the Contact Us page.",
+        blank=True, 
+        null=True,
+    )
+    physical_address = models.TextField(
+        'Physical Address', 
+        help_text="Physical Address details displayed on the Contact Us page.",
+        blank=True, 
+        null=True,
+    )
+    postal_address = models.TextField(
+        'Postal Address', 
+        help_text="Postal Address details displayed on the Contact Us page.",
+        blank=True, 
+        null=True,
+    )
+
     class Meta:
         verbose_name = 'Settings'
         verbose_name_plural = 'Settings'
