@@ -24,7 +24,7 @@
 		    	        <span class="com_meta_time">{{ comment.submit_date|date:"D, j M G:i" }}</span>
 			            <span class="com_meta_abuse"><a href="abuse_pop.html?height=500&amp;width=540" class="thickbox">Report Abuse</a></span>
 		            </p>
-	                <p class="com_blurb">{{ comment.comment|linebreaks }}</p>
+	                <p class="com_blurb">{{ comment.comment|linebreaksbr }}</p>
     	        </div><!--/comment-->
             {% endwith %}
         {% endfor %}
