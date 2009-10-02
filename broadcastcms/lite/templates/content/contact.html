@@ -1,0 +1,140 @@
+{% extends "sections/base_section.html" %}
+
+{% block left %}
+    <div class="page_head">
+	    <h1>Contact Us &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+		<div class="page_menu">
+		    {% if sent %}
+    		    <p>Thanks for getting in touch! We'll get back to you as soon as possible.</p>
+            {% else %}
+                <p>We'd like to hear from you. Here's how you can contact us.</p>
+            {% endif %}
+		</div>
+	</div><!--/head-->
+	<div class="page_container contact">
+	    <div class="contact_left">
+		    <h3>Fill in the form below to get in contact with us:</h3>
+    		<form id="frmContact" method="post" action="{% url contact %}" method="POST" class="cmxform">
+                {% with form.name as field %}
+                    {% if field %}
+        	    		<p class="field_contact shift">
+                            {{ field }}
+                            <script type="text/javascript">
+                                $("#{{ field.auto_id}}").focus(function() {
+                                    if (this.value == '{{ field.label }}')
+                                        this.value = '';
+                                });
+                                $("#{{ field.auto_id}}").blur(function() {
+                                    if (this.value == '')
+                                        this.value = '{{ field.label }}';
+                                });
+                            </script>
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                {% endwith %}
+                {% with form.email as field %}
+                    {% if field %}
+	    		        <p class="field_contact shift">
+                            {{ field }}
+                            <script type="text/javascript">
+                                $("#{{ field.auto_id}}").focus(function() {
+                                    if (this.value == '{{ field.label }}')
+                                        this.value = '';
+                                });
+                                $("#{{ field.auto_id}}").blur(function() {
+                                    if (this.value == '')
+                                        this.value = '{{ field.label }}';
+                                });
+                            </script>
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                {% endwith %}
+                {% with form.subject as field %}
+                    {% if field %}
+    	    		    <p class="field_contact shift">
+                            {{ field }}
+                            <script type="text/javascript">
+                                $("#{{ field.auto_id}}").focus(function() {
+                                    if (this.value == '{{ field.label }}')
+                                        this.value = '';
+                                });
+                                $("#{{ field.auto_id}}").blur(function() {
+                                    if (this.value == '')
+                                        this.value = '{{ field.label }}';
+                                });
+                            </script>
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                {% endwith %}
+                {% with form.recaptcha_response_field as field %}
+                    {% if field %}
+                        <p class="spam_contact">
+                            <span id="recaptcha_image" style="width: 300px; height: 57px;"></span>
+    	    	    		<span class="spam_contact_txt">{{ field.help_text }}</span>
+                        </p>
+    	    	    	<p class="field_contact shift">
+                            {{ field }}
+                            <script type="text/javascript">
+                                Recaptcha.create(
+                                    "6LdcYgcAAAAAAEq2mn0KoUfM18BsgjSkuyLu-Pzk",
+                                    "", 
+                                    { theme: "custom" }
+                                );
+                                $("#{{ field.auto_id}}").focus(function() {
+                                    if (this.value == '{{ field.label }}')
+                                        this.value = '';
+                                });
+                                $("#{{ field.auto_id}}").blur(function() {
+                                    if (this.value == '')
+                                        this.value = '{{ field.label }}';
+                                });
+                            </script>
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                {% endwith %}
+                {% with form.message as field %}
+                    {% if field %}
+    				    <p class="textfield_contact shift_plenty">
+                            {{ field }}
+                            <script type="text/javascript">
+                                $("#{{ field.auto_id}}").focus(function() {
+                                    if (this.value == '{{ field.label }}')
+                                        this.value = '';
+                                });
+                                $("#{{ field.auto_id}}").blur(function() {
+                                    if (this.value == '')
+                                        this.value = '{{ field.label }}';
+                                });
+                            </script>
+                        </p>
+                    {% endif %}
+                {% endwith %}
+				<ul class="btns_contact">
+			    	<li><input type="image" src="/media/bcms/images/forms/btn-send_message.jpg" name="submit" /></li>
+					<li><a href="javascript: document.getElementById('frmContact').reset();"><img src="/media/bcms/images/forms/btn-clear.jpg" width="76" height="27" alt="" /></a></li>
+				</ul>
+			</form>
+		</div>
+		<div class="contact_right">
+		    <h3>Other ways to contact us:</h3>
+			{% if settings.phone %}<p><strong>Phone</strong>: {{ settings.phone }}</p>{% endif %}
+            {% if settings.fax %}<p><strong>Fax</strong>: {{ settings.fax }}</p>{% endif %}
+			{% if settings.email %}<p><strong>E-Mail</strong>: <a href="mailto:{{ settings.email }}">{{ settings.email }}</a></p>{% endif %}
+            {% if settings.sms %}<p><strong>SMS Text</strong>: {{ settings.sms }}</p>{% endif %}
+			{% if settings.physical_address %}<p><strong>Physical Address</strong>:<br />{{ settings.physical_address|linebreaksbr }}</p>{% endif %}
+			{% if settings.postal_address %}<p><strong>Postal</strong>:<br />{{ settings.postal_address|linebreaksbr }}</p>{% endif %}
+		</div>
+	</div><!--/container-->
+{% endblock %}
