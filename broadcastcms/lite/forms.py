@@ -1,10 +1,16 @@
 from datetime import datetime
 
 from django import forms
+from django.contrib.sites.models import Site
+from django.core.mail import EmailMessage, mail_managers
 
 from broadcastcms.competition.models import CompetitionEntry
 from broadcastcms.event.models import Province
 from broadcastcms.fields import formfields
+from broadcastcms.integration.captchas import ReCaptcha
+
+from models import Settings
+
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -255,3 +261,97 @@ def make_competition_form(competition):
                 return self.cleaned_data['answer']
 
         return _AnswerCompetitionForm
+
+class _BaseContactForm(forms.Form):
+    subject = forms.CharField(
+        max_length=512,
+        label='Subject',
+    )
+    message = forms.CharField(
+        max_length=10000,
+        label='Message',
+        widget=forms.Textarea(),
+        error_messages={'required':'Please enter a message.'}
+    )
+
+    def is_valid(self, request=None):
+        """
+        Override purely to provide for the extra request parameter, used by AnonymousContactForm
+        """
+        return super(_BaseContactForm, self).is_valid()
+        
+    
+    def get_recipients(self):
+        current_site = Site.objects.get_current()
+        site_name = current_site.name
+        recipients = []
+        
+        settings = Settings.objects.all()
+        if settings:
+            contact_email_recipients = settings[0].contact_email_recipients
+            if contact_email_recipients:
+                split_recipients = [recipient.replace('\r', '') for recipient in contact_email_recipients.split('\n')]
+                for recipient in split_recipients:
+                    if recipient:
+                        recipients.append(recipient)
+
+        if not recipients:
+            mail_managers('Error: No email address specified', 'Users are trying to contact %s for which no contact email recipients are specified.' % site_name, fail_silently=False)
+        return recipients
+    
+    def send_message(self):
+        current_site = Site.objects.get_current()
+        site_name = current_site.name
+        
+        name = self.from_name
+        email = self.from_email
+        subject = "Contact message from %s: %s" % (site_name, self.cleaned_data['subject'])
+        message = self.cleaned_data['message']
+        recipients = self.get_recipients()
+        from_address = "%s <%s>" % (name, email)
+        
+        mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
+        mail.send(fail_silently=False)
+
+def make_contact_form(request):
+    user = request.user
+    if request.user.is_authenticated():
+        class AuthenticatedContactForm(_BaseContactForm):
+            from_name = '%s %s' % (user.first_name, user.last_name)
+            from_email = user.email
+
+        return AuthenticatedContactForm
+    else:
+        class AnonymousContactForm(_BaseContactForm):
+            name = forms.CharField(
+                max_length=100,
+                label='Your Name',
+            )
+            email = forms.EmailField(
+                max_length=100,
+                label='Your Email',
+                error_messages={'required':'Please enter your email address.'}
+            )
+            recaptcha_response_field = forms.CharField(
+                max_length=100,
+                label='',
+                help_text='Spam prevention code. Enter the words above.',
+                widget=forms.TextInput(attrs={'class':'required', 'id': 'recaptcha_response_field', 'autocomplete': 'off'}),
+                error_messages={'required': 'Please enter the words above.'}
+            )
+            from_name = property(lambda f: f.cleaned_data['name'])
+            from_email = property(lambda f: f.cleaned_data['email'])
+        
+            def is_valid(self, request):
+                # Base validate
+                valid = super(AnonymousContactForm, self).is_valid()
+
+                # Validate Captcha
+                if not self._errors.has_key('recaptcha_response_field'):
+                    if not ReCaptcha().verify(request):
+                        self._errors['recaptcha_response_field'] = ['Incorrect, please try again.',]
+                        valid = False
+
+                return valid
+
+        return AnonymousContactForm
