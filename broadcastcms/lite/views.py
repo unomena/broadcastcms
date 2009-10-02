@@ -33,7 +33,7 @@ from broadcastcms.scaledimage.storage import ScaledImageStorage
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.utils import mail_user
 
-from forms import make_competition_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
+from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
 from templatetags.inclusion_tags import AccountLinksNode
 import utils
 
@@ -447,7 +447,27 @@ def account_links(request):
 
 def contact(request):
     context = RequestContext(request, {})
-    return render_to_response('content/search_results.html', context)
+    form_class = make_contact_form(request)
+    sent = False
+
+    if request.method == "POST":
+        form = form_class(request.POST)
+
+        if form.is_valid(request):
+            form.send_message()
+            sent = True
+    else:
+        data = {}
+        for key, item in form_class().fields.items():
+            data.update({key: item.label})
+        form = form_class(initial=data)
+    
+
+    context.update({
+        'form': form,
+        'sent': sent,
+    })
+    return render_to_response('content/contact.html', context)
 
 def comment_add(request):
     """
@@ -926,8 +946,8 @@ class ContentBaseViews(object):
         vote_url = reverse('xmlhttprequest_vote_on_object', kwargs={'slug': self.slug})
 
         # get site name
-        site_pk = settings.SITE_ID
-        site_name = Site.objects.get(pk=site_pk).name
+        current_site = Site.objects.get_current()
+        site_name = current_site.name
         
         # build mailto url
         mailto_url = "mailto:?%s" % urlencode({
