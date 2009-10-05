@@ -31,7 +31,12 @@ class CompetitionAdmin(ContentBaseAdmin):
     fieldsets = deepcopy(ContentBaseAdmin.fieldsets)
     for fieldset in fieldsets:
         if fieldset[0] == None:
-            fieldset[1]['fields'] += ('content', 'rules', 'question', 'start', 'end')
+            fieldset[1]['fields'] += ('content', 'rules', 'start', 'end')
+    fieldsets += (
+        ('Q&A', {'fields': ('question', 'question_blurb', 'correct_answer',),
+                  'classes': ('collapse',),
+        }),
+    )
     
     inlines = (
         OptionInline, 
