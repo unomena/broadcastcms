@@ -52,9 +52,9 @@ def slugify(self):
     slug = defaultfilters.slugify(title)
     if self.slug == slug:
         return slug
-    
+   
     #check to see if slug exists, increment slug tail if it does
-    slugs = [content.slug for content in self.__class__.objects.all()]
+    slugs = [content.slug for content in ModelBase.objects.all()]
     i = 1
     numbered_slug = slug
     while numbered_slug in slugs:
@@ -103,7 +103,8 @@ class ModelBase(PermissionBase):
         if(not self.content_type):
             self.content_type = ContentType.objects.get_for_model(self.__class__)
         self.classname = self.__class__.__name__
-        self.slug = slugify(self)
+        if not self.slug:
+            self.slug = slugify(self)
         super(ModelBase, self).save(*args, **kwargs)
     
 
