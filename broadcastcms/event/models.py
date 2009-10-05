@@ -43,7 +43,7 @@ class Event(ContentBase):
 
 
 class Location(ModelBase):
-    address = models.CharField(max_length=512, help_text='Physical venue address.')
+    address = models.CharField(max_length=512, blank=True, help_text='Physical venue address.')
     venue = models.CharField(max_length=255, help_text='Short venue name.')
     event = models.ForeignKey(Event, related_name='locations', help_text='Event this location is for.')
     city = models.ForeignKey(
