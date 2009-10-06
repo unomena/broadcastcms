@@ -1,0 +1,27 @@
+{% extends "desktop/sections/base_popup.html" %}
+{% load desktop_inclusion_tags %}
+
+{% block title %}
+    <h1 class="uber">Studio Cam &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+{% endblock %}
+
+{% block uber_body %}
+    <div class="uber_left">
+        <div id="gallery">
+	        <div id="slideshow" class="slideshow"></div>
+    	</div>
+	    <div id="thumbs" class="thumb_carousel">
+	        <p class="thumbs_prev"></p>
+    		<ul class="thumbs">
+                {% for url in urls %}
+    	    	    <li><a class="thumb" href="{{ url }}"><img src="{{ url }}" width="80" height="53" /></a></li>
+                {% endfor %}
+    		</ul>
+	    	<p class="thumbs_next"></p>
+    	</div>
+    </div>
+
+	<div class="uber_right">
+	    {% popup_updates %}
+	</div>
+{% endblock %}

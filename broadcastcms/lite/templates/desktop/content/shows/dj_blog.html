@@ -1,0 +1,12 @@
+{% extends "desktop/sections/base_section.html" %}
+{% load desktop_inclusion_tags public_tags %}
+
+{% block left %}
+    {% dj_header %}
+    {% with pager.object_list as instances %}
+        {% for instance in instances %}
+            {% call_view instance render_listing %}
+        {% endfor %}
+    {% endwith %}
+    {% paging pager %}
+{% endblock %}

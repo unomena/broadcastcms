@@ -1,0 +1,26 @@
+{% extends "desktop/sections/base_section.html" %}
+{% load desktop_inclusion_tags scaled_image_tags public_tags %}
+
+{% block left %}
+    <div class="page_head">
+	    <h1>Shows &amp; DJs &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+		<div class="page_menu">
+		    <h2>{% ifequal day today %}Today{% else %}{{ day|title }}{% endifequal %}</h2>
+			<ul>
+                {% for day_option in days %}
+				    <li {% ifequal day day_option %}class="on"{% endifequal %}><span class="pm_left"></span><a href="{{ day_option }}">{{ day_option|slice:":3"|title }}</a><span class="pm_right"></span></li>
+                    {% endfor %}
+				</ul>
+			</div>
+		</div><!--/head-->
+		<div class="page_container">
+		    <div class="block_container">
+                {% with pager.object_list as entries %}
+                    {% for entry in entries %}
+                        {% call_view entry render_block %}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+		</div><!--/container-->
+    {% paging pager %}
+{% endblock %}

@@ -34,7 +34,7 @@ from broadcastcms.show.models import Show, CastMember
 from broadcastcms.utils import mail_user
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
-from templatetags.inclusion_tags import AccountLinksNode
+from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode
 import utils
 
 # Account
@@ -63,7 +63,7 @@ def account_picture(request):
         'profile': profile,
         'form': form,
     })
-    return render_to_response('content/account/picture.html', context)
+    return render_to_response('desktop/content/account/picture.html', context)
 
 def account_profile(request):
     """
@@ -181,7 +181,7 @@ def account_profile(request):
     context.update({
         'form': form,
     })
-    return render_to_response('content/account/profile.html', context)
+    return render_to_response('desktop/content/account/profile.html', context)
 
 def account_subscriptions(request):
     if not request.user.is_authenticated():
@@ -207,7 +207,7 @@ def account_subscriptions(request):
     context.update({
         'form': form,
     })
-    return render_to_response('content/account/subscriptions.html', context)
+    return render_to_response('desktop/content/account/subscriptions.html', context)
 
 # Chart
 
@@ -239,7 +239,7 @@ def chart(request, slug):
         'pager': pager,
         'pages': pages,
     })
-    return render_to_response('content/charts/chart.html', context)
+    return render_to_response('desktop/content/charts/chart.html', context)
 
 # Competitions
 
@@ -251,13 +251,13 @@ def competitions(request):
     context.update({
         'pager': pager,
     })
-    return render_to_response('content/competitions/competitions.html', context)
+    return render_to_response('desktop/content/competitions/competitions.html', context)
 
 def competitions_rules(request):
     context = RequestContext(request, {})
     if not context['settings'].competition_general_rules:
         raise Http404
-    return render_to_response('content/competitions/rules.html', context)
+    return render_to_response('desktop/content/competitions/rules.html', context)
 
 def competitions_content(request, slug):
     content = get_object_or_404(Competition, slug=slug, is_public=True)
@@ -266,7 +266,7 @@ def competitions_content(request, slug):
     context.update({
         'content': content,
     })
-    return render_to_response('content/competitions/content.html', context)
+    return render_to_response('desktop/content/competitions/content.html', context)
 
 
 # Events
@@ -308,7 +308,7 @@ def events(request):
         'sorter': sorter,
     })
         
-    return render_to_response('content/events/events.html', context)
+    return render_to_response('desktop/content/events/events.html', context)
 
 def events_content(request, slug):
     content = get_object_or_404(Event, slug=slug, is_public=True)
@@ -320,7 +320,7 @@ def events_content(request, slug):
         'content': content,
         'sorter': sorter,
     })
-    return render_to_response('content/events/content.html', context)
+    return render_to_response('desktop/content/events/content.html', context)
 
 # Validate
 def validate_username(request):
@@ -423,7 +423,7 @@ def galleries(request):
         'pager': pager,
         'sorter': sorter,
     })
-    return render_to_response('content/galleries/galleries.html', context)
+    return render_to_response('desktop/content/galleries/galleries.html', context)
 
 def galleries_content(request, slug):
     content = get_object_or_404(Gallery, slug=slug, is_public=True)
@@ -434,7 +434,7 @@ def galleries_content(request, slug):
         'content': content,
         'sorter': sorter,
     })
-    return render_to_response('content/galleries/content.html', context)
+    return render_to_response('desktop/content/galleries/content.html', context)
 
 
 # Misc
@@ -467,7 +467,7 @@ def contact(request):
         'form': form,
         'sent': sent,
     })
-    return render_to_response('content/contact.html', context)
+    return render_to_response('desktop/content/contact.html', context)
 
 def comment_add(request):
     """
@@ -567,7 +567,6 @@ def comment_add(request):
     context.update({
         'instance': target
     })
-    from templatetags.inclusion_tags import CommentsNode
     return HttpResponse(CommentsNode('instance').render(context))
 
 def logout(request):
@@ -577,11 +576,11 @@ def logout(request):
     
 def home(request):
     context = RequestContext(request, {})
-    return render_to_response('content/home.html', context)
+    return render_to_response('desktop/content/home.html', context)
 
 def search_results(request):
     context = RequestContext(request, {})
-    return render_to_response('content/search_results.html', context)
+    return render_to_response('desktop/content/search_results.html', context)
 
 def short_redirect(request, pk):
     context = RequestContext(request, {})
@@ -616,7 +615,7 @@ def info_content(request, section):
         'section_verbose_name': section_verbose_name,
         'menu_items': menu_items,
     })
-    return render_to_response('content/info/content.html', context)
+    return render_to_response('desktop/content/info/content.html', context)
     
 
 # Mailers
@@ -657,13 +656,13 @@ def modals_login(request):
     else:
         form = LoginForm()
 
-    return render_to_response('modals/login.html', {'form': form})
+    return render_to_response('desktop/modals/login.html', {'form': form})
 
 def modals_content(request, slug):
     if not request.is_ajax():
         raise Http404
     
-    return render_to_response('modals/login.html', {'form': form})
+    return render_to_response('desktop/modals/login.html', {'form': form})
 
 def modals_register(request):
     if not request.is_ajax():
@@ -722,14 +721,14 @@ def modals_register(request):
     context.update({
         'form': form,
     })
-    return render_to_response('modals/register.html', context)
+    return render_to_response('desktop/modals/register.html', context)
 
 def modals_password_reset(request):
     if not request.is_ajax():
         raise Http404
 
     context = {}
-    return render_to_response('modals/password_reset.html', context)
+    return render_to_response('desktop/modals/password_reset.html', context)
 
 # News
 def news(request, sorter='most-recent'):
@@ -741,7 +740,7 @@ def news(request, sorter='most-recent'):
         'pager': pager,
         'sorter': sorter,
     })
-    return render_to_response('content/news/news.html', context)
+    return render_to_response('desktop/content/news/news.html', context)
 
 def news_content(request, slug):
     content = get_object_or_404(ContentBase, slug=slug, is_public=True)
@@ -753,12 +752,12 @@ def news_content(request, slug):
         'content': content,
         'sorter': sorter,
     })
-    return render_to_response('content/news/content.html', context)
+    return render_to_response('desktop/content/news/content.html', context)
 
 # Popups     
 def listen_live(request):
     context = RequestContext(request, {})
-    return render_to_response('popups/listen_live.html', context)
+    return render_to_response('desktop/popups/listen_live.html', context)
 
 def studio_cam(request):
     context = RequestContext(request, {})
@@ -773,7 +772,7 @@ def studio_cam(request):
         'urls': urls,
     })
 
-    return render_to_response('popups/studio_cam.html', context)
+    return render_to_response('desktop/popups/studio_cam.html', context)
 
 # Shows
 def shows_line_up(request, day='monday'):
@@ -804,7 +803,7 @@ def shows_line_up(request, day='monday'):
         'days': days,
     })
 
-    return render_to_response('content/shows/line_up.html', context)
+    return render_to_response('desktop/content/shows/line_up.html', context)
 
 def shows_dj_blog(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
@@ -818,7 +817,7 @@ def shows_dj_blog(request, slug):
         'castmember': castmember,
         'pager': pager,
     })
-    return render_to_response('content/shows/dj_blog.html', context)
+    return render_to_response('desktop/content/shows/dj_blog.html', context)
 
 def shows_dj_profile(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
@@ -827,7 +826,7 @@ def shows_dj_profile(request, slug):
     context.update({
         'castmember': castmember,
     })
-    return render_to_response('content/shows/dj_profile.html', context)
+    return render_to_response('desktop/content/shows/dj_profile.html', context)
 
 def shows_dj_content(request, castmember_slug, content_slug):
     castmember = get_object_or_404(CastMember, slug=castmember_slug, is_public=True)
@@ -839,16 +838,16 @@ def shows_dj_content(request, castmember_slug, content_slug):
         'castmember': castmember,
         'content': content,
     })
-    return render_to_response('content/shows/dj_content.html', context)
+    return render_to_response('desktop/content/shows/dj_content.html', context)
 
 # Model Views
 class CodeBannerViews(object):
     def render(self):
-        return render_to_string('content/banners/code_banner.html', {"self": self})
+        return render_to_string('desktop/content/banners/code_banner.html', {"self": self})
 
 class ImageBannerViews(object):
     def render(self):
-        return render_to_string('content/banners/image_banner.html', {"self": self})
+        return render_to_string('desktop/content/banners/image_banner.html', {"self": self})
 
 class ContentBaseViews(object):
     def render_home_updates(self, context):
@@ -856,7 +855,7 @@ class ContentBaseViews(object):
             'self': self,
             'url': self.url(context),
         }
-        return render_to_string('content/contentbase/home_updates.html', context)
+        return render_to_string('desktop/content/contentbase/home_updates.html', context)
     
     def render_updates_widget(self, context):
         labels = self.labels.visible()
@@ -866,21 +865,21 @@ class ContentBaseViews(object):
             'label': label,
             'url': self.url(context),
         }
-        return render_to_string('content/contentbase/updates_widget.html', context)
+        return render_to_string('desktop/content/contentbase/updates_widget.html', context)
     
     def render_listing(self, context):
         context = {
             'self': self,
             'url': self.url(context),
         }
-        return render_to_string('content/contentbase/listing.html', context)
+        return render_to_string('desktop/content/contentbase/listing.html', context)
 
     def render_article(self, context):
         context = RequestContext(context['request'], {})
         context.update({
             'self': self,
         })
-        return render_to_string('content/article.html', context)
+        return render_to_string('desktop/content/article.html', context)
         
     def url(self, context):
         def handle_home(self):
@@ -979,7 +978,7 @@ class ContentBaseViews(object):
             'facebook_url': facebook_url,
             'twitter_url': twitter_url,
         })
-        return render_to_string('content/contentbase/post_head.html', context)
+        return render_to_string('desktop/content/contentbase/post_head.html', context)
 
 class ChartEntryViews(object):
     def render_chart(self):
@@ -999,7 +998,7 @@ class ChartEntryViews(object):
             'artist': self.get_primary_artist(),
             'weeks_on': weeks_on,
         }
-        return render_to_string('content/charts/entry.html', context)
+        return render_to_string('desktop/content/charts/entry.html', context)
     
     def get_primary_artist(self):
         artist = None
@@ -1017,7 +1016,7 @@ class CompetitionViews(object):
             'self': self,
             'url': self.url(context),
         }
-        return render_to_string('content/competitions/listing.html', context)
+        return render_to_string('desktop/content/competitions/listing.html', context)
     
     def render_article_body(self, context):
         form_class = make_competition_form(self)
@@ -1034,7 +1033,7 @@ class CompetitionViews(object):
             'self': self,
             'form': form,
         })
-        return render_to_string('content/competitions/article_body.html', context)
+        return render_to_string('desktop/content/competitions/article_body.html', context)
 
 class EntryViews(object):
     def render_block(self, context):
@@ -1047,7 +1046,7 @@ class EntryViews(object):
             'content': content,
             'castmember_url': castmember_url,
         }
-        return render_to_string('content/entry/block.html', context)
+        return render_to_string('desktop/content/entry/block.html', context)
     
 class EventViews(object):
     def render_article_body(self, context):
@@ -1056,7 +1055,7 @@ class EventViews(object):
             'self': self,
             'entries': entries,
         }
-        return render_to_string('content/events/article_body.html', context)
+        return render_to_string('desktop/content/events/article_body.html', context)
     
     def render_listing(self, context):
         locations = self.locations.permitted()
@@ -1067,7 +1066,7 @@ class EventViews(object):
             'url': self.url(context),
             'location': location,
         }
-        return render_to_string('content/events/listing.html', context)
+        return render_to_string('desktop/content/events/listing.html', context)
     
 class GalleryViews(object):
     def render_block(self, context):
@@ -1075,13 +1074,13 @@ class GalleryViews(object):
             'self': self,
             'url': self.url(context),
         }
-        return render_to_string('content/galleries/block.html', context)
+        return render_to_string('desktop/content/galleries/block.html', context)
     
     def render_article_body(self, context):
         context = {
             'self': self,
         }
-        return render_to_string('content/galleries/article_body.html', context)
+        return render_to_string('desktop/content/galleries/article_body.html', context)
 
 class CastMemberViews(object):
     def url(self):
@@ -1092,7 +1091,7 @@ class PostViews(object):
         context = {
             'self': self,
         }
-        return render_to_string('content/posts/article_body.html', context)
+        return render_to_string('desktop/content/posts/article_body.html', context)
        
 class UserViews(object):
     def url(self):

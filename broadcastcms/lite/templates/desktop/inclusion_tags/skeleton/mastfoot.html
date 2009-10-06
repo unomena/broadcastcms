@@ -1,0 +1,17 @@
+<div class="logo bottom_logo"><a href="{% url home %}"></a></div>
+	
+<div class="legal">
+    <p>&copy; {% now "Y" %} Powered by <a href="http://www.broadcastcms.com/">BroadcastCMS</a></p>
+	<p>All rights reserved. <a href="{{ mobile_url }}">View mobile version</a></p>
+	{% if terms_or_privacy %}<p>Please read our {% if terms %}<a href="{% url info_content "terms" %}">Terms and Conditions</a>{% endif %}{% if terms_and_privacy %} and {% endif %}{% if privacy %}<a href="{% url info_content "privacy" %}">Privacy Policy</a></p>{% endif %}{% endif %}
+</div>
+	
+<div class="link_list">
+    {% for column in sitemap_columns %}
+        <ul>
+            {% for item in column %}
+    	        <li><a href="{{ item.url }}">{{ item.title|safe }}</a></li>
+            {% endfor %}
+	    </ul>
+    {% endfor %}
+</div>

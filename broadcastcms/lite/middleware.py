@@ -8,7 +8,7 @@ class URLSwitchMiddleware(object):
         TODO: Refactor to use DeviceAtlas or WURFL type device recognition 
         to determine switch
         """
-        host = request.META['HTTP_HOST'].split(':')[0]
+        host = request.META['HTTP_HOST']
         if host in settings.DESKTOP_HOSTNAMES:
             settings.ROOT_URLCONF = 'broadcastcms.lite.desktop_urls'
         elif host in settings.MOBILE_HOSTNAMES:
