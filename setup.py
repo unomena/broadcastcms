@@ -18,6 +18,7 @@ setup(
         'mysql-python==1.2.3c1',
         'pexpect==2.4',
         'simplejson==2.0.9',
+        'django-debug-toolbar==0.8.0',
     ],
     include_package_data=True,    
 )
