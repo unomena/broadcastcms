@@ -55,9 +55,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'broadcastcms.lite.middleware.URLSwitchMiddleware',
 )
 
-ROOT_URLCONF = 'broadcastcms.lite.production_urls'
+ROOT_URLCONF = 'broadcastcms.lite.desktop_urls'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.auth',
