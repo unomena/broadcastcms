@@ -15,7 +15,7 @@ setup(
     install_requires = [
         'django-debug-toolbar==0.8.0',
         'django-voting==0.1-pre',
-        'mysql-python==1.2.2',
+        'mysql_python==1.2.2',
         'pexpect==2.4',
         'python-memcached==1.44',
         'PIL==1.1.6',
