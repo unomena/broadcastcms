@@ -4,6 +4,7 @@ from django.conf.urls.defaults import *
 from mobile_views import *
 
 urlpatterns = patterns('',
+    url(r'^$', home, name='home'),
 )
 
 if settings.DEBUG:

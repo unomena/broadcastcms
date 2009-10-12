@@ -1,0 +1,84 @@
+{% extends "mobile/sections/base.html" %}
+
+{% block head %}
+{% endblock %}
+
+{% block content_body %}
+<h2>On-Air: 15:00 - 19:00</h2>
+
+<div class="section">
+    <div class="abstract">
+        <img src="/media/bcmslite/pics/content/dj.png" class="thumb" />
+
+        <h3>Fast Forward with <a href="dj.html">Nathi Buzani</a> &amp; <a href="dj.html">Andile Ncube</a></h3>
+        <div class="tag nowplaying" title="Now Playing"><strong>Katy Perry</strong> - Leaving Las Vegas</div>
+    </div>	
+</div>
+
+<h2>Updates</h2>
+
+<div class="section">
+    <div class="abstract">
+        <a href="comps.html"><img src="/media/bcmslite/pics/content/update_thumb.jpg" class="thumb" /></a>
+        <div class="tag"><a href="comps.html">Competitions</a> - 15 mins Ago</div>
+        <h3><a href="comp-item.html">Win R4500 &amp; A Year's Supply of Kellogg's</a></h3>
+    </div>	
+
+    <hr />
+
+    <div class="abstract">
+        <a href="news.html"><img src="/media/bcmslite/pics/content/1.jpg" class="thumb" /></a>
+        <div class="tag"><a href="news.html">News</a> - 30 mins Ago</div>
+        <h3><a href="news-article.html">Cannon Defends His Lady, Takes Down Eminem...</a></h3>
+    </div>
+
+    <hr />
+
+    <div class="abstract">
+        <a href="dj.html"><img src="/media/bcmslite/pics/content/4.jpg" class="thumb" /></a>
+        <div class="tag"><a href="dj.html">DJ Fresh</a> - 30 mins Ago</div>
+        <h3><a href="dj-news-article.html">Cannon Defends His Lady, Takes Down Eminem...</a></h3>
+    </div>
+
+    <hr />
+
+    <div class="abstract">
+        <a href="events.html"><img src="/media/bcmslite/pics/content/5.jpg" class="thumb" /></a>
+        <div class="tag"><a href="events.html">Upcoming Event</a> - Today</div>
+        <h3><a href="event-item.html">Cannon Defends His Lady, Takes Down Eminem...</a></h3>
+    </div>
+
+    <hr />
+
+    <div class="abstract">
+        <a href="dj.html"><img src="/media/bcmslite/pics/content/2.jpg" class="thumb" /></a>
+        <div class="tag"><a href="dj.html">DJ Fresh</a> - 30 mins Ago</div>
+        <h3><a href="dj-news-article.html">Cannon Defends His Lady, Takes Down Eminem...</a></h3>
+    </div>
+</div>
+
+<h2>Search</h2>
+<div class="section">
+    <div id="search">
+        <form action="search-results.html" method="get" id="search-form">
+        <input type="text" maxlength="255" id="search-input" size="12" name="search-input" />
+        <input type="submit" id="search-submit" name="search-submit" value="Search" />
+        </form>
+    </div>
+</div>	
+
+<h2>Menu</h2>
+
+<div id="nav">
+    <ul>
+        <li><a href="shows.html">Shows &amp; DJs <span class="red">&raquo;</span></a></li>
+        <li><a href="news.html">News <span class="red">&raquo;</span></a></li>
+        <li><a href="events.html">Events &amp; Gigs <span class="red">&raquo;</span></a></li>
+        <li><a href="comps.html">Competitions <span class="red">&raquo;</span></a></li>
+        <li><a href="galleries.html">Galleries <span class="red">&raquo;</span></a></li>
+        <li><a href="about.html">About <span class="red">&raquo;</span></a></li>
+        <li><a href="contact.html">Contact Us <span class="red">&raquo;</span></a></li>
+        <li class="last"><a href="signin.html">My Account <span class="red">&raquo;</span></a></li>
+    </ul>
+</div>
+{% endblock %}
