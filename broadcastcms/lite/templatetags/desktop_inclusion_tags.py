@@ -9,6 +9,7 @@ from broadcastcms.calendar.models import Entry
 from broadcastcms.show.models import Show
 from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.radio.models import Song
+from broadcastcms.cache.decorators import cache_view_function
 
 register = template.Library()
 
@@ -38,6 +39,7 @@ def masthead(parser, token):
     return MastheadNode()
 
 class MastheadNode(template.Node):
+    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
         section = context['section']
         items = [
@@ -60,6 +62,7 @@ def mastfoot(parser, token):
     return MastfootNode()
 
 class MastfootNode(template.Node):
+    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
         site_settings = context['settings']
         terms = site_settings.terms
