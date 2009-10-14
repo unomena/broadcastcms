@@ -1,11 +1,11 @@
 from django.core.cache import cache
 import md5 
 
-def get_request_key(node, request, respect_path, respect_get, f):
+def get_request_key(function, request, respect_path, respect_get):
     """
-    TODO: Refactor to generate proper keys.
+    TODO: Seems a little flacky, refactor.
     """
-    key = str(node.__class__) + str(f.__name__)
+    key = str(hash(function))
     if respect_path:
         path_key = str(request.path)
         key += path_key
@@ -20,7 +20,7 @@ def get_request_key(node, request, respect_path, respect_get, f):
 def cache_view_function(seconds, respect_path=False, respect_get=False):
     def wrap(f):
         def wrap_f(self, context):
-            key = get_request_key(self, context['request'], respect_path, respect_get, f)
+            key = get_request_key(f, context['request'], respect_path, respect_get)
             cached_result = cache.get(key)
             if cached_result:
                 return cached_result
@@ -34,7 +34,7 @@ def cache_view_function(seconds, respect_path=False, respect_get=False):
 def cache_context_processor(seconds, respect_path=False, respect_get=False):
     def wrap(f):
         def wrap_f(request):
-            key = get_request_key(f, request, respect_path, respect_get, f)
+            key = get_request_key(f, request, respect_path, respect_get)
             cached_result = cache.get(key)
             if cached_result:
                 return cached_result
