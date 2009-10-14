@@ -29,7 +29,6 @@ from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.post.models import Post
 from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.scaledimage.fields import get_image_scales
-from broadcastcms.scaledimage.storage import ScaledImageStorage
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.utils import mail_user
 
@@ -52,9 +51,7 @@ def account_picture(request):
         if form.is_valid():
             image = form.cleaned_data['image']
             if image:
-                saver = ScaledImageStorage(scales=get_image_scales(profile))
-                image = saver.save(profile.image.field.upload_to(profile, image.name), image)
-                profile.image = image
+                profile.image.save(image.name, image)
                 profile.save()
     else:
         form = ProfilePictureForm()
