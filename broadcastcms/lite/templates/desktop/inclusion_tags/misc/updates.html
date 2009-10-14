@@ -3,13 +3,15 @@
     <div id="slider">    
 	    <h1>Updates</h1>
 		<p class="updates_more"><a href="{% url news %}">View all Updates &raquo;</a></p>
-		<div class="scroll_nav">
+		{% if render_controls %}
+        <div class="scroll_nav">
 	        <ul class="navigation">
                 {% for panel in panels %}
     	            <li><a href="#panel{{ forloop.counter }}"></a></li>
                 {% endfor %}
 	        </ul>
 		</div>
+        {% endif %}
 	    <div class="scroll">
 	        <div class="scroll_container">
                 {% for panel in panels %}        
