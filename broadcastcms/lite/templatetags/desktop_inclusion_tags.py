@@ -123,6 +123,7 @@ def home_advert(parser, token):
     return HomeAdvertNode()
 
 class HomeAdvertNode(template.Node):
+    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
         section = context['section']
         settings = context['settings']
@@ -134,6 +135,7 @@ def features(parser, token):
     return FeaturesNode()
 
 class FeaturesNode(template.Node):
+    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
         features = []
         settings = context['settings']
@@ -185,6 +187,7 @@ class OnAirNode(template.Node):
 
         return artist
         
+    @cache_view_function(60*2, respect_path=True)
     def render(self, context):
         show_entry = self.get_on_air_entry(Show)
         show = show_entry.content.as_leaf_class() if show_entry else None
@@ -234,12 +237,14 @@ class HomeUpdatesNode(template.Node):
 
         return panels
 
+    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
         instances = [instance.as_leaf_class() for instance in self.get_instances(context)[:self.count]]
         panels = self.build_panels(instances)
-       
+      
         context.update({
             'panels': panels,
+            'render_controls': (len(panels) > 1),
         })
         return render_to_string('desktop/inclusion_tags/misc/updates.html', context)
 
@@ -253,6 +258,16 @@ class PopupUpdatesNode(HomeUpdatesNode):
     tray_length = 1
     panel_rows = 3
     count = 9
+
+
+@register.tag
+def modal_updates(parser, token):
+    return ModalUpdatesNode()
+
+class ModalUpdatesNode(HomeUpdatesNode):
+    tray_length = 2
+    panel_rows = 1
+    count = 2
 
 # Misc
 
