@@ -659,7 +659,14 @@ def modals_content(request, slug):
     if not request.is_ajax():
         raise Http404
     
-    return render_to_response('desktop/modals/login.html', {'form': form})
+    content = get_object_or_404(ContentBase, slug=slug, is_public=True)
+    content = content.as_leaf_class()
+
+    context = RequestContext(request, {})
+    context.update({
+        'self': content,
+    })
+    return render_to_response('desktop/modals/content.html', context)
 
 def modals_register(request):
     if not request.is_ajax():
@@ -863,7 +870,10 @@ class ContentBaseViews(object):
             'url': self.url(context),
         }
         return render_to_string('desktop/content/contentbase/updates_widget.html', context)
-    
+   
+    def render_modals_content(self, context):
+        return render_to_string('desktop/content/contentbase/modals_content.html', context)
+        
     def render_listing(self, context):
         context = {
             'self': self,
