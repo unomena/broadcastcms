@@ -75,9 +75,9 @@ class MastfootNode(template.Node):
         """
         Renders the sitewide footer.
         Copyright Year is rendered dynamically.
-        Mobile version link is rendered only when a mobile hostname has been defined.
+        Mobile version link is rendered only when settings.MOBILE_HOSTNAME has been defined.
         T&C, Privacy Policy, About Us and Advertise links are 
-        rendered only when appropriate posts are specified in settings.
+        rendered only when appropriate content has been provided in site settings object.
         """
         site_settings = context['settings']
         terms = site_settings.terms
@@ -85,6 +85,7 @@ class MastfootNode(template.Node):
         about = site_settings.about
         advertise = site_settings.advertise
         
+        # standard site section items to display in the footer navcard
         sitemap_items = [
             {'title': 'Shows &amp; DJs', 'url': reverse('shows_line_up')},
             {'title': 'Listen Live', 'url': "javascript: openPlayer(%s);" % reverse('listen_live')},
@@ -95,15 +96,18 @@ class MastfootNode(template.Node):
             {'title': 'Contact Us', 'url': reverse('contact')},
         ]
 
+        # append additional dynamic navcard items
         if about: sitemap_items.append({'title': "About Us", 'url': reverse('info_content', kwargs={'section': "about"})})
         if advertise: sitemap_items.append({'title': "Advertise", 'url': reverse('info_content', kwargs={'section': "advertise"})})
         
+        # arrange items into easily rendered columns
         sitemap_columns = []
         rows = 3
         slices = range(0, len(sitemap_items), rows)
         for slice_start in slices:
             sitemap_columns.append(sitemap_items[slice_start: slice_start + rows])
 
+        # build the mobile url from settings.MOBILE_HOSTNAME
         mobile_hostname = getattr(settings, 'MOBILE_HOSTNAME', None)
         mobile_url = 'http://%s' % mobile_hostname if mobile_hostname else None
 
