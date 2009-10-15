@@ -163,3 +163,5 @@ class CalendarManagerTests(TestCase):
     def testNextMonth(self):
         # todo: add tests
         pass
+
+
