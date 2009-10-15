@@ -1,6 +1,7 @@
 from cStringIO import StringIO
 from math import ceil
-import os 
+import os
+import shutil
 from PIL import Image, ImageFilter
 import random
 
@@ -75,6 +76,34 @@ class ScaledImageFieldFile(ImageFieldFile):
 
 
         return name
+    
+    def delete(self, save=True):
+        # delete all scales
+
+        name = self.name
+        path = name[:name.rindex('/')]
+
+        # remove all scaled images
+        scales = get_image_scales(self.instance)
+        for scale in scales:
+            # create scale name
+            width, height = scale[0], scale[1]
+            try:
+                dot_index = name.rindex('.')
+            except ValueError: # filename has no dot
+                scaled_name = '%s/%sx%s' % (path, width, height)
+            else:
+                scaled_name = '%s/%sx%s%s' % (path, width, height, name[dot_index:])
+
+            # delete scaled content
+            self.storage.delete(scaled_name)
+        
+        # remove path
+        full_name = self.storage.path(self.name)
+        full_path = full_name[:full_name.rindex('/')]
+        shutil.rmtree(full_path)
+        
+        super(ScaledImageFieldFile, self).delete(save)
     
     def get_available_name(self, name):
         """
