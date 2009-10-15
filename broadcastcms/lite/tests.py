@@ -78,11 +78,25 @@ class MiddlewareTestCase(TestCase):
         self.failUnlessEqual(settings.ROOT_URLCONF, 'dummy')
 
 class DesktopViewsTestCase(TestCase):
+    def assertSkeletonTemplatesUsed(self, response):
+        self.assertTemplateUsed(response, 'desktop/sections/base.html')
+        self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/masthead.html')
+        self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/account_links.html')
+        self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/mastfoot.html')
+        self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/metrics.html')
+        
     def testHome(self):
         response = self.client.get('/')
 
-        #Check that response is 200 (OK)
+        # check the response is 200 (OK)
         self.failUnlessEqual(response.status_code, 200)
+
+        # check that the home template was used
+        self.assertTemplateUsed(response, 'desktop/content/home.html')
+        
+        # check that skeleton templates were used
+        self.assertSkeletonTemplatesUsed(response)
+
 
 class DesktopInlcusionTagsTestCase(TestCase):
     def setContext(self, path):
@@ -199,3 +213,22 @@ class DesktopInlcusionTagsTestCase(TestCase):
         self.setContext(path='/')
         response_string = mastfoot('', '').render(self.context)
         self.failUnless('Advertise' in response_string)
+
+    def testMetrics(self):
+        # setup
+        self.setContext(path='/')
+        site_settings = Settings.objects.get_or_create(pk='1')[0]
+       
+        # don't return anything if no metrics specified
+        response_string = metrics('', '').render(self.context)
+        self.failIf(len(response_string) > 1)
+        
+        # render metric if metric specified
+        site_settings.metrics = "Metric<br />Code"
+        site_settings.save()
+        self.setContext(path='/')
+        response_string = metrics('', '').render(self.context)
+        self.failUnless(site_settings.metrics in response_string)
+
+    def testOnAir(self):
+       pass 
