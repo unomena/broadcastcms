@@ -129,12 +129,10 @@ class MetricsNode(template.Node):
     def render(self, context):
         settings = context['settings']
         metrics = settings.metrics
-        if metrics:
-            context = {
-                'metrics': settings.metrics,
-            }
-            return render_to_string('desktop/inclusion_tags/skeleton/metrics.html', context)
-        return ''
+        context = {
+            'metrics': settings.metrics,
+        }
+        return render_to_string('desktop/inclusion_tags/skeleton/metrics.html', context)
 
 # Home
 
@@ -207,7 +205,6 @@ class OnAirNode(template.Node):
 
         return artist
         
-    @cache_view_function(60*2, respect_path=True)
     def render(self, context):
         show_entry = self.get_on_air_entry(Show)
         show = show_entry.content.as_leaf_class() if show_entry else None
