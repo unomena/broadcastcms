@@ -53,7 +53,7 @@ class ScaledImageFieldFile(ImageFieldFile):
         path = self.get_available_name(name)
         name = '%s/original.jpeg' % path
         super(ScaledImageFieldFile, self).save(name, content, save)
-      
+    
         # save all scales
         scales = get_image_scales(self.instance)
         for scale in scales:
@@ -72,6 +72,7 @@ class ScaledImageFieldFile(ImageFieldFile):
 
             # save scaled content
             self.storage.save(scaled_name, scaled_content)
+
 
         return name
     
@@ -104,15 +105,33 @@ class ScaledImageFieldFile(ImageFieldFile):
         except ValueError:
             raise SuspiciousOperation("Attempted access to '%s' denied." % name)
         return os.path.normpath(path)
-    
+   
+    def load_image(self, content):
+        """
+        create an image from original content
+        """
+        content.seek(0)
+        original_image_data = content.read()
+        image = Image.open(StringIO(original_image_data))
+        return image
+
+    def create_content(self, image, quality=93):
+        """
+        create new content object
+        """
+        image_file = StringIO()
+        image.save(image_file, 'JPEG', quality=quality)
+        image_file.seek(0)
+        return ContentFile(image_file.read())
+        
+        
     def scale_and_crop_image(self, content, width, height):
         """
         Scales and crops an image to the requested size retaining its
         original aspect ratio. Image is sharpened after scaleing
         Use up/downsampling specific filter
         """
-        content.seek(0)
-        image = Image.open(content)
+        image = self.load_image(content)
         orig_width, orig_height = image.size
         orig_aspect = float(orig_width) / float(orig_height)
         # calculate new dimentions
@@ -121,7 +140,7 @@ class ScaledImageFieldFile(ImageFieldFile):
         new_aspect = float(width) / float(height)
         # check if scaling is really needed
         if width == orig_width and height == orig_height:
-            return image
+            return self.create_content(image=image, quality=93)
         # calculate the scaling factor and react to it
         scaling_factor = self.scaling_factor(orig_width, orig_height, width, height)
         if scaling_factor != 1:
@@ -145,12 +164,8 @@ class ScaledImageFieldFile(ImageFieldFile):
             crop_lower = int(crop_top + height)
             crop_box = (crop_left, crop_top, crop_right, crop_lower)
             image = image.crop(crop_box)
-            
-        image_file = StringIO()
-        image.save(image_file, 'JPEG', quality=93)
-        image_file.seek(0)
-        scaled_content = ContentFile(image_file.read())
-        return scaled_content
+        
+        return self.create_content(image=image, quality=93)
     
     def scaling_factor(self, orig_width, orig_height, width, height):
         """
@@ -187,16 +202,8 @@ class ScaledImageFieldFile(ImageFieldFile):
             converted_name = '%s.jpeg' % name
         else:
             converted_name = '%s.jpeg' % name[:dot_index]
-        # create an image from original content
-        content.seek(0)
-        original_image_data = content.read()
-        image = Image.open(StringIO(original_image_data))
-        # save as jpeg in memory
-        image_file = StringIO()
-        image.save(image_file, 'JPEG', quality=100)
-        # create new content object
-        image_file.seek(0)
-        converted_content = ContentFile(image_file.read()) 
+        image = self.load_image(content)
+        converted_content = self.create_content(image=image, quality=100)
 
         return converted_name, converted_content
 
