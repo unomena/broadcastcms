@@ -5,12 +5,9 @@ from django.conf import settings
 from django.db import models
 from django.core.management import call_command
 from django.core.files import File
-from ..fields import ScaledImageField, get_image_scales
-from ..storage import ScaledImageStorage
-
+from ..fields import ScaledImageField, ScaledImageFieldFile, get_image_scales
 
 SCRIPT_PATH = os.path.dirname( os.path.realpath( __file__ ) )
-
 
 class ScalesImageTest(TestCase):
     def setUp(self):
@@ -82,14 +79,17 @@ class ScalesImageTest(TestCase):
         )
 
     def test_scaling(self):
-        file = File(open('%s/1.jpg' % SCRIPT_PATH, 'r'))
-        orig_image = Image.open(file)
-        storage = ScaledImageStorage()
+        image_file = open('%s/1.jpg' % SCRIPT_PATH, 'r')
+        model = models.get_model('scaledimage', 'Trunk')
+        obj = model()
+        
         # test scaling to 50x100
-        image = storage.scale_and_crop_image(file, 50, 100)
+        image = obj.image.scale_and_crop_image(image_file, 50, 100)
+        image = Image.open(image)
         self.assertEquals(image.size, (50, 100))
         # test scaling to 100x50
-        image = storage.scale_and_crop_image(file, 100, 50)
+        image = obj.image.scale_and_crop_image(image_file, 100, 50)
+        image = Image.open(image)
         self.assertEquals(image.size, (100, 50))
 
     def test_storage(self):
@@ -97,9 +97,10 @@ class ScalesImageTest(TestCase):
         file = File(open('%s/1.jpg' % SCRIPT_PATH, 'r'))
         obj = model()
         obj.image.save('', file, save=True)
+        obj.save()
         # test the created files
         original_size = (obj.image.width, obj.image.height)
-        path = obj.image.path
+        path = obj.image.path(obj.image.name)
         path = path[:path.rindex('/')]
         self.assertImageSize('%s/original.jpeg' % path, original_size) 
         self.assertImageSize('%s/50x50.jpeg' % path, (50, 50)) 
