@@ -22,8 +22,8 @@ def account_links(parser, token):
 class AccountLinksNode(template.Node):
     def render(self, context):
         """
-        Renders anonymous avatar, sign in and sign up for anonymous users
-        Renders avatar, profile and sign out for authenticated users
+        Renders anonymous avatar, sign in and sign up for anonymous users.
+        Renders avatar, profile and sign out for authenticated users.
         """
         request = context['request']
 
@@ -45,8 +45,11 @@ def masthead(parser, token):
     return MastheadNode()
 
 class MastheadNode(template.Node):
-    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
+        """
+        Renders the sitewide masthead, including site logo, site section links, search and account links.
+        Site section links are highlighted when on appropriate section.
+        """
         section = context['section']
         items = [
             {'title': 'Shows &amp; DJs', 'url': reverse('shows_line_up'), 'current': section == 'shows'},
@@ -68,8 +71,14 @@ def mastfoot(parser, token):
     return MastfootNode()
 
 class MastfootNode(template.Node):
-    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
+        """
+        Renders the sitewide footer.
+        Copyright Year is rendered dynamically.
+        Mobile version link is rendered only when a mobile hostname has been defined.
+        T&C, Privacy Policy, About Us and Advertise links are 
+        rendered only when appropriate posts are specified in settings.
+        """
         site_settings = context['settings']
         terms = site_settings.terms
         privacy = site_settings.privacy
@@ -95,7 +104,8 @@ class MastfootNode(template.Node):
         for slice_start in slices:
             sitemap_columns.append(sitemap_items[slice_start: slice_start + rows])
 
-        mobile_url = 'http://%s' % settings.MOBILE_HOSTNAMES[0] if settings.MOBILE_HOSTNAMES else None
+        mobile_hostname = getattr(settings, 'MOBILE_HOSTNAME', None)
+        mobile_url = 'http://%s' % mobile_hostname if mobile_hostname else None
 
         context = {
             'terms': terms,
