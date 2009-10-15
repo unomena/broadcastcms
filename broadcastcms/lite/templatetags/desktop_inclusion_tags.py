@@ -21,12 +21,18 @@ def account_links(parser, token):
 
 class AccountLinksNode(template.Node):
     def render(self, context):
+        """
+        Renders anonymous avatar, sign in and sign up for anonymous users
+        Renders avatar, profile and sign out for authenticated users
+        """
         request = context['request']
-        user = request.user
+
+        # get user and profile objects
+        user = getattr(request, 'user', None)
         profile = None
         if user:
             if not user.is_anonymous():
-                profile = request.user.profile
+                profile = user.profile
 
         context.update({
             'user': user,
