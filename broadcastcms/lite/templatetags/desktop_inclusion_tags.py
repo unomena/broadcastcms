@@ -505,16 +505,16 @@ class DJHeaderNode(template.Node):
             'title': 'Profile',
             'url': reverse('shows_dj_profile', kwargs={'slug': castmember.slug}),
         },
-        {
-            'slug': 'contact',
-            'title': 'Contact',
-            'url': 'test',
-        },
-        {
-            'slug': 'appearances',
-            'title': 'Appearances',
-            'url': 'test',
-        },
+        #{
+        #    'slug': 'contact',
+        #    'title': 'Contact',
+        #    'url': 'test',
+        #},
+        #{
+        #    'slug': 'appearances',
+        #    'title': 'Appearances',
+        #    'url': 'test',
+        #},
         ]
 
         current_section = request.path.split('/')[-2]
