@@ -1,5 +1,7 @@
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
+    
+from voting.models import Vote
 
 def paging(list, request_key, request, size=10):
     paginator = Paginator(list, size)
@@ -15,7 +17,10 @@ def order_by_created(items):
     return items.order_by("-created")
 
 def order_by_likes(items):
-    raise NotImplementedError
+    items = [item.contentbase for item in items.all()]
+    items.sort(reverse=True, key=lambda x: Vote.objects.get_score(x)['score'])
+    items = [item.as_leaf_class() for item in items]
+    return items
 
 def filter_by_upcoming(items):
     return items.upcoming()
