@@ -67,7 +67,7 @@ class CalendarQuerySet(ModelBaseQuerySet):
 
     def day(self, offset=0):
         """
-        Returns entries for a today.
+        Returns entries for a day.
         If an offset is provided a future or past day is returned relative to today:
         * offset of 0 returns entries for today (default).
         * offset of 1 returns entries for tomorrow.
