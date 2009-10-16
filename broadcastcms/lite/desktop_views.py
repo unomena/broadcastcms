@@ -785,7 +785,7 @@ def shows_line_up(request, day='monday'):
     today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     if day in days:
-        offset = days.index(day)
+        offset = days.index(day) - today.weekday()
     else:
         offset = 0
         day = 'monday'
