@@ -1,6 +1,8 @@
 from models import Settings
 from broadcastcms.cache.decorators import cache_context_processor
 
+SITE_SECTIONS = ['home', 'shows', 'chart', 'competitions', 'news', 'events', 'galleries']
+
 def settings(request):
     """
     Get or create a lite settings object and add it to context['settings'].
@@ -11,10 +13,9 @@ def settings(request):
 
 def section(request):
     """
-    Determines the current site section from request path and add it to context['section'].
-    Section defaults to 'home'.
+    Determines the current site section from request path and adds
+    it to context['section']. Section defaults to 'home'.
     """
-    SECTIONS = ['home', 'shows', 'chart', 'competitions', 'news', 'events', 'galleries']
     path = request.path
     
     # remove starting '/' present
@@ -24,6 +25,6 @@ def section(request):
     # section is determined by first path element, defaults to home
     path = path.split('/')
     section = path[0] if len(path) > 0 else 'home'
-    section = section if section in SECTIONS else 'home'
+    section = section if section in SITE_SECTIONS else 'home'
 
     return {'section': section}
