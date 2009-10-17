@@ -153,12 +153,20 @@ def features(parser, token):
     return FeaturesNode()
 
 class FeaturesNode(template.Node):
-    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
-        features = []
+        """
+        Renders the homepage features box. Content is featured by labeling it
+        and then selecting labels to feature in the setting object's homepage featured labels field.
+        Only public content and visible labels will render.
+        A maximum of 3 labels will render.
+        """
+        # grab featured labels from settings
         settings = context['settings']
-        homepage_featured_labels = settings.homepage_featured_labels.all()[:3]
-        
+        homepage_featured_labels = settings.homepage_featured_labels.filter(is_visible=True)[:3]
+       
+        # Build a dictionary with label and content keys corresponding to 
+        # a featured label and its last created content.
+        features = []
         for label in homepage_featured_labels:
             content = ContentBase.objects.permitted().filter(labels__exact=label).order_by('-created')
             if content: features.append({'label': label, 'content': content[0]})
@@ -190,7 +198,7 @@ class OnAirNode(template.Node):
     
     def render(self, context):
         """
-        Renders the homepage On Air bar containing details on the
+        Renders the homepage On Air box containing details on the
         current show and current song as well as listen live, studio
         cam and castmember blog links
         """
