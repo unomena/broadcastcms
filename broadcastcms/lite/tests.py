@@ -8,11 +8,13 @@ from django.template import RequestContext
 from django.test.client import Client
 from django.test import TestCase
 
+from broadcastcms.banner.models import ImageBanner
 from broadcastcms.base.models import ContentBase
 from broadcastcms.label.models import Label
 from broadcastcms.show.models import CastMember, Credit, Show
 from broadcastcms.test.mocks import RequestFactory
 
+from context_processors import SITE_SECTIONS
 from models import Settings
 from templatetags.desktop_inclusion_tags import *
 
@@ -56,7 +58,8 @@ class ContextProcessorsTestCase(TestCase):
         # if a settings object exists it should be returned
         site_settings = Settings.objects.get_or_create(pk='1')[0]
         self.failUnless(settings(request)['settings'] == site_settings)
-            
+
+
 class MiddlewareTestCase(TestCase):
     def setUp(self):
         from middleware import URLSwitchMiddleware
@@ -81,6 +84,37 @@ class MiddlewareTestCase(TestCase):
         request = RequestFactory(HTTP_HOST='bogus_host').get('/')
         self.url_switch.process_request(request)
         self.failUnlessEqual(settings.ROOT_URLCONF, 'dummy')
+
+
+class ModelsTestCase(TestCase):
+    def setContext(self, path):
+        request = RequestFactory().get(path)
+        self.context = RequestContext(request, {})
+    
+    def testSettingsGetSectionBanners(self):
+        self.setContext(path='/')
+        site_settings = Settings.objects.create()
+
+        # if no banners are specified return nothing for each section
+        for section in SITE_SECTIONS:
+            self.setContext(path=section)
+            self.failIf(site_settings.get_section_banners(self.context['section']))
+
+        # if banners are specified return the correct ones for each section
+        # banners should be returned as their respective leaf classes
+        for section in SITE_SECTIONS:
+            banners = [
+                ImageBanner.objects.create(url='private %s image banner' % section, is_public=False), 
+                ImageBanner.objects.create(url='public %s image banner' % section, is_public=True),
+            ]
+            setattr(site_settings, 'banner_section_%s' % section, banners)
+            site_settings.save()
+            self.setContext(path=section)
+            # only public banners are returned by default
+            self.failUnless(banners[1:] == site_settings.get_section_banners(self.context['section']))
+            # but if specified both private and public banners are returned
+            self.failUnless(banners == site_settings.get_section_banners(self.context['section'], permitted=False))
+
 
 class DesktopViewsTestCase(TestCase):
     def assertSkeletonTemplatesUsed(self, response):
@@ -182,10 +216,44 @@ class DesktopInclusionTagsTestCase(TestCase):
         response = features('', '').render(self.context)
         self.failIf("label 4" in response)
 
-
-
+    def testHomeAdvert(self):
+        # setup
+        self.setContext(path='/')
+        site_settings = Settings.objects.get_or_create(pk='1')[0]
+        private_image_banner = ImageBanner.objects.create(url='private image banner', is_public=False)
+        public_image_banner = ImageBanner.objects.create(url='public image banner', is_public=True)
+       
+        # if no banner is specified nothing should render
+        self.failIf(home_advert('', '').render(self.context))
         
+        # if a private banner is specified it should not render
+        site_settings.banner_section_home = [private_image_banner,]
+        site_settings.save()
+        self.setContext(path='/')
+        self.failIf(private_image_banner.url in home_advert('', '').render(self.context))
+        
+        # if a public banner is specified it should render
+        site_settings.banner_section_home = [public_image_banner,]
+        site_settings.save()
+        self.setContext(path='/')
+        self.failUnless(public_image_banner.url in home_advert('', '').render(self.context))
 
+        # if multiple banners are specified only 1 should render
+        banners = []
+        for i in range(1,5):
+            banners.append(ImageBanner.objects.create(url='image banner %s' % i, is_public=True))
+        site_settings.banner_section_home = banners
+        site_settings.save()
+        self.setContext(path='/')
+        response = home_advert('', '').render(self.context)
+
+        found = 0
+        for banner in banners:
+            if banner.url in response:
+                found += 1
+
+        self.failIf(found != 1)
+        
     def testMasthead(self):
         # setup
         self.setContext(path='/')
