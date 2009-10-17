@@ -226,36 +226,59 @@ class OnAirNode(template.Node):
         })
         return render_to_string('desktop/inclusion_tags/home/on_air.html', context)
 
-@register.tag
-def home_updates(parser, token):
-    return HomeUpdatesNode()
+class SlidingUpdatesNode(template.Node):
+    def __init__(self, tray_length=3, panel_rows=2, count=18):
+        self.tray_length = tray_length
+        self.panel_rows = panel_rows
+        self.count = count
+        super(SlidingUpdatesNode, self).__init__()
 
-class HomeUpdatesNode(template.Node):
-    tray_length = 3
-    panel_rows = 2
-    count = 18
-
-    def get_instances(self, context):
-        settings = context['settings']
+    def get_instances(self, settings):
+        """
+        Returns public instance for those types specified in the Settings object's
+        update_types field, sorted on created date descending. The number of items returned
+        is limited to the value of self.count.
+        """
+        # get the update types from settings
         update_types = [update_type.model_class().__name__ for update_type in settings.update_types.all()]
-        return ContentBase.permitted.filter(classname__in=update_types).order_by("-created")
+
+        # collect public instances, limited to count, sorted on created descending
+        instances = ContentBase.permitted.filter(classname__in=update_types).order_by("-created")[:self.count]
+        
+        # return list of instance leaves
+        return [instance.as_leaf_class() for instance in instances]
   
     def build_panels(self, instances):
+        """
+        Returns panels with trays containing instances. Pannels are build according
+        to self.tray_length and self.panel_rows. Panels can be seen as pages, with 
+        tray length indicating how many instances are contained in a panel row.
+        """
         trays = []
+        # generate instance slice offsets from which to populate trays
         slices = range(0, len(instances), self.tray_length)
+        # populate trays based on instance slices
         for slice_start in slices:
             trays.append(instances[slice_start: slice_start + self.tray_length])
 
         panels = []
+        # generate tray slice offsets
         slices = range(0, len(trays), self.panel_rows)
+        # populate pannels based on tray slices
         for slice_start in slices:
             panels.append(trays[slice_start: slice_start + self.panel_rows])
 
         return panels
 
-    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
-        instances = [instance.as_leaf_class() for instance in self.get_instances(context)[:self.count]]
+        """
+        Renders update box containing sliding panels, which contain
+        a number of trays/rows, which in turn contains latest content
+        for content types specified in the Settings object's 
+        update_types field. If we only one panel, sliding and sliding 
+        controls are disabled.
+        """
+        instances = self.get_instances(context['settings'])
         panels = self.build_panels(instances)
       
         context.update({
@@ -264,26 +287,17 @@ class HomeUpdatesNode(template.Node):
         })
         return render_to_string('desktop/inclusion_tags/misc/updates.html', context)
 
-# Popup
+@register.tag
+def home_updates(parser, token):
+    return SlidingUpdatesNode(tray_length=3, panel_rows=2, count=18)
 
 @register.tag
 def popup_updates(parser, token):
-    return PopupUpdatesNode()
-
-class PopupUpdatesNode(HomeUpdatesNode):
-    tray_length = 1
-    panel_rows = 3
-    count = 9
-
+    return SlidingUpdatesNode(tray_length=1, panel_rows=3, count=9)
 
 @register.tag
 def modal_updates(parser, token):
-    return ModalUpdatesNode()
-
-class ModalUpdatesNode(HomeUpdatesNode):
-    tray_length = 2
-    panel_rows = 1
-    count = 2
+    return SlidingUpdatesNode(tray_length=2, panel_rows=1, count=2)
 
 # Misc
 
@@ -476,7 +490,7 @@ class NowPlayingNode(OnAirNode):
 def updates(parser, token):
     return UpdatesNode()
 
-class UpdatesNode(HomeUpdatesNode):
+class UpdatesNode(SlidingUpdatesNode):
         
     def render(self, context):
         instances = [instance.as_leaf_class() for instance in self.get_instances(context)[:5]]
