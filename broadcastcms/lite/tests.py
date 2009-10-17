@@ -8,12 +8,16 @@ from django.template import RequestContext
 from django.test.client import Client
 from django.test import TestCase
 
-from broadcastcms.test.mocks import RequestFactory
 from broadcastcms.base.models import ContentBase
+from broadcastcms.label.models import Label
 from broadcastcms.show.models import CastMember, Credit, Show
+from broadcastcms.test.mocks import RequestFactory
 
 from models import Settings
 from templatetags.desktop_inclusion_tags import *
+
+# import desktop views to register content views
+import desktop_views
 
 class ContextProcessorsTestCase(TestCase):
     def testSection(self):
@@ -92,11 +96,16 @@ class DesktopViewsTestCase(TestCase):
         # check the response is 200 (OK)
         self.failUnlessEqual(response.status_code, 200)
 
-        # check that the home template was used
+        # check that the home template is used
         self.assertTemplateUsed(response, 'desktop/content/home.html')
         
-        # check that skeleton templates were used
+        # check that skeleton templates are used
         self.assertSkeletonTemplatesUsed(response)
+
+        # check that correct inclusion tag templates are used
+        self.assertTemplateUsed(response, 'desktop/inclusion_tags/home/features.html')
+        self.assertTemplateUsed(response, 'desktop/inclusion_tags/home/on_air.html')
+
 
 class DesktopInclusionTagsTestCase(TestCase):
     def setContext(self, path):
@@ -120,6 +129,62 @@ class DesktopInclusionTagsTestCase(TestCase):
         self.failUnless('Hello test' in response_string)
         self.failUnless('Profile' in response_string)
         self.failUnless('Sign out' in response_string)
+
+    def testFeatures(self):
+        #setup labels
+        contentless_label = Label.objects.create(title="contentless label", is_visible=True)
+        private_content_label = Label.objects.create(title="private content label", is_visible=True)
+        visible_label = Label.objects.create(title="visible label", is_visible=True)
+        invisible_label = Label.objects.create(title="invisible label", is_visible=False)
+        
+        #setup content
+        private_content = ContentBase.objects.create(title="private content", is_public=False)
+        private_content.labels= [private_content_label,visible_label]
+        private_content.save()
+        public_content = ContentBase.objects.create(title="public content", is_public=True)
+        public_content.labels = [visible_label, invisible_label,]
+        public_content.save()
+        
+        # setup settings
+        site_settings = Settings.objects.get_or_create(pk='1')[0]
+        site_settings.homepage_featured_labels = [contentless_label, private_content_label, invisible_label, visible_label]
+        site_settings.save()
+        self.setContext(path='/')
+        response = features('', '').render(self.context)
+        
+        # labels with no content should not render
+        self.failIf(contentless_label.title in response)
+        
+        # labels with private content should not render
+        self.failIf(private_content_label.title in response)
+        
+        # invisible labels should not render, even if they have public content
+        self.failIf(invisible_label.title in response)
+        
+        # visible labels with public content should render
+        self.failUnless(visible_label.title in response)
+
+        # private content should not render
+        self.failIf(private_content.title in response)
+        
+        # public content should render
+        self.failUnless(public_content.title in response)
+
+        # maximum of 3 labels should render
+        site_settings.homepage_featured_labels = []
+        for i in range(1,5):
+            label = Label.objects.create(title="label %s" % i, is_visible=True)
+            public_content.labels.add(label)
+            site_settings.homepage_featured_labels.add(label)
+        public_content.save()
+        site_settings.save()
+        self.setContext(path='/')
+        response = features('', '').render(self.context)
+        self.failIf("label 4" in response)
+
+
+
+        
 
     def testMasthead(self):
         # setup
@@ -237,9 +302,6 @@ class DesktopInclusionTagsTestCase(TestCase):
         after_now = now + timedelta(minutes=10)
         self.setContext(path='/')
         response =  on_air('', '').render(self.context)
-
-        # always return something
-        self.failUnless(response)
 
         # don't display show banner without a show        
         self.failIf('banner_thumb' in response)
