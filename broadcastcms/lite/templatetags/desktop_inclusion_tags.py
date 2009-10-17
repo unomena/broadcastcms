@@ -141,8 +141,11 @@ def home_advert(parser, token):
     return HomeAdvertNode()
 
 class HomeAdvertNode(template.Node):
-    @cache_view_function(60*10, respect_path=True)
     def render(self, context):
+        """
+        Render a single advertising banner as specified in the Settings 
+        object's banner section home field. Only public banners are rendered
+        """
         section = context['section']
         settings = context['settings']
         banners = settings.get_section_banners(section)
