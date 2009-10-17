@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 
 from broadcastcms.calendar.models import Entry
-from broadcastcms.show.models import Show
+from broadcastcms.show.models import Credit, Show
 from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.radio.models import Song
 from broadcastcms.cache.decorators import cache_view_function
@@ -173,59 +173,47 @@ def on_air(parser, token):
     return OnAirNode()
 
 class OnAirNode(template.Node):
-    def get_on_air_entry(self, content_type):
-        valid_entry = None
-        now = datetime.now()
-        
-        entries = Entry.objects.permitted().by_content_type(content_type).filter(start__lt=now, end__gt=now).order_by('start')
-        for entry in entries:
-            if entry.content.is_public:
-                valid_entry = entry
-                break
-
-        return valid_entry
+    def get_public_on_air_entry(self, content_type):
+        """
+        Returns first currently active public entry that has public content
+        """
+        entries = Entry.objects.permitted().by_content_type(content_type).now().filter(content__is_public=True)
+        return entries[0] if entries else None
 
     def get_primary_castmember(self, show):
-        castmember = None
-        credits = show.credits.all().order_by('role')
-        for credit in credits:
-            castmember = credit.castmember
-            if castmember.is_public:
-                break
-
-        return castmember
+        """
+        Returns the primary public castmember for the given show.
+        Primary castmember is determined by credit roles.
+        """
+        credits = show.credits.all().filter(castmember__is_public=True).order_by('role')
+        return credits[0].castmember if credits else None
     
-    def get_primary_artist(self, song):
-        artist = None
-        credits = song.credits.all().order_by('role')
-        for credit in credits:
-            artist = credit.artist
-            if artist.is_public:
-                break
-
-        return artist
-        
     def render(self, context):
-        show_entry = self.get_on_air_entry(Show)
+        """
+        Renders the homepage On Air bar containing details on the
+        current show and current song as well as listen live, studio
+        cam and castmember blog links
+        """
+        # get the current on air show
+        show_entry = self.get_public_on_air_entry(Show)
         show = show_entry.content.as_leaf_class() if show_entry else None
-        if not show:
-            return ''
-        castmember = self.get_primary_castmember(show) if show else None
+       
+        # get the primary castmember for the current on air show
+        primary_castmember = self.get_primary_castmember(show) if show else None
         
-        song_entry = self.get_on_air_entry(Song)
+        # get the current playing song and artist info
+        song_entry = self.get_public_on_air_entry(Song)
         song = song_entry.content.as_leaf_class() if song_entry else None
-        artist = self.get_primary_artist(song) if song else None
+        artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
 
         context.update({
             'entry': show_entry,
             'show': show,
-            'castmember': castmember,
+            'primary_castmember': primary_castmember,
             'song': song,
             'artist': artist,
         })
         return render_to_string('desktop/inclusion_tags/home/on_air.html', context)
-
-        return ''
 
 @register.tag
 def home_updates(parser, token):

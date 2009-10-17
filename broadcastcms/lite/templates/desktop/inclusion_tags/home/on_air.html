@@ -1,15 +1,27 @@
 {% load scaled_image_tags %}
 
 <div class="banner">
-    <p class="banner_thumb"><img src="{% scaled_image_url show 216 77 %}" width="216" height="77" alt="" /></p>
+    {% if show %}
+        <p class="banner_thumb"><img src="{% scaled_image_url show 216 77 %}" width="216" height="77" alt="" /></p>
+    {% endif %}
     <p class="banner_info">
-	    <span class="onair">On Air: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</span><br />
-		<span class="showtitle">{{ show.title }}</span><br />
-    	{% if song %}<span class="nowplaying"><strong>Now Playing:</strong>{% if artist %} {{ artist.title }} -{% endif %} {{ song.title }}</span>{% endif %}
+        {% if show %}
+    	    <span class="onair">On Air: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</span><br />
+	    	<span class="showtitle">{{ show.title }}</span><br />
+        {% endif %}
+    	{% if song %}
+            <span class="nowplaying"><strong>Now Playing:</strong>{% if artist %} {{ artist.title }} -{% endif %} {{ song.title }}</span>
+        {% endif %}
 	</p>
     <ul>
-	    {% if settings.player_controls %}<li class="listen_live"><a href="javascript: openPlayer({% url listen_live %});">Listen Live</a></li>{% endif %}
-		{% if settings.studio_cam_urls %}<li class="studio_cam"><a href="javascript: openCam({% url studio_cam %});">Studio Cam</a></li>{% endif %}
-    	{% if castmember %}<li class="my_blog"><a href="{{ castmember.url }}">{{ castmember.title }}My Blog</a></li>{% endif %}
+	    {% if settings.player_controls %}
+            <li class="listen_live"><a href="javascript: openPlayer({% url listen_live %});">Listen Live</a></li>
+        {% endif %}
+		{% if settings.studio_cam_urls %}
+            <li class="studio_cam"><a href="javascript: openCam({% url studio_cam %});">Studio Cam</a></li>
+        {% endif %}
+    	{% if primary_castmember %}
+            <li class="my_blog"><a href="{{ primary_castmember.url }}">My Blog</a></li>
+        {% endif %}
 	</ul>
 </div><!--/Banner-->
