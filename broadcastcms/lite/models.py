@@ -204,10 +204,20 @@ class Settings(models.Model):
         verbose_name_plural = 'Settings'
 
     def get_section_banners(self, section, permitted=True):
+        """
+        Returns a list of banners for each section as specified
+        in the banner section fields. If permitted=True only 
+        public banners are returned.
+        """
+        # grab banners from relevant field
         banners = getattr(self, "banner_section_%s" % section, None)
+
         if banners:
+            # filter on permitted
             banners = banners.permitted() if permitted else banners.all()
+            # traverse to leaf class
             banners = [banner.as_leaf_class() for banner in banners]
+
         return banners
 
     def __unicode__(self):
