@@ -1,16 +1,20 @@
 import unittest
 from datetime import datetime, timedelta
+from math import ceil
 
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.template import RequestContext
 from django.test.client import Client
 from django.test import TestCase
 
 from broadcastcms.banner.models import ImageBanner
 from broadcastcms.base.models import ContentBase
+from broadcastcms.event.models import Event
 from broadcastcms.label.models import Label
+from broadcastcms.post.models import Post
 from broadcastcms.show.models import CastMember, Credit, Show
 from broadcastcms.test.mocks import RequestFactory
 
@@ -139,6 +143,7 @@ class DesktopViewsTestCase(TestCase):
         # check that correct inclusion tag templates are used
         self.assertTemplateUsed(response, 'desktop/inclusion_tags/home/features.html')
         self.assertTemplateUsed(response, 'desktop/inclusion_tags/home/on_air.html')
+        self.assertTemplateUsed(response, 'desktop/inclusion_tags/misc/updates.html')
 
 
 class DesktopInclusionTagsTestCase(TestCase):
@@ -422,8 +427,6 @@ class DesktopInclusionTagsTestCase(TestCase):
         # display my blog link for a castmember        
         self.failUnless('my_blog' in response)
         
-
-
     def testOnAirGetPublicOnAirEntry(self):
         """
         get_public_on_air_entry should only return the
@@ -482,3 +485,101 @@ class DesktopInclusionTagsTestCase(TestCase):
         self.failIf(primary_private_castmember == primary_castmember)
         self.failIf(secondary_castmember == primary_castmember)
         self.failUnless(primary_public_castmember == primary_castmember)
+
+    def testSlidingUpdatesNodeGetInstances(self):
+        # setup
+        update_types = ContentType.objects.all().filter(model__in=['Post', 'Event'])
+        site_settings = Settings.objects.create()
+        node = SlidingUpdatesNode()
+
+        # don't return anything if no update types have been set
+        self.failIf(node.get_instances(site_settings))
+
+        # don't return anything if update types have been set without public content 
+        site_settings.update_types = update_types
+        site_settings.save()
+        self.failIf(node.get_instances(site_settings))
+
+        # return public instances for set update types
+        # instances should be returned as their respective leaf classes
+        post = Post.objects.create(is_public=True)
+        event = Event.objects.create(is_public=True)
+        result = node.get_instances(site_settings)
+        self.failUnless(post in result and event in result)
+        
+        # don't return instances for non update types
+        show = Show.objects.create(is_public=True)
+        self.failIf(show in node.get_instances(site_settings))
+
+        # only return as many instances as specified in count
+        node.count = 5
+        for i in range(0, 10):
+            Post.objects.create(is_public=True)
+        self.failIf(len(node.get_instances(site_settings)) > node.count)
+    
+    def testSlidingUpdatesNodeBuildPanels(self):
+        # setup
+        update_types = ContentType.objects.all().filter(model__in=['Post', 'Event'])
+        site_settings = Settings.objects.create()
+        node = SlidingUpdatesNode(tray_length=2, panel_rows=3, count=20)
+
+        # panels should be empty if no content is available
+        instances = node.get_instances(site_settings)
+        panels = node.build_panels(instances)
+        self.failIf(panels)
+        
+        # check if panels are formed correctly 
+        site_settings.update_types = update_types
+        site_settings.save()
+        for i in range(0, 25):
+            Post.objects.create(is_public=True)
+        instances = node.get_instances(site_settings)
+        panels = node.build_panels(instances)
+
+        # no more than max possible panels as allowed by instance count, 
+        max_panels = ceil(float(node.count) / (node.panel_rows * node.tray_length))
+        self.failIf(len(panels) > max_panels)
+
+        # no panels with more rows than panel_rows
+        for panel in panels:
+            self.failIf(len(panel) > node.panel_rows)
+        
+        # no trays longer than tray_length
+        for panel in panels:
+            for tray in panel:
+                self.failIf(len(tray) > node.tray_length)
+
+        # no tray/panel/row overlap (since we are generating a unique set
+        # of instances, overlap is indicated if any tray contains content 
+        # also present in any other tray
+        dup_test = []
+        for panel in panels:
+            for tray in panel:
+                for instance in tray:
+                    self.failIf(instance in dup_test)
+                    dup_test.append(instance)
+
+        # all instances are accounted for in trays and are arranged in teh order 
+        # they were provided
+        self.failUnless(dup_test == instances)
+    
+    def testHomeUpdates(self):
+        # setup
+        update_types = ContentType.objects.all().filter(model__in=['Post', 'Event'])
+        site_settings = Settings.objects.create()
+        site_settings.update_types = update_types
+        site_settings.save()
+        self.setContext(path='/')
+        
+        # don't render anything if panels are empty
+        self.failIf('updates' in home_updates('', '').render(self.context))
+
+        # sliding controls should not render if only one panel is available
+        for i in range(0, 2):
+            Post.objects.create(is_public=True)
+        self.failIf('scroll_nav' in home_updates('', '').render(self.context))
+
+        # sliding controls should render if more than one panel is available
+        for i in range(0, 25):
+            Post.objects.create(is_public=True)
+        self.failUnless('scroll_nav' in home_updates('', '').render(self.context))
