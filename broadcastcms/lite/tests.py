@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -10,6 +10,7 @@ from django.test import TestCase
 
 from broadcastcms.test.mocks import RequestFactory
 from broadcastcms.base.models import ContentBase
+from broadcastcms.show.models import CastMember, Credit, Show
 
 from models import Settings
 from templatetags.desktop_inclusion_tags import *
@@ -84,7 +85,7 @@ class DesktopViewsTestCase(TestCase):
         self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/account_links.html')
         self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/mastfoot.html')
         self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/metrics.html')
-        
+       
     def testHome(self):
         response = self.client.get('/')
 
@@ -97,8 +98,7 @@ class DesktopViewsTestCase(TestCase):
         # check that skeleton templates were used
         self.assertSkeletonTemplatesUsed(response)
 
-
-class DesktopInlcusionTagsTestCase(TestCase):
+class DesktopInclusionTagsTestCase(TestCase):
     def setContext(self, path):
         request = RequestFactory().get(path)
         self.context = RequestContext(request, {})
@@ -231,4 +231,124 @@ class DesktopInlcusionTagsTestCase(TestCase):
         self.failUnless(site_settings.metrics in response_string)
 
     def testOnAir(self):
-       pass 
+        # setup
+        now = datetime.now()
+        before_now = now - timedelta(minutes=10)
+        after_now = now + timedelta(minutes=10)
+        self.setContext(path='/')
+        response =  on_air('', '').render(self.context)
+
+        # always return something
+        self.failUnless(response)
+
+        # don't display show banner without a show        
+        self.failIf('banner_thumb' in response)
+        
+        # don't display show details without a show        
+        self.failIf('showtitle' in response)
+        
+        # don't display song details without a song        
+        self.failIf('nowplaying' in response)
+        
+        # don't display listen live link if player controls are not specified in settings        
+        self.failIf('listen_live' in response)
+        
+        # don't display studio cam link if cam image urls are not specified in settings        
+        self.failIf('studio_cam' in response)
+        
+        # don't display my blog link without a castmember        
+        self.failIf('my_blog' in response)
+
+        # setup some content
+        show = Show.objects.create(is_public=True)
+        castmember = CastMember.objects.create(is_public=True)
+        Credit.objects.create(show=show, castmember=castmember)
+        show_entry = Entry.objects.create(start=before_now, end=after_now, content=show, is_public=True)
+        song = Song.objects.create(is_public=True)
+        song_entry = Entry.objects.create(start=before_now, end=after_now, content=song, is_public=True)
+        site_settings = Settings.objects.get_or_create(pk='1')[0]
+        site_settings.player_controls = "player_controls"
+        site_settings.studio_cam_urls = "studio_cam_urls"
+        site_settings.save()
+       
+        self.setContext(path='/')
+        response =  on_air('', '').render(self.context)
+        
+        # display show banner for a show        
+        self.failUnless('banner_thumb' in response)
+        
+        # display show details for a show        
+        self.failUnless('showtitle' in response)
+        
+        # display song details for a song        
+        self.failUnless('nowplaying' in response)
+        
+        # display listen live link if player controls are specified in settings        
+        self.failUnless('listen_live' in response)
+        
+        # display studio cam link if cam image urls are specified in settings        
+        self.failUnless('studio_cam' in response)
+        
+        # display my blog link for a castmember        
+        self.failUnless('my_blog' in response)
+        
+
+
+    def testOnAirGetPublicOnAirEntry(self):
+        """
+        get_public_on_air_entry should only return the
+        first currently active public entry that has public content
+        """
+        # setup
+        now = datetime.now()
+        before_now = now - timedelta(minutes=10)
+        after_now = now + timedelta(minutes=10)
+
+        # don't return a current private entry, regardless of content
+        content = ContentBase.objects.create(title='Content', is_public=True)
+        entry = Entry.objects.create(start=before_now, end=after_now, content=content, is_public=False)
+        self.failIf(entry == on_air('', '').get_public_on_air_entry(ContentBase))
+
+        # don't return a current public entry with private content
+        content = ContentBase.objects.create(title='Content', is_public=False)
+        entry = Entry.objects.create(start=before_now, end=after_now, content=content, is_public=True)
+        self.failIf(entry == on_air('', '').get_public_on_air_entry(ContentBase))
+        
+        # return a current public entry with public content
+        content = ContentBase.objects.create(title='Content', is_public=True)
+        entry = Entry.objects.create(start=before_now, end=after_now, content=content, is_public=True)
+        self.failUnless(entry == on_air('', '').get_public_on_air_entry(ContentBase))
+
+    def testOnAirGetPrimaryCastmember(self):
+        """
+        get_primary_castmember should only return the most seniour (based on role)
+        public castmember for the given show
+        """
+        # setup
+        show = Show.objects.create()
+
+        # don't retun anything if the show does not have credits 
+        self.failIf(on_air('', '').get_primary_castmember(show))
+
+        # don't return anything if the show does not have any public credits
+        castmember = CastMember.objects.create(is_public=False)
+        credit = Credit.objects.create(show=show, castmember=castmember)
+        self.failIf(on_air('', '').get_primary_castmember(show))
+
+        # expect a response if the show has credits with public castmembers
+        castmember = CastMember.objects.create(is_public=True)
+        credit = Credit.objects.create(show=show, castmember=castmember)
+        self.failUnless(on_air('', '').get_primary_castmember(show))
+        
+        # return the primary public castmember
+        show = Show.objects.create()
+        primary_private_castmember = CastMember.objects.create(is_public=False)
+        primary_public_castmember = CastMember.objects.create(is_public=True)
+        secondary_castmember = CastMember.objects.create(is_public=True)
+        Credit.objects.create(show=show, castmember=primary_private_castmember, role=1)
+        Credit.objects.create(show=show, castmember=primary_public_castmember, role=2)
+        Credit.objects.create(show=show, castmember=secondary_castmember, role=3)
+        primary_castmember = on_air('', '').get_primary_castmember(show)
+        self.failIf(primary_private_castmember == primary_castmember)
+        self.failIf(secondary_castmember == primary_castmember)
+        self.failUnless(primary_public_castmember == primary_castmember)
