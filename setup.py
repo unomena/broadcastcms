@@ -20,7 +20,7 @@ setup(
         'python-memcached==1.44',
         'PIL==1.1.6',
         'simplejson==2.0.9',
-        'windmill==1.2',
+        'windmill==1.3',
     ],
     include_package_data=True,    
 )
