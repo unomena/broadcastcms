@@ -1,4 +1,6 @@
 {% load scaled_image_tags public_tags %}
+
+{% if features %}
 <div class="promo">
     <div id="controller">
         {% for feature in features %}
@@ -18,3 +20,4 @@
         {% endfor %}
 	</div>
 </div><!--/Promo-->
+{% endif %}
