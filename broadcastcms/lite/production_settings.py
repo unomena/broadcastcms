@@ -7,8 +7,11 @@ BUILDOUT_PATH =  path.split(path.abspath(path.join(path.dirname(sys.argv[0]))))[
 
 # Django settings for broadcastcmslite project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
+
+# If you set this to False, Django won't server static content (recommended)
+SERVE_STATIC = False
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
