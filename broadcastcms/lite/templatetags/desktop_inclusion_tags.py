@@ -463,13 +463,17 @@ class NowPlayingNode(OnAirNode):
         return valid_entry
 
     def render(self, context):
-        show_entry = self.get_on_air_entry(Show)
+        # get the current on air show
+        show_entry = self.get_public_on_air_entry(Show)
         show = show_entry.content.as_leaf_class() if show_entry else None
-        castmember = self.get_primary_castmember(show) if show else None
+       
+        # get the primary castmember for the current on air show
+        primary_castmember = self.get_primary_castmember(show) if show else None
         
-        song_entry = self.get_on_air_entry(Song)
+        # get the current playing song and artist info
+        song_entry = self.get_public_on_air_entry(Song)
         song = song_entry.content.as_leaf_class() if song_entry else None
-        artist = self.get_primary_artist(song) if song else None
+        artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
         
         next_entry = self.get_next_entry(Show)
         next_show = next_entry.content.as_leaf_class() if next_entry else None
@@ -478,7 +482,7 @@ class NowPlayingNode(OnAirNode):
         context.update({
             'entry': show_entry,
             'show': show,
-            'castmember': castmember,
+            'primary_castmember': primary_castmember,
             'song': song,
             'artist': artist,
             'next_show': next_show,
@@ -493,7 +497,7 @@ def updates(parser, token):
 class UpdatesNode(SlidingUpdatesNode):
         
     def render(self, context):
-        instances = [instance.as_leaf_class() for instance in self.get_instances(context)[:5]]
+        instances = [instance.as_leaf_class() for instance in self.get_instances(context['settings'])[:5]]
         context.update({
             'instances': instances,
         })
