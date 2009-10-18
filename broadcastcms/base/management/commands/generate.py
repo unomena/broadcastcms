@@ -20,7 +20,8 @@ class Command(BaseCommand):
             app_path = __import__(name, {}, {}, [name.split('.')[-1]]).__path__
             try:
                 params = imp.find_module('generate', app_path)
-                generate = imp.load_module(name + '.generate', *params)
-                generate.generate()
             except ImportError:
                 pass
+            else:
+                generate = imp.load_module(name + '.generate', *params)
+                generate.generate() 
