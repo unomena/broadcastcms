@@ -614,6 +614,15 @@ def info_content(request, section):
     })
     return render_to_response('desktop/content/info/content.html', context)
     
+def handler404(request):
+    context = RequestContext(request, {})
+    context.update({'error': '404'})
+    return render_to_response('desktop/404.html', context)
+
+def handler500(request):
+    context = RequestContext(request, {})
+    context.update({'error': '500'})
+    return render_to_response('desktop/500.html', context)
 
 # Mailers
 def mailer_new_user(request, username, password):
@@ -622,7 +631,7 @@ def mailer_new_user(request, username, password):
     host = "http://%s" % request.META['HTTP_HOST']
     subject = "Welcome to %s" % site_name
     
-    return (render_to_string('mailers/new_user.html', {
+    return (render_to_string('desktop/mailers/new_user.html', {
         'username': username, 
         'password': password,
         'host': host,
@@ -702,7 +711,7 @@ def modals_register(request):
             profile.email_subscribe = email_subscribe
             profile.sms_subscribe = sms_subscribe
             profile.save()
-        
+       
             # Send confirmation mail
             message, subject = mailer_new_user(request, username, password)
             mail_user(subject, message, user, content_subtype="html", fail_silently=False)
