@@ -1,12 +1,16 @@
+{% extends "desktop/sections/base_modal.html" %}
+
 {% load public_tags %}
 
-<div class="peek_body">
-    <h1>{{ self.title }}</h1>
-	{% if self.description %}
-        <p><strong>{{ self.description }}</strong></p>
-    {% endif %}
-	{% if self.content %}
-        <p>{{ self.content|truncatewords_html:200|safe }}</p>
-    {% endif %}
-	<p><a href="{% call_view self url %}">Read More</a></p>
-</div><!--/Body-->
+{% block content %}
+    <div class="peek_body">
+        <h1>{{ self.title }}</h1>
+    	{% if self.description %}
+            <p><strong>{{ self.description }}</strong></p>
+        {% endif %}
+	    {% if self.content %}
+            <p>{{ self.content|truncatewords_html:200|safe }}</p>
+        {% endif %}
+	    <p><a href="{% call_view self url %}">Read More</a></p>
+    </div><!--/Body-->
+{% endblock %}
