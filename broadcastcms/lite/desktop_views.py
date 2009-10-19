@@ -27,6 +27,7 @@ from broadcastcms.event.models import Event
 from broadcastcms.gallery.models import Gallery
 from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.post.models import Post
+from broadcastcms.radio.models import Song
 from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.scaledimage.fields import get_image_scales
 from broadcastcms.show.models import Show, CastMember
@@ -668,14 +669,12 @@ def modals_content(request, slug):
     if not request.is_ajax():
         raise Http404
     
+    context = RequestContext(request, {})
+    
     content = get_object_or_404(ContentBase, slug=slug, is_public=True)
     content = content.as_leaf_class()
 
-    context = RequestContext(request, {})
-    context.update({
-        'self': content,
-    })
-    return render_to_response('desktop/modals/content.html', context)
+    return content.render_modals_content(context)
 
 def modals_register(request):
     if not request.is_ajax():
@@ -881,7 +880,10 @@ class ContentBaseViews(object):
         return render_to_string('desktop/content/contentbase/updates_widget.html', context)
    
     def render_modals_content(self, context):
-        return render_to_string('desktop/content/contentbase/modals_content.html', context)
+        context.update({
+            'self': self,
+        })
+        return render_to_response('desktop/content/contentbase/modals_content.html', context)
         
     def render_listing(self, context):
         context = {
@@ -997,7 +999,7 @@ class ContentBaseViews(object):
         return render_to_string('desktop/content/contentbase/post_head.html', context)
 
 class ChartEntryViews(object):
-    def render_chart(self):
+    def render_chart(self, context):
         song = self.song
         now = datetime.now()
         week_start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -1008,24 +1010,14 @@ class ChartEntryViews(object):
         else:
             weeks_on = 0
 
-        context = {
+        context.update({
             'self': self, 
             'song': self.song,
-            'artist': self.get_primary_artist(),
+            'artist': song.get_primary_artist(),
             'weeks_on': weeks_on,
-        }
+        })
         return render_to_string('desktop/content/charts/entry.html', context)
     
-    def get_primary_artist(self):
-        artist = None
-        credits = self.song.credits.all().order_by('role')
-        for credit in credits:
-            artist = credit.artist
-            if artist.is_public:
-                break
-
-        return artist
-        
 class CompetitionViews(object):
     def render_listing(self, context):
         context = {
@@ -1113,7 +1105,15 @@ class UserViews(object):
     def url(self):
         castmembers = self.contentbase_set.permitted().filter(classname__exact="castmember")
         return castmembers[0].as_leaf_class().url() if castmembers else ''
- 
+
+class SongViews(object):
+    def render_modals_content(self, context):
+        context.update({
+            'self': self,
+            'artist': self.get_primary_artist(),
+        })
+        return render_to_response('desktop/content/charts/modals_content.html', context)
+    
 public.site.register(CastMember, CastMemberViews)
 public.site.register(ChartEntry, ChartEntryViews)
 public.site.register(CodeBanner, CodeBannerViews)
@@ -1125,3 +1125,4 @@ public.site.register(Gallery, GalleryViews)
 public.site.register(ImageBanner, ImageBannerViews)
 public.site.register(Post, PostViews)
 public.site.register(User, UserViews)
+public.site.register(Song, SongViews)
