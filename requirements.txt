@@ -4,7 +4,7 @@
 # pip install --no-deps -e . (in broadcastcms clone)
 
 
-Django==1.0.4
+http://code.djangoproject.com/svn/django/branches/releases/1.1.X/
 MySQL-python==1.2.3c1
 http://dist.repoze.org/PIL-1.1.6.tar.gz
 django-debug-toolbar==0.8.0
