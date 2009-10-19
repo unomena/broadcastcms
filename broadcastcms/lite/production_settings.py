@@ -122,6 +122,7 @@ IMAGE_SCALES = {
         'ImageBanner': {
             'image': (
                 (300, 250),
+                (424, 260),
             )
         },
     },
