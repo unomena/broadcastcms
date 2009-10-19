@@ -171,9 +171,22 @@ class FeaturesNode(template.Node):
         # a featured label and its last created content.
         features = []
         for label in homepage_featured_labels:
-            content = ContentBase.objects.permitted().filter(labels__exact=label).order_by('-created')
-            if content: features.append({'label': label, 'content': content[0]})
-
+            content = ModelBase.objects.permitted().filter(labels__exact=label).order_by('-pk')
+            if content: 
+                content = content[0].as_leaf_class()
+                # for objects with a url field return the fields value as its url
+                # otherwise try and generate a url from the object's url method
+                try:
+                    url = content.url(context)
+                except TypeError:
+                    url = content.url
+                feature = {
+                    'label': label, 
+                    'content': content,
+                    'url': url,
+                }
+                features.append(feature)
+    
         context.update({
             'features': features
         })
