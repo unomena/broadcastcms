@@ -94,6 +94,18 @@ class DesktopInclusionTagsTestCase(TestCase):
         response = features('', '').render(self.context)
         self.failIf("label 4" in response)
 
+        # modelbase objects should be renderable (i.e. image banners)
+        label = Label.objects.create(title="modelbase label", is_visible=True)
+        content = ImageBanner.objects.create(title="modelbase content", is_public=True)
+        content.labels.add(label)
+        content.save()
+        site_settings.homepage_featured_labels = []
+        site_settings.homepage_featured_labels.add(label)
+        site_settings.save()
+        self.setContext(path='/')
+        response = features('', '').render(self.context)
+        self.failUnless("modelbase content" in response)
+
     def testHomeAdvert(self):
         # setup
         self.setContext(path='/')
