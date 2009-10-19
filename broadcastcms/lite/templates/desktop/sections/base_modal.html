@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% load desktop_inclusion_tags public_tags %}
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Quick Peek - Broadcast CMS</title>
+</head>
+
+<body>
+<script type="text/javascript">
+//Updates Block - Hovers/Hides
+jQuery(function(){
+	jQuery(".chunk_body").mouseenter(function() {
+		jQuery(this).find('p.upd_pic').css({'display' : 'none'});
+		jQuery(this).find('p.upd_cat span.upd_catname').css({'display' : 'none'});
+		jQuery(this).find('p.upd_cat span.upd_meta').css({'display' : 'block'});
+		jQuery(this).find('h2 a').css({'color' : '#fff'});
+		jQuery(this).find('p').css({'color' : '#999'});
+		jQuery(this).find('p a').css({'color' : '#fff'});
+    });
+	jQuery(".chunk_body").mouseleave(function() {
+		jQuery(this).find('p.upd_pic').css({'display' : 'block'});
+		jQuery(this).find('p.upd_cat span.upd_catname').css({'display' : 'block'});
+		jQuery(this).find('p.upd_cat span.upd_meta').css({'display' : 'none'});
+		jQuery(this).find('h2 a').css({'color' : '#292929'});
+		jQuery(this).find('p a').css({'color' : '#666'});
+    });
+});
+jQuery(document).ready(function() {
+	jQuery.easing.def = "easeInOutSine"; 
+	jQuery('.chunk_body, .post_intro, .block, .box_update_item, .comment').bind('mouseenter',function(){
+		jQuery(this).stop().animate({
+			backgroundColor: "#3c3c3c" }, 200)
+	}).bind('mouseleave',function(){
+		jQuery(this).stop().animate({
+			backgroundColor: "#ffffff" }, 300)
+	});
+});
+</script>
+	<div class="peek">
+	
+		<div class="peek_title">
+			<p class="pt_left">Quick Peek</p>
+			<p class="pt_right"><a href="javascript: void(0);" onclick="self.parent.tb_remove();" class="close">Close</a></p>
+		</div><!--/Title-->
+	
+        {% block content %}{% endblock %}
+		
+        {% modal_updates %}
+
+	</div><!--/PEEK-->
+</body>
+</html>

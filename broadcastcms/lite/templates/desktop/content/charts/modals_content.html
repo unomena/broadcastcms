@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+	<title>Video - Broadcast CMS</title>
+</head>
+
+<body>
+	<div class="modal">
+	
+		<div class="modal_title">
+			{% if artist %}<h1>{{ artist.title }}</h1>{% endif %}
+			<p><a href="javascript: void(0);" onclick="tb_remove()" id="TB_closeWindowButton" class="close">Close</a></p>
+			{% if self.title %}<p class="modal_intro">{{ self.title }}</p>{% endif %}
+		</div>
+	
+        {% if self.video_embed %}
+    		<div class="modal_video">
+                {{ self.video_embed|safe }}
+            </div>
+        {% endif %}
+	
+	</div><!--/MODAL-->
+</body>
+</html>
