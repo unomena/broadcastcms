@@ -869,7 +869,7 @@ class ContentBaseViews(object):
             'url': self.url(context),
         }
         return render_to_string('desktop/content/contentbase/home_updates.html', context)
-    
+   
     def render_updates_widget(self, context):
         labels = self.labels.visible()
         label = labels[0] if labels else None
