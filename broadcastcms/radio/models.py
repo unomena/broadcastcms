@@ -14,6 +14,14 @@ class Song(ContentBase):
     artists = models.ManyToManyField('Artist', through='Credit')
     video_embed = models.TextField('Video Embed Tag', blank=True, null=True)
 
+    def get_primary_artist(self):
+        """
+        Returns the primary artist for a song.
+        Primary artist is determined by credit roles.
+        """
+        credits = self.credits.all().filter(artist__is_public=True).order_by('role')
+        return credits[0].artist if credits else None
+        
 
 CREDIT_CHOICES = [('1', 'Performer'), ('2', 'Contributor'), ('3', 'Writer'), ('4', 'Producer')]
 class Credit(models.Model):
