@@ -4,7 +4,7 @@
     <h1>Now Playing &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
 	<div class="box_show_info">
 	    {% if primary_castmember %}<p class="bsi_thumb"><img src="{% scaled_image_url primary_castmember 81 81 %}" width="81" height="81" alt="" /></p>{% endif %}
-		<p class="bsi_time">On Air: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</p
+		<p class="bsi_time">On Air: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</p>
 		<p class="bsi_name"><a href="{{ primary_castmember.url }}">{{ show.title }}</a><br />{% if primary_castmember %} with {{ primary_castmember.title }}{% endif %}</p>
 	</div>
 	{% if song %}<p class="box_playing"><strong>Now Playing:</strong> {% if artist %} {{ artist.title }} -{% endif %} {{ song.title }}</p>{% endif %}
