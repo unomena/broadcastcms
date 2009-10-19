@@ -1,5 +1,5 @@
 {% extends "desktop/sections/base_section.html" %}
-{% load template_tags %}
+{% load template_tags public_tags %}
 
 {% block left %}	
     <div class="page_head">
@@ -21,7 +21,8 @@
 	</div><!--/item-->
     {% with pager.object_list as entries %}
         {% for entry in entries %}
-            {{ entry.render_chart }}
+            {% call_view entry render_chart %}
         {% endfor %}
     {% endwith %}
+    <p class="clearfix"/>
 {% endblock %}
