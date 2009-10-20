@@ -71,6 +71,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'broadcastcms.lite.context_processors.settings',
     'broadcastcms.lite.context_processors.section',
+    'broadcastcms.lite.context_processors.site',
 )
 
 TEMPLATE_DIRS = (
