@@ -629,6 +629,7 @@ def handler500(request):
 def mailer_new_user(request, username, password):
     current_site = Site.objects.get_current()
     site_name = current_site.name
+    site_domain = current_site.domain
     host = "http://%s" % request.META['HTTP_HOST']
     subject = "Welcome to %s" % site_name
     
@@ -637,6 +638,7 @@ def mailer_new_user(request, username, password):
         'password': password,
         'host': host,
         'site_name': site_name,
+        'site_domain': site_domain,
     }), subject)
 
 
