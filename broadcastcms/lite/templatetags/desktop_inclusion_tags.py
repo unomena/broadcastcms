@@ -486,7 +486,7 @@ class NowPlayingNode(OnAirNode):
         # get the current playing song and artist info
         song_entry = self.get_public_on_air_entry(Song)
         song = song_entry.content.as_leaf_class() if song_entry else None
-        artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
+        artist = song.get_primary_artist()
         
         next_entry = self.get_next_entry(Show)
         next_show = next_entry.content.as_leaf_class() if next_entry else None
