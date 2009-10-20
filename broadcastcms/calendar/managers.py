@@ -67,7 +67,7 @@ class CalendarQuerySet(ModelBaseQuerySet):
 
     def day(self, offset=0):
         """
-        Returns entries for a today.
+        Returns entries for a day.
         If an offset is provided a future or past day is returned relative to today:
         * offset of 0 returns entries for today (default).
         * offset of 1 returns entries for tomorrow.
@@ -136,6 +136,13 @@ class CalendarQuerySet(ModelBaseQuerySet):
                 )
             else:
                 raise Exception('Calendar query model has no relation to the Entry model.')
+        
+    def now(self):
+        """
+        Filters for currently active entries, ordered by start
+        """
+        now = datetime.now()
+        return self.filter(start__lt=now, end__gt=now).order_by('start')
 
 
 class CalendarManager(ModelBaseManager):
@@ -170,3 +177,9 @@ class CalendarManager(ModelBaseManager):
 
     def upcoming(self):
         return self.get_query_set().upcoming()
+    
+    def by_content_type(self, model):
+        return self.get_query_set().by_content_type(model)
+
+    def now(self):
+        return self.get_query_set().now()

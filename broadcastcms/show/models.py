@@ -1,9 +1,11 @@
+import calendar
+
 from django.db import models
-from broadcastcms.label.models import Label
+
 from broadcastcms.base.models import ModelBase, ContentBase
 from broadcastcms.calendar.managers import CalendarManager
+from broadcastcms.label.models import Label
 from broadcastcms.richtext.fields import RichTextField
-import calendar
 
 
 class CastMember(ContentBase):
@@ -79,6 +81,7 @@ class Show(ContentBase):
     class Meta:
         verbose_name = 'Show'
         verbose_name_plural = 'Shows'
+
 
 CREDIT_CHOICES = [('1', 'DJ'), ('2', 'Contributor'), ('3', 'News Reader')]
 class Credit(models.Model):

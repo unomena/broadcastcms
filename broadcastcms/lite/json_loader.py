@@ -13,13 +13,12 @@ from django.db.models.fields.related import ManyToManyField
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from broadcastcms.richtext.fields import RichTextField
-from broadcastcms.scaledimage.storage import ScaledImageStorage
-from broadcastcms.scaledimage.fields import get_image_scales, image_path_and_scales, ScaledImageField
+from broadcastcms.scaledimage.fields import ScaledImageField
 
 SCRIPT_PATH = os.path.dirname( os.path.realpath( __file__ ) )
 USE_CACHE = True
 
-def create_scaled_image(instance, source):
+def load_image(instance, source):
     source = fetch_from_cache(source)
     size = os.path.getsize(source)
     image_file = cStringIO.StringIO()
@@ -27,12 +26,7 @@ def create_scaled_image(instance, source):
     field_name = u'image'
     name = source.split('/')[-1]
     content_type = 'image/jpeg'
-    in_memory_file = InMemoryUploadedFile(image_file, 'image', name, 'image/jpeg', size, None)
-    saver = ScaledImageStorage(scales=set(get_image_scales(instance)))
-    try:
-        return saver.save(image_path_and_scales(instance, name), in_memory_file)
-    except IOError:
-        return None
+    return InMemoryUploadedFile(image_file, 'image', name, 'image/jpeg', size, None)
 
 def format_rich_text(rich_text):
     #rich_text = unicodedata.normalize('NFKD', rich_text).encode('ascii','ignore')
@@ -105,7 +99,9 @@ def generate_item(item):
                 obj_field.add(value)
     
         for field, value in scaled_image_fields.items():
-            setattr(obj, field, create_scaled_image(model_instance, value))
+            field = getattr(obj, field)
+            image = load_image(model_instance, value)
+            field.save(image.name, image)
 
         if password_field:
             obj.set_password(password_field)

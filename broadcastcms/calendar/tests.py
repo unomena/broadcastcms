@@ -150,7 +150,6 @@ class CalendarManagerTests(TestCase):
         entries.create(start=nxmon, end=nxtue, content=objA)
         # test using the data
         self.assertEquals(entries.thisweekend().count(), 3)
-        self.assertEquals(objects.thisweekend().count(), 1)
 
     def testWeek(self):
         # todo: add tests
@@ -163,3 +162,23 @@ class CalendarManagerTests(TestCase):
     def testNextMonth(self):
         # todo: add tests
         pass
+
+    def testNow(self):
+        # setup
+        now = datetime.now()
+        entries = Entry.objects
+        before_now = now - timedelta(minutes=10)
+        after_now = now + timedelta(minutes=10)
+        content = self.model.objects.create(title='Content')
+
+        # entry has started but has not yet ended, should be returned
+        entry = entries.create(start=before_now, end=after_now, content=content)
+        self.failUnless(entry in entries.now())
+
+        # entry is yet to start, should not be returned
+        entry = entries.create(start=after_now, end=after_now, content=content)
+        self.failIf(entry in entries.now())
+
+        # entry has ended, should not be returned
+        entry = entries.create(start=before_now, end=before_now, content=content)
+        self.failIf(entry in entries.now())

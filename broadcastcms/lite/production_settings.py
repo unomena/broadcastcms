@@ -7,8 +7,11 @@ BUILDOUT_PATH =  path.split(path.abspath(path.join(path.dirname(sys.argv[0]))))[
 
 # Django settings for broadcastcmslite project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
+
+# If you set this to False, Django won't server static content (recommended)
+SERVE_STATIC = False
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -29,7 +32,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '%s/media/' % BUILDOUT_PATH
+MEDIA_ROOT = '%s/production_media/' % BUILDOUT_PATH
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -68,6 +71,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'broadcastcms.lite.context_processors.settings',
     'broadcastcms.lite.context_processors.section',
+    'broadcastcms.lite.context_processors.site',
 )
 
 TEMPLATE_DIRS = (
@@ -119,6 +123,7 @@ IMAGE_SCALES = {
         'ImageBanner': {
             'image': (
                 (300, 250),
+                (424, 260),
             )
         },
     },

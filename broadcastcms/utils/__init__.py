@@ -1,3 +1,5 @@
+import threading
+
 from django.conf import settings
 from django.db.models import get_model
 from django.core.mail import EmailMessage
@@ -15,5 +17,7 @@ def mail_user(subject, message, user, content_subtype=None, fail_silently=False)
 
     if content_subtype:
         mail.content_subtype = "html"
-
-    mail.send(fail_silently=fail_silently)        
+    
+    t = threading.Thread(target=mail.send, kwargs={'fail_silently': fail_silently})
+    t.setDaemon(True)
+    t.start()

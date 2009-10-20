@@ -4,13 +4,23 @@ class URLSwitchMiddleware(object):
     def process_request(self, request):
         """
         Alters urlconf module used based on hostname, thus enabling the 
-        delivery of different portals for desktop and mobile clients.
-        TODO: Refactor to use DeviceAtlas or WURFL type device recognition 
-        to determine switch
+        delivery of different portals for different clients, i.e desktop and mobile clients.
+        TODO: Refactor to use DeviceAtlas/WURFL device recognition to determine switch.
         """
-        host = request.META['HTTP_HOST']
-        if host in settings.DESKTOP_HOSTNAMES:
-            settings.ROOT_URLCONF = 'broadcastcms.lite.desktop_urls'
-        elif host in settings.MOBILE_HOSTNAMES:
-            settings.ROOT_URLCONF = 'broadcastcms.lite.mobile_urls'
-        return None
+        # grab url switches from settings. 
+        # don't do anything if no switches are found
+        url_switches = getattr(settings, 'URL_SWITCHES', None)
+        if not url_switches:
+            return
+
+        # grab the hostname from request.META
+        # don't do anything if no hostname is found
+        meta = request.META
+        if meta.has_key('HTTP_HOST'):
+            host = request.META['HTTP_HOST']
+        else:
+            return
+      
+        # only change ROOT_URLCONF when a valid switch is found
+        if url_switches.has_key(host):
+            settings.ROOT_URLCONF = url_switches[host]

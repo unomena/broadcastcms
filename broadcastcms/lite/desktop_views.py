@@ -27,9 +27,9 @@ from broadcastcms.event.models import Event
 from broadcastcms.gallery.models import Gallery
 from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.post.models import Post
+from broadcastcms.radio.models import Song
 from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.scaledimage.fields import get_image_scales
-from broadcastcms.scaledimage.storage import ScaledImageStorage
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.utils import mail_user
 
@@ -52,9 +52,7 @@ def account_picture(request):
         if form.is_valid():
             image = form.cleaned_data['image']
             if image:
-                saver = ScaledImageStorage(scales=get_image_scales(profile))
-                image = saver.save(profile.image.field.upload_to(profile, image.name), image)
-                profile.image = image
+                profile.image.save(image.name, image)
                 profile.save()
     else:
         form = ProfilePictureForm()
@@ -617,19 +615,30 @@ def info_content(request, section):
     })
     return render_to_response('desktop/content/info/content.html', context)
     
+def handler404(request):
+    context = RequestContext(request, {})
+    context.update({'error': '404'})
+    return render_to_response('desktop/404.html', context)
+
+def handler500(request):
+    context = RequestContext(request, {})
+    context.update({'error': '500'})
+    return render_to_response('desktop/500.html', context)
 
 # Mailers
 def mailer_new_user(request, username, password):
     current_site = Site.objects.get_current()
     site_name = current_site.name
+    site_domain = current_site.domain
     host = "http://%s" % request.META['HTTP_HOST']
     subject = "Welcome to %s" % site_name
     
-    return (render_to_string('mailers/new_user.html', {
+    return (render_to_string('desktop/mailers/new_user.html', {
         'username': username, 
         'password': password,
         'host': host,
         'site_name': site_name,
+        'site_domain': site_domain,
     }), subject)
 
 
@@ -662,7 +671,12 @@ def modals_content(request, slug):
     if not request.is_ajax():
         raise Http404
     
-    return render_to_response('desktop/modals/login.html', {'form': form})
+    context = RequestContext(request, {})
+    
+    content = get_object_or_404(ContentBase, slug=slug, is_public=True)
+    content = content.as_leaf_class()
+
+    return content.render_modals_content(context)
 
 def modals_register(request):
     if not request.is_ajax():
@@ -698,7 +712,7 @@ def modals_register(request):
             profile.email_subscribe = email_subscribe
             profile.sms_subscribe = sms_subscribe
             profile.save()
-        
+       
             # Send confirmation mail
             message, subject = mailer_new_user(request, username, password)
             mail_user(subject, message, user, content_subtype="html", fail_silently=False)
@@ -781,7 +795,7 @@ def shows_line_up(request, day='monday'):
     today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     if day in days:
-        offset = days.index(day)
+        offset = days.index(day) - today.weekday()
     else:
         offset = 0
         day = 'monday'
@@ -856,7 +870,7 @@ class ContentBaseViews(object):
             'url': self.url(context),
         }
         return render_to_string('desktop/content/contentbase/home_updates.html', context)
-    
+   
     def render_updates_widget(self, context):
         labels = self.labels.visible()
         label = labels[0] if labels else None
@@ -866,7 +880,13 @@ class ContentBaseViews(object):
             'url': self.url(context),
         }
         return render_to_string('desktop/content/contentbase/updates_widget.html', context)
-    
+   
+    def render_modals_content(self, context):
+        context.update({
+            'self': self,
+        })
+        return render_to_response('desktop/content/contentbase/modals_content.html', context)
+        
     def render_listing(self, context):
         context = {
             'self': self,
@@ -981,7 +1001,7 @@ class ContentBaseViews(object):
         return render_to_string('desktop/content/contentbase/post_head.html', context)
 
 class ChartEntryViews(object):
-    def render_chart(self):
+    def render_chart(self, context):
         song = self.song
         now = datetime.now()
         week_start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -992,24 +1012,14 @@ class ChartEntryViews(object):
         else:
             weeks_on = 0
 
-        context = {
+        context.update({
             'self': self, 
             'song': self.song,
-            'artist': self.get_primary_artist(),
+            'artist': song.get_primary_artist(),
             'weeks_on': weeks_on,
-        }
+        })
         return render_to_string('desktop/content/charts/entry.html', context)
     
-    def get_primary_artist(self):
-        artist = None
-        credits = self.song.credits.all().order_by('role')
-        for credit in credits:
-            artist = credit.artist
-            if artist.is_public:
-                break
-
-        return artist
-        
 class CompetitionViews(object):
     def render_listing(self, context):
         context = {
@@ -1097,7 +1107,15 @@ class UserViews(object):
     def url(self):
         castmembers = self.contentbase_set.permitted().filter(classname__exact="castmember")
         return castmembers[0].as_leaf_class().url() if castmembers else ''
- 
+
+class SongViews(object):
+    def render_modals_content(self, context):
+        context.update({
+            'self': self,
+            'artist': self.get_primary_artist(),
+        })
+        return render_to_response('desktop/content/charts/modals_content.html', context)
+    
 public.site.register(CastMember, CastMemberViews)
 public.site.register(ChartEntry, ChartEntryViews)
 public.site.register(CodeBanner, CodeBannerViews)
@@ -1109,3 +1127,4 @@ public.site.register(Gallery, GalleryViews)
 public.site.register(ImageBanner, ImageBannerViews)
 public.site.register(Post, PostViews)
 public.site.register(User, UserViews)
+public.site.register(Song, SongViews)

@@ -9,6 +9,9 @@ from voting.views import xmlhttprequest_vote_on_object
 
 admin.autodiscover()
 
+handler404 = 'broadcastcms.lite.desktop_views.handler404'
+handler500 = 'broadcastcms.lite.desktop_views.handler500'
+
 urlpatterns = patterns('',
     url(r'^$', home, name='home'),
     
@@ -67,7 +70,7 @@ urlpatterns = patterns('',
     url(r'(?P<pk>[\w-]+)/$', short_redirect,  name='short_redirect'),
 )
 
-if settings.DEBUG:
+if settings.SERVE_STATIC:
     urlpatterns += patterns('',
         (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
     )

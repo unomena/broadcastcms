@@ -1,6 +1,7 @@
 from django.test import Client
 from django.core.handlers.wsgi import WSGIRequest
 
+# RequestFactory shamelessly stolen from http://www.djangosnippets.org/snippets/963/
 class RequestFactory(Client):
     """
     Taken from DjangoSnippet 963, http://www.djangosnippets.org/snippets/963/
