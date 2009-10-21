@@ -19,7 +19,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 
-from friends.models import FriendshipInvitation
+from friends.models import FriendshipInvitation, Friendship
 
 from broadcastcms import public
 from broadcastcms.banner.models import CodeBanner, ImageBanner
@@ -215,8 +215,8 @@ def account_subscriptions(request):
 def account_friends_find(request):
     if request.method == 'POST' and request.POST.get('user_id'):
         user = get_object_or_404(User, pk=request.POST['user_id'])
-        FriendshipInvitation.objects.create(from_user=request.user,
-            to_user=user, status=1)
+        FriendshipInvitation.objects.create_friendship_request(request.user,
+            user)
         return HttpResponseRedirect(reverse("accounts_friends_find"))
     elif request.GET.get('q'):
         q = request.GET['q']
@@ -229,6 +229,13 @@ def account_friends_find(request):
         users = None
     return render_to_response('desktop/content/account/find_friends.html', {
         'users': users,
+    }, context_instance=RequestContext(request))
+
+@login_required
+def account_friends(request):
+    friends = Friendship.objects.friends_for_user(request.user)
+    return render_to_response('desktop/content/account/friends.html', {
+        'friends': [o['friend'] for o in friends],
     }, context_instance=RequestContext(request))
 
 # Chart

@@ -21,10 +21,11 @@ urlpatterns = patterns('',
     
     url(r'^admin/(.*)', admin.site.root),
 
-    url(r'account/picture/$', account_picture, name='account_picture'),
-    url(r'account/profile/$', account_profile, name='account_profile'),
-    url(r'account/subscriptions/$', account_subscriptions, name='account_subscriptions'),
-    url(r'account/friends/find/$', account_friends_find, name='account_friends_find'),
+    url(r'^account/picture/$', account_picture, name='account_picture'),
+    url(r'^account/profile/$', account_profile, name='account_profile'),
+    url(r'^account/subscriptions/$', account_subscriptions, name='account_subscriptions'),
+    url(r'^account/friends/$', account_friends, name='account_friends'),
+    url(r'^account/friends/find/$', account_friends_find, name='account_friends_find'),
 
     
     url(r'chart/(?P<slug>[\w-]+)??$', chart, name='chart'),
