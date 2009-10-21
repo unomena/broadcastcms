@@ -92,6 +92,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
 
     'voting',
+    'friends',
 
     'broadcastcms.banner',
     'broadcastcms.base',
