@@ -416,6 +416,11 @@ class AccountMenuNode(template.Node):
                 'section': 'subscriptions',
                 'url': reverse('account_subscriptions'),
             },
+            {
+                'title': 'Find Friends',
+                'section': 'friends',
+                'url': reverse('account_friends_find'),
+            },
         ]
         account_section = request.path.split('/')[-2]
        

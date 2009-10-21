@@ -4,18 +4,22 @@ import calendar
 from django.conf import settings
 from django.contrib import auth
 from django.contrib import comments
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.comments import signals
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import Q
 from django.forms.util import ValidationError
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
+
+from friends.models import FriendshipInvitation
 
 from broadcastcms import public
 from broadcastcms.banner.models import CodeBanner, ImageBanner
@@ -206,6 +210,22 @@ def account_subscriptions(request):
         'form': form,
     })
     return render_to_response('desktop/content/account/subscriptions.html', context)
+
+@login_required
+def account_friends_find(request):
+    if request.method == 'POST' and request.POST.get('user_id'):
+        user = get_object_or_404(User, pk=request.POST['user_id'])
+        FriendshipInvitation.objects.create(from_user=request.user,
+            to_user=user, status=1)
+        return HttpResponseRedirect(reverse("accounts_friends_find"))
+    elif request.GET.get('q'):
+        q = request.GET['q']
+        users = User.objects.filter(Q(first_name=q) | Q(last_name=q) | Q(username=q))
+    else:
+        users = None
+    return render_to_response('desktop/content/account/find_friends.html', {
+        'users': users,
+    }, context_instance=RequestContext(request))
 
 # Chart
 

@@ -12,3 +12,4 @@ django-voting==0.1-pre
 pexpect==2.4
 python-memcached==1.44
 simplejson==2.0.9
+-e git://github.com/alex/django-friends.git#egg=friends
