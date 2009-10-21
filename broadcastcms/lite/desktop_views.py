@@ -220,7 +220,11 @@ def account_friends_find(request):
         return HttpResponseRedirect(reverse("accounts_friends_find"))
     elif request.GET.get('q'):
         q = request.GET['q']
-        users = User.objects.filter(Q(first_name=q) | Q(last_name=q) | Q(username=q))
+        users = User.objects.filter(
+            Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) |
+            Q(username__icontains=q)
+        )
     else:
         users = None
     return render_to_response('desktop/content/account/find_friends.html', {
