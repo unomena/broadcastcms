@@ -167,7 +167,7 @@ class FeaturesNode(template.Node):
         settings = context['settings']
         homepage_featured_labels = settings.homepage_featured_labels.filter(is_visible=True)[:3]
        
-        # Build a dictionary with label and content keys corresponding to 
+        # build a dictionary with label, content and url keys corresponding to 
         # a featured label and its last created content.
         features = []
         for label in homepage_featured_labels:
@@ -203,6 +203,13 @@ class OnAirNode(template.Node):
         """
         entries = Entry.objects.permitted().by_content_type(content_type).now().filter(content__is_public=True)
         return entries[0] if entries else None
+    
+    def get_public_next_on_air_entry(self, content_type):
+        """
+        Returns first 'coming up next' public entry that has public content
+        """
+        entries = Entry.objects.permitted().by_content_type(content_type).upcoming().filter(content__is_public=True)
+        return entries[0] if entries else None
 
     def get_primary_castmember(self, show):
         """
@@ -218,8 +225,12 @@ class OnAirNode(template.Node):
         current show and current song as well as listen live, studio
         cam and castmember blog links
         """
-        # get the current on air show
+        # get a show to display, either currently on air or coming up
+        on_air = True
         show_entry = self.get_public_on_air_entry(Show)
+        if not show_entry:
+            show_entry = self.get_public_next_on_air_entry(Show)
+            on_air = False
         show = show_entry.content.as_leaf_class() if show_entry else None
        
         # get the primary castmember for the current on air show
@@ -233,6 +244,7 @@ class OnAirNode(template.Node):
         context.update({
             'entry': show_entry,
             'show': show,
+            'on_air': on_air,
             'primary_castmember': primary_castmember,
             'song': song,
             'artist': artist,
