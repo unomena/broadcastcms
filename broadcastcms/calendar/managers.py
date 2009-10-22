@@ -143,7 +143,7 @@ class CalendarQuerySet(ModelBaseQuerySet):
         """
         now = datetime.now()
         return self.filter(start__lt=now, end__gt=now).order_by('start')
-
+    
 
 class CalendarManager(ModelBaseManager):
     use_for_related_fields = True
