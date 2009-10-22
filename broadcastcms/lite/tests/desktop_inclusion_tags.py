@@ -258,11 +258,13 @@ class DesktopInclusionTagsTestCase(TestCase):
         now = datetime.now()
         before_now = now - timedelta(minutes=10)
         after_now = now + timedelta(minutes=10)
+        later = now + timedelta(minutes=60)
+        much_later = now + timedelta(minutes=120)
         self.setContext(path='/')
         response =  on_air('', '').render(self.context)
 
-        # don't display show banner without a show        
-        self.failIf('banner_thumb' in response)
+        # don't display show banner without a show     
+        self.failIf(response.replace('\n', ''))
         
         # don't display show details without a show        
         self.failIf('showtitle' in response)
@@ -284,6 +286,7 @@ class DesktopInclusionTagsTestCase(TestCase):
         castmember = CastMember.objects.create(is_public=True)
         Credit.objects.create(show=show, castmember=castmember)
         show_entry = Entry.objects.create(start=before_now, end=after_now, content=show, is_public=True)
+        later_show_entry = Entry.objects.create(start=later, end=much_later, content=show, is_public=True)
         song = Song.objects.create(is_public=True)
         song_entry = Entry.objects.create(start=before_now, end=after_now, content=song, is_public=True)
         site_settings = Settings.objects.get_or_create(pk='1')[0]
@@ -311,6 +314,13 @@ class DesktopInclusionTagsTestCase(TestCase):
         
         # display my blog link for a castmember        
         self.failUnless('my_blog' in response)
+
+        # display correct on air or coming up show tag
+        self.failUnless('On Air' in response)
+        show_entry.delete()
+        response =  on_air('', '').render(self.context)
+        self.failUnless('Coming Up' in response)
+
         
     def testOnAirGetPublicOnAirEntry(self):
         """
@@ -336,6 +346,32 @@ class DesktopInclusionTagsTestCase(TestCase):
         content = ContentBase.objects.create(title='Content', is_public=True)
         entry = Entry.objects.create(start=before_now, end=after_now, content=content, is_public=True)
         self.failUnless(entry == on_air('', '').get_public_on_air_entry(ContentBase))
+    
+    def testOnAirGetPublicNextOnAirEntry(self):
+        """
+        get_public_next_on_air_entry should only return the
+        first 'coming up next' active public entry that has public content
+        """
+        # setup
+        now = datetime.now()
+        later = now + timedelta(minutes=60)
+        much_later = now + timedelta(minutes=120)
+
+        # don't return a private entry, regardless of content
+        content = ContentBase.objects.create(title='Content', is_public=True)
+        entry = Entry.objects.create(start=later, end=much_later, content=content, is_public=False)
+        self.failIf(entry == on_air('', '').get_public_next_on_air_entry(ContentBase))
+
+        # don't return a public entry with private content
+        content = ContentBase.objects.create(title='Content', is_public=False)
+        entry = Entry.objects.create(start=later, end=much_later, content=content, is_public=True)
+        self.failIf(entry == on_air('', '').get_public_next_on_air_entry(ContentBase))
+        
+        # return a public entry with public content
+        content = ContentBase.objects.create(title='Content', is_public=True)
+        entry = Entry.objects.create(start=later, end=much_later, content=content, is_public=True)
+        self.failUnless(entry == on_air('', '').get_public_next_on_air_entry(ContentBase))
+
 
     def testOnAirGetPrimaryCastmember(self):
         """
