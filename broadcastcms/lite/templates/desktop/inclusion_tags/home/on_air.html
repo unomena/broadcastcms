@@ -1,12 +1,13 @@
 {% load scaled_image_tags %}
 
+{% if show %}
 <div class="banner">
     {% if show %}
         <p class="banner_thumb"><img src="{% scaled_image_url show 216 77 %}" width="216" height="77" alt="" /></p>
     {% endif %}
     <p class="banner_info">
         {% if show %}
-    	    <span class="onair">On Air: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</span><br />
+    	    <span class="onair">{% if on_air %}On Air{% else %}Coming Up{% endif %}: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</span><br />
 	    	<span class="showtitle">{{ show.title }}</span><br />
         {% endif %}
     	{% if song %}
@@ -25,3 +26,4 @@
         {% endif %}
 	</ul>
 </div><!--/Banner-->
+{% endif %}
