@@ -7,6 +7,9 @@ class Banner(ModelBase):
         max_length='256', 
         help_text='A short descriptive title.'
     ) 
+    description = models.TextField(
+        help_text='A short description. More verbose than the title but limited to one or two sentences.'
+    )
     
     def __unicode__(self):
         return self.title
