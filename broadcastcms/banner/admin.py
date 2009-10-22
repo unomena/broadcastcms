@@ -10,7 +10,7 @@ class BannerAdmin(ModelBaseAdmin):
     search_fields = ('title',)
     
     fieldsets = (
-        (None, {'fields': ('is_public', 'title')}),
+        (None, {'fields': ('is_public', 'title', 'description')}),
         ('Labels', {'fields': ('labels',),
                     'classes': ('collapse',),
         }),
