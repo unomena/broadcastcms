@@ -3,10 +3,14 @@
 
 {% block listing %}
     <div class="page_container">
-	    <div class="block_container">
-            {% for entry in object_list %}
+        {% for entry in object_list %}
+            {% if forloop.counter0|divisibleby:"3" or forloop.first %}
+	            <div class="block_container">
+            {% endif %}
                 {% call_view entry render_block %}
-            {% endfor %}
-        </div>
+            {% if forloop.counter|divisibleby:"3" or forloop.last %}
+                </div>
+            {% endif %}
+        {% endfor %}
 	</div><!--/container-->
 {% endblock %}
