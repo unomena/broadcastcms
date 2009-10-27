@@ -9,7 +9,11 @@
     <div class="page_form">
         {% if threads %}
             {% for thread in threads %}
-                <p>{{ thread.subject }} sent by {{ thread.latest_message.sender }}</p>
+                <p>
+                    <a href="{{ thread.get_absolute_url }}">
+                        {{ thread.subject }} sent by {{ thread.latest_message.sender }}
+                    </a>
+                </p>
             {% endfor %}
         {% else %}
             <p>No messages in your inbox.</p>
