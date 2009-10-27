@@ -1,3 +1,6 @@
+import calendar
+from datetime import date, datetime
+
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
     
@@ -72,4 +75,172 @@ class EventSorter(Sorter):
             'title': 'This Weekend',
             'sorter': filter_by_thisweekend,
         },
+    ]
+
+
+class QuerysetModifier(object):
+    def __init__(self, get_value):
+        self.get_value = get_value
+        
+class EntryWeekQuerysetModifier(QuerysetModifier):
+    def updateQuery(self, queryset):
+        days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        today = date.today()
+
+        if self.get_value in days:
+            offset = days.index(self.get_value) - today.weekday()
+        else:
+            offset = 0
+
+        return queryset.day(offset)
+class ChartQuerysetModifier(QuerysetModifier):
+    def __init__(self, get_value, page_length):
+        self.page_length = page_length
+        super(ChartQuerysetModifier, self).__init__(get_value)
+
+    def updateQuery(self, queryset):
+        return queryset[int(self.get_value): int(self.get_value) + self.page_length]
+
+class MostLikedQuerysetModifier(QuerysetModifier):
+    def updateQuery(self, queryset):
+        queryset = queryset.extra(
+            select={
+                'score': 'SELECT COUNT(*) FROM votes WHERE votes.object_id = base_contentbase.modelbase_ptr_id AND votes.vote = 1'
+            },
+        )
+        queryset = queryset.order_by('-score', '-created')
+        return queryset
+
+class MostRecentQuerysetModifier(QuerysetModifier):
+    def updateQuery(self, queryset):
+        return queryset.order_by("-created")
+    
+class PageMenu(object):
+    request_key = None
+
+    def __init__(self, request):
+        self.request = request
+        for item in self.items:
+            if item.has_key('view_name'):
+                item['path'] = reverse(item['view_name'])
+            item['url'] = ''
+            if item.has_key('path'):
+                item['url'] += item['path']
+            if item.has_key('get_value'):
+                item['url'] += "?%s=%s" % (self.request_key, item['get_value'])
+
+    @property
+    def get_value(self):
+        get_value = str(self.request.REQUEST.get(self.request_key, None))
+        if get_value:
+            valid_get_values = []
+            for item in self.items:
+                if item.has_key('get_value'):
+                    valid_get_values.append(item['get_value'])
+            if get_value not in valid_get_values:
+                return valid_get_values[0] if valid_get_values else None
+            else:
+                return get_value
+
+    @property
+    def active_item(self):
+        for item in self.items:
+            active = False
+            if item.has_key('get_value'):
+                if self.get_value == item['get_value']:
+                    active = True
+                else:
+                    active = False
+                
+            if item.has_key('path'):
+                if self.request.path == item['path']:
+                    active = True
+                else:
+                    active = False
+
+            if active:
+                return item
+                
+        """
+        if self.get_value not in [item['get_value'] for item in self.items]:
+            return self.items[0]
+        else:
+            for item in self.items:
+                if self.get_value == item['get_value']:
+                    return item
+        """
+
+    @property
+    def title(self):
+        return self.active_item['title'] if self.active_item else None
+
+    @property
+    def queryset_modifier(self):
+        return self.active_item['queryset_modifier'](self.get_value) if self.active_item else None
+        
+class ChartPageMenu(PageMenu):
+    request_key = 'page'
+    page_length = 10
+
+    def __init__(self, request, chart):
+        self.items = []
+        self.chart = chart
+        entry_count = chart.chartentries.permitted().count()
+        slices = range(0, entry_count, self.page_length)
+        for slice_start in slices:
+            self.items.append({
+                'title': '%s - %s' % (slice_start + 1, slice_start + self.page_length),
+                'get_value': str(slice_start),
+                'queryset_modifier': ChartQuerysetModifier,
+            })
+        super(ChartPageMenu, self).__init__(request)
+    
+    @property
+    def queryset_modifier(self):
+        return self.active_item['queryset_modifier'](self.get_value, self.page_length) if self.active_item else None
+
+class CompetitionsPageMenu(PageMenu):
+    items = [
+        {
+            'title': 'Current Competitions',
+            'view_name': 'competitions',
+        },
+        {
+            'title': 'General Competition Rules',
+            'view_name': 'competitions_rules',
+        }
+    ]
+                
+class EntryWeekPageMenu(PageMenu):
+    request_key = 'day'
+    items = [
+        {
+            'title': day[0],
+            'get_value': day[1],
+            'queryset_modifier': EntryWeekQuerysetModifier,
+        }
+    for day in [('Mon', 'monday'), ('Tue', 'tuesday'), ('Wed', 'wednesday'), ('Thu', 'thursday'), ('Fri', 'friday'), ('Sat', 'saturday'), ('Sun', 'sunday'),]]
+
+    @property
+    def title(self):
+        today = str(calendar.day_name[datetime.now().weekday()]).lower()
+        if self.active_item:
+            if self.active_item['get_value'] == today:
+                return 'Today'
+            else:
+                return self.active_item['get_value'].title
+
+class OrderPageMenu(PageMenu):
+    request_key = 'order-by'
+    items = [
+        {
+            'title': 'Most Recent',
+            'get_value': 'recent',
+            'queryset_modifier': MostRecentQuerysetModifier,
+        },
+        {
+            'title': 'Most Liked',
+            'get_value': 'liked',
+            'queryset_modifier': MostLikedQuerysetModifier,
+        }
     ]
