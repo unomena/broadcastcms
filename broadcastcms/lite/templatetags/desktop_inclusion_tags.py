@@ -87,6 +87,7 @@ class MastfootNode(template.Node):
         
         # standard site section items to display in the footer navcard
         sitemap_items = [
+            {'title': 'Home', 'url': reverse('home')},
             {'title': 'Shows &amp; DJs', 'url': reverse('shows_line_up')},
             {'title': 'Listen Live', 'url': "javascript: openPlayer(%s);" % reverse('listen_live')},
             {'title': 'Music Chart', 'url': reverse('chart')},
