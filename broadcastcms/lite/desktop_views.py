@@ -234,8 +234,10 @@ def account_friends_find(request):
 @login_required
 def account_friends(request):
     friends = Friendship.objects.friends_for_user(request.user)
+    invitations = FriendshipInvitation.objects.invitations(request.user)
     return render_to_response('desktop/content/account/friends.html', {
         'friends': [o['friend'] for o in friends],
+        'invitations': invitations,
     }, context_instance=RequestContext(request))
 
 # Chart
