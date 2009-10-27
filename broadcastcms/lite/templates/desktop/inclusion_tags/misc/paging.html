@@ -4,21 +4,21 @@
 {% with page.paginator.num_pages as num_pages %}
     <div class="paged_results">
         {% if page.has_previous %}
-	        <p class="prev"><a href="{% smart_query_string page.key page.previous_page_number %}">Previous</a></p>
+	        <p class="prev"><a href="{% smart_query_string 'page' page.previous_page_number %}">Previous</a></p>
         {% else %}
 	        <p class="prev_empty">&nbsp;</p>
         {% endif %}
 	    <p class="num">
             {% if render_first %}
 	            {% ifnotequal 1 page.number %}
-                    <a href="{% smart_query_string page.key 1 %}">1</a>&nbsp;|&nbsp; ... &nbsp;| 
+                    <a href="{% smart_query_string 'page' 1 %}">1</a>&nbsp;|&nbsp; ... &nbsp;| 
                 {% else %}
                     {{ 1 }}&nbsp;|&nbsp; ... &nbsp;|
                 {% endifnotequal %}
             {% endif %}
             {% for p in pager_items %}
 	            {% ifnotequal p page.number %}
-                    <a href="{% smart_query_string page.key p %}">{{ p }}</a>
+                    <a href="{% smart_query_string 'page' p %}">{{ p }}</a>
                 {% else %}
                     {{ p }}
                 {% endifnotequal %}
@@ -28,11 +28,11 @@
                 {% endifnotequal %}
             {% endfor %}
             {% if render_last %}
-                 ... &nbsp;| <a href="{% smart_query_string page.key num_pages %}">{{ num_pages }}</a> 
+                 ... &nbsp;| <a href="{% smart_query_string 'page' num_pages %}">{{ num_pages }}</a> 
             {% endif %}
         </p>
         {% if page.has_next %}
-	        <p class="next"><a href="{% smart_query_string page.key page.next_page_number %}">Next</a></p>
+	        <p class="next"><a href="{% smart_query_string 'page' page.next_page_number %}">Next</a></p>
         {% else %}
 	        <p class="next_empty">&nbsp;</p>
         {% endif %}
