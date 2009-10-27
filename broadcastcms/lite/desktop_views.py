@@ -217,7 +217,7 @@ def account_friends_find(request):
         user = get_object_or_404(User, pk=request.POST['user_id'])
         FriendshipInvitation.objects.create_friendship_request(request.user,
             user)
-        return HttpResponseRedirect(reverse("accounts_friends_find"))
+        return HttpResponseRedirect(reverse("account_friends_find"))
     elif request.GET.get('q'):
         q = request.GET['q']
         users = User.objects.filter(
