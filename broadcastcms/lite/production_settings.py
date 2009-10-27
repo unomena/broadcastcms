@@ -93,6 +93,7 @@ INSTALLED_APPS = (
 
     'voting',
     'friends',
+    'user_messages',
 
     'broadcastcms.banner',
     'broadcastcms.base',

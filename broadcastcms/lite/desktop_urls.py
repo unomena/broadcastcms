@@ -27,6 +27,12 @@ urlpatterns = patterns('',
     url(r'^account/friends/$', account_friends, name='account_friends'),
     url(r'^account/friends/find/$', account_friends_find, name='account_friends_find'),
     url(r'^account/friends/response/(\d+)/$', 'friends.views.respond_to_friendship_invitation', {'redirect_to_view': 'account_friends'}, name='account_friends_reply'),
+    url(r'^account/messages/inbox/$', 'user_messages.views.inbox', name='messages_inbox'),
+    url(r'^account/messages/create/$', 'user_messages.views.message_create', name='message_create'),
+    url(r'^account/messagse/create/(?P<user_id>\d)/$', 'user_messages.views.message_create', name='message_create'),
+    url(r'^account/messages/thread/(?P<thread_id>\d+)/$', 'user_messages.views.thread_detail', name='messages_thread_detail'),
+    url(r'^account/messages/thread/(?P<thread_id>\d+)/delete/$', 'user_messages.views.thread_delete', name='messages_thread_delete'),
+
     
     url(r'chart/(?P<slug>[\w-]+)??$', chart, name='chart'),
     
