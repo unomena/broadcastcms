@@ -31,8 +31,7 @@
                         <input type="submit" value="make friends" />
                     </form>
                     {% friendship_status request.user user as status %}
-                    {{ status }}
-                    {% ifequal status "sent" %}
+                    {% ifequal status "Sent" %}
                         <p>Friendship request sent</p>
                     {% endifequal %}
                 </div>

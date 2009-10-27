@@ -216,11 +216,13 @@ def account_subscriptions(request):
 def account_friends_find(request):
     if request.method == 'POST' and request.POST.get('user_id'):
         user = get_object_or_404(User, pk=request.POST['user_id'])
-        FriendshipInvitation.objects.create_friendship_request(request.user,
+        inv = FriendshipInvitation.objects.create_friendship_request(request.user,
             user)
         ctx = {
             "to_user": user,
-            "from_user": request.user
+            "from_user": request.user,
+            "invitation": inv,
+            "site": Site.objects.get_current(),
         }
         subject = render_to_string("desktop/mailers/account/friend_request_subject.txt", ctx).strip()
         body = render_to_string("desktop/mailers/account/friend_request_body.html", ctx)
