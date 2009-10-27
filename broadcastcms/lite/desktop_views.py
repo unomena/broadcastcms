@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.comments import signals
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.sites.models import Site
+from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
@@ -217,6 +218,13 @@ def account_friends_find(request):
         user = get_object_or_404(User, pk=request.POST['user_id'])
         FriendshipInvitation.objects.create_friendship_request(request.user,
             user)
+        ctx = {
+            "to_user": user,
+            "from_user": request.user
+        }
+        subject = render_to_string("desktop/mailers/account/friend_request_subject.txt", ctx).strip()
+        body = render_to_string("desktop/mailers/account/friend_request_body.html", ctx)
+        send_mail(subject, body, settings.SERVER_EMAIL, [user.email])
         return HttpResponseRedirect(reverse("account_friends_find"))
     elif request.GET.get('q'):
         q = request.GET['q']
