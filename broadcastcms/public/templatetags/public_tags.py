@@ -11,8 +11,12 @@ class CallViewNode(template.Node):
 
     def render(self, context):
         instance = self.instance.resolve(context)
-        return getattr(instance, self.method)(context)
-
+        if hasattr(instance, self.method):
+            return getattr(instance, self.method)(context)
+        else:
+            method = template.Variable(self.method)
+            method = method.resolve(context)
+            return getattr(instance, method)(context)
 
 @register.tag
 def call_view(parser, token):
