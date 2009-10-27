@@ -235,7 +235,7 @@ class ChartView(object):
             queryset=queryset,
             template_name=template_name,
             extra_context={
-                'page_title': 'Shows &amp; DJs',
+                'page_title': chart.title,
                 'page_menu': page_menu,
                 'header_includes': ['desktop/includes/charts/header.html',]
             },
