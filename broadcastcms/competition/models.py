@@ -10,12 +10,22 @@ from broadcastcms.richtext.fields import RichTextField
 
 class Competition(ContentBase):
     content = RichTextField(help_text='Full article detailing this competition.')
-    start = models.DateField(blank=True, null=True, help_text='Date on which this competition opens.')
-    end = models.DateField(blank=True, null=True, help_text='Date on which this competition ends.')
+    start = models.DateField(
+        blank=True, 
+        null=True, 
+        help_text='Date on which this competition opens.'
+    )
+    end = models.DateField(
+        blank=True, 
+        null=True, 
+        help_text='Date on which this competition ends.'
+    )
     question = models.CharField(
+        blank=True, 
+        null=True, 
         max_length=255,
         help_text='Short competition question',
-        )
+    )
     question_blurb = RichTextField(
         blank=True, 
         null=True, 
