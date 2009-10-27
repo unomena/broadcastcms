@@ -51,7 +51,7 @@ def clear_and_sync():
     db_user = settings.DATABASE_USER
     db_pass = settings.DATABASE_PASSWORD
     
-    flags = ['-u%s']
+    flags = ['-u%s' % db_user]
     if db_host:
         flags.append('-h %s' % db_host)
     flags.append('-p')
