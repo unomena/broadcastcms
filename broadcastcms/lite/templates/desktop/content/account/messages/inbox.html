@@ -1,0 +1,18 @@
+{% extends "desktop/sections/base_section.html" %}
+
+{% load desktop_inclusion_tags %}
+
+{% block left %}
+    {% account_menu %}
+    {% account_thanks %}
+    
+    <div class="page_form">
+        {% if threads %}
+            {% for thread in threads %}
+                <p>{{ thread.subject }} sent by {{ thread.latest_message.sender }}</p>
+            {% endfor %}
+        {% else %}
+            <p>No messages in your inbox.</p>
+        {% endif %}
+    </div>
+{% endblock %}
