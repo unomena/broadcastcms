@@ -47,11 +47,17 @@ def clear_and_sync():
     ADMIN_EMAIL = 'admin@admin.com'
 
     db_name = settings.DATABASE_NAME
+    db_host = settings.DATABASE_HOST
     db_user = settings.DATABASE_USER
     db_pass = settings.DATABASE_PASSWORD
     
+    flags = ['-u%s']
+    if db_host:
+        flags.append('-h %s' % db_host)
+    flags.append('-p')
+    
     # Clear db
-    child = pexpect.spawn('mysql -u%s -p' % db_user)
+    child = pexpect.spawn('mysql %s' % ' '.join(flags))
     child.expect('Enter password:')
     child.sendline(db_pass)
     child.expect('mysql> ')
