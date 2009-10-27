@@ -111,6 +111,10 @@ INSTALLED_APPS = (
     'broadcastcms.lite',
 )
 
+ABSOLUTE_URL_OVERRIDES = {
+    "user_messages.thread": lambda o: "/account/messages/thread/%s/" % o.pk
+}
+
 IMAGE_SCALES = {
     'base': {
         'ContentBase': {
