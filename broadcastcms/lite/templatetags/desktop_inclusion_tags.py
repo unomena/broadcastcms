@@ -504,15 +504,16 @@ class NowPlayingNode(OnAirNode):
         next_entry = self.get_next_entry(Show)
         next_show = next_entry.content.as_leaf_class() if next_entry else None
         next_castmember = self.get_primary_castmember(next_show) if next_show else None
-
+        next_str = "%s%s" % (next_show.title, " with %s" % next_castmember.title if next_castmember else "") if next_show else ''
+        next_str = next_str[:50] + ' ...' if len(next_str) > 50 else next_str
+        
         context.update({
             'entry': show_entry,
             'show': show,
             'primary_castmember': primary_castmember,
             'song': song,
             'artist': artist,
-            'next_show': next_show,
-            'next_castmember': next_castmember,
+            'next_str': next_str,
         })
         return render_to_string('desktop/inclusion_tags/widgets/now_playing.html', context)
 
