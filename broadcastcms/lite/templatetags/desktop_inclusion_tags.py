@@ -433,6 +433,11 @@ class AccountMenuNode(template.Node):
                 'section': 'friends',
                 'url': reverse('account_friends_find'),
             },
+            {
+                'title': 'Messages',
+                'section': 'messages',
+                'url': reverse('messages_inbox'),
+            },
         ]
         account_section = request.path.split('/')[-2]
        
