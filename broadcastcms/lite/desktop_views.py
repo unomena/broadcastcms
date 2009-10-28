@@ -251,20 +251,6 @@ def account_friends(request):
         'invitations': invitations,
     }, context_instance=RequestContext(request))
 
-@login_required
-def account_history(request):
-    events = []
-    events.extend(comments.get_model().objects.filter(user=request.user))
-    key_map = {
-        comments.get_model(): 'submit_date',
-    }
-    # what other data types go in here?
-    def key(o):
-        return getattr(o, key_map[type(o)])
-    events.sort(key=key)
-    return render_to_response("desktop/content/account/history.html", {
-        "events": events,
-    }, context_instance=RequestContext(request))
 
 # Chart
 
