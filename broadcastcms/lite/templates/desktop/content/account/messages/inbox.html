@@ -18,5 +18,7 @@
         {% else %}
             <p>No messages in your inbox.</p>
         {% endif %}
+        
+        <p><a href="{% url message_create %}">Compose a message</a></p>
     </div>
 {% endblock %}
