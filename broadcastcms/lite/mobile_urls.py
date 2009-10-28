@@ -7,7 +7,7 @@ urlpatterns = patterns('',
     url(r'^$', home, name='home'),
 )
 
-if settings.DEBUG:
+if settings.SERVE_STATIC:
     urlpatterns += patterns('',
         (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
     )
