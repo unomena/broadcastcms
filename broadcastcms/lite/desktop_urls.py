@@ -3,6 +3,7 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 
 from broadcastcms.base.models import ContentBase
+import broadcastcms.lite.management
 
 from desktop_views import *
 from voting.views import xmlhttprequest_vote_on_object
