@@ -9,5 +9,5 @@
 	</div>
 	{% if song %}<p class="box_playing"><strong>Now Playing:</strong> {% if artist %} {{ artist.title }} -{% endif %} {{ song.title }}</p>{% endif %}
 	<p class="box_links">{% if settings.player_controls %}<a href="javascript: openPlayer({% url listen_live %});" class="listen_live">Listen Live</a>{% endif %}{% if settings.studio_cam_urls %}<a href="javascript: openCam({% url studio_cam %});" class="studio_cam">Studio Cam</a>{% endif %}<a href="{{ primary_castmember.url }}" class="my_blog">My Blog</a></p>
-	{% if next_show %}<p class="box_bottom"><strong>Next:</strong> {{ next_show.title }}{% if next_castmember %} with {{ next_castmember.title }}{% endif %}</p>{% endif %}
+	{% if next_str %}<p class="box_bottom"><strong>Next:</strong> {{ next_str }}</p>{% endif %}
 </div><!--/box-->

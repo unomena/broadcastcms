@@ -20,7 +20,7 @@ urlpatterns = patterns('',
     url(r'comment-add/$', comment_add, name='comment_add'),
     
     url(r'^admin/(.*)', admin.site.root),
-
+    
     url(r'^account/picture/$', account_picture, name='account_picture'),
     url(r'^account/profile/$', account_profile, name='account_profile'),
     url(r'^account/subscriptions/$', account_subscriptions, name='account_subscriptions'),
@@ -28,7 +28,7 @@ urlpatterns = patterns('',
     url(r'^account/friends/find/$', account_friends_find, name='account_friends_find'),
     url(r'^account/friends/response/(\d+)/$', 'friends.views.respond_to_friendship_invitation', {'redirect_to_view': 'account_friends'}, name='account_friends_reply'),
     
-    url(r'chart/(?P<slug>[\w-]+)??$', chart, name='chart'),
+    url(r'chart/$', ChartView(), name='chart'),
     
     url(r'competitions/$', competitions, name='competitions'),
     url(r'competitions/rules/$', competitions_rules, name='competitions_rules'),
@@ -55,7 +55,7 @@ urlpatterns = patterns('',
     url(r'modals/password_reset/$', modals_password_reset, name='modals_password_reset'),
     url(r'modals/register/$', modals_register, name='modals_register'),
 
-    url(r'shows/line-up/(?P<day>[\w-]+)??$', shows_line_up, name='shows_line_up'),
+    url(r'shows/line-up/$', shows_line_up, name='shows_line_up'),
     url(r'shows/(?P<slug>[\w-]+)/$', shows_dj_blog, name='shows_dj_blog'),
     url(r'shows/(?P<slug>[\w-]+)/profile/$', shows_dj_profile, name='shows_dj_profile'),
     url(r'shows/(?P<castmember_slug>[\w-]+)/(?P<content_slug>[\w-]+)/$', shows_dj_content, name='shows_dj_content'),

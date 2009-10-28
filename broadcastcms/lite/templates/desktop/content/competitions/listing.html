@@ -1,6 +1,6 @@
 {% load scaled_image_tags public_tags %}
 
-<div class="post_intro">
+<div class="post_intro{% if forloop.last %} no-bord{% endif %}">
     <p class="pi_pic"><a href="{{ url }}"><img src="{% scaled_image_url self 107 60 %}" width="107" height="60" alt="" /></a></p>
 	{% if self.end %}<p class="pi_meta">Closes: {{ self.end|date:"j F Y" }}</p>{% endif %}
 	<h2><a href="{{ url }}">{{ self.title }}</a></h2>

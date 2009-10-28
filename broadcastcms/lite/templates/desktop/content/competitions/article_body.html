@@ -1,56 +1,57 @@
-
 <div class="post_body rich">
     <p>
         {{ self.content|safe }}
     </p>
 </div>
-<div class="page_form">
-    {% if form.is_valid %}
-        <h1>Thank You!</h1>
-        <p class="blurb">Your entry has been received. Good luck!</p>
-    {% else %}
-        <h1>{{ self.question }}</h1>
-	    {% if self.question_blurb %}<p class="blurb">{{ self.question_blurb|safe }}</p>{% endif %}
-
-        <p class="clearfix">&nbsp;</p>
-        {% if request.user.is_authenticated %}
-    	<form id="frmEnterCompetition" action="{% url competitions_content self.slug %}" class="cmxform" method="POST">
-            {% with form.answer as field %}
-		        <div class="page_form_row">
-                    {{ field.label_tag }}
-				    <p class="text_input{% ifequal field.field.widget.attrs.class "compchoice" %} no-bg{% else %} shift{% endifequal %}">
-                        {{ field }}
-                        {% if field.errors %}
-                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
-                        {% endif %}
-                    </p>
-			        {% if field.help_text %}
-                        <p class="note">
-                            {{ field.help_text }}
-                        </p>
-                    {% endif %}
-		    	</div>
-            {% endwith %}
-	    	<div class="page_form_row no-pad">
-		        <p class="label">&nbsp;</p>
-			    <p class="btn"><input type="image" src="/media/bcms/images/forms/btn-submit_entry.jpg" name="submit" /></p>
-    		</div>
-	    </form>
-        <script type="text/javascript">
-            $().ready(function() {
-	            bindForm();
-                validateEnterCompetition();
-            });
-        </script>
+{% if self.question %}
+    <div class="page_form">
+        {% if form.is_valid %}
+            <h1>Thank You!</h1>
+            <p class="blurb">Your entry has been received. Good luck!</p>
         {% else %}
-        <h1>Enter Now!</h1>
-        <p class="blurb"><a href="{% url modals_login %}?height=300&amp;width=540" class="thickbox">Sign in</a> to enter this competition. Not yet a member? <a href="{% url modals_register %}?height=580&amp;width=515" class="thickbox">Sign up</a> now!</p>
+            <h1>{{ self.question }}</h1>
+    	    {% if self.question_blurb %}<p class="blurb">{{ self.question_blurb|safe }}</p>{% endif %}
+
+            <p class="clearfix">&nbsp;</p>
+            {% if request.user.is_authenticated %}
+        	    <form id="frmEnterCompetition" action="{% url competitions_content self.slug %}" class="cmxform" method="POST">
+                    {% with form.answer as field %}
+		                <div class="page_form_row">
+                            {{ field.label_tag }}
+    				        <p class="text_input{% ifequal field.field.widget.attrs.class "compchoice" %} no-bg{% else %} shift{% endifequal %}">
+                                {{ field }}
+                                {% if field.errors %}
+                                    <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                                {% endif %}
+                            </p>
+    		    	        {% if field.help_text %}
+                                <p class="note">
+                                    {{ field.help_text }}
+                                </p>
+                            {% endif %}
+	    	    	    </div>
+                    {% endwith %}
+	        	    <div class="page_form_row no-pad">
+		                <p class="label">&nbsp;</p>
+    		    	    <p class="btn"><input type="image" src="/media/bcms/images/forms/btn-submit_entry.jpg" name="submit" /></p>
+        		    </div>
+    	        </form>
+                <script type="text/javascript">
+                    $().ready(function() {
+	                    bindForm();
+                        validateEnterCompetition();
+                    });
+                </script>
+            {% else %}
+                <h1>Enter Now!</h1>
+                <p class="blurb"><a href="{% url modals_login %}?height=300&amp;width=540" class="thickbox">Sign in</a> to enter this competition. Not yet a member? <a href="{% url modals_register %}?height=580&amp;width=515" class="thickbox">Sign up</a> now!</p>
+            {% endif %}
         {% endif %}
-    {% endif %}
-    <p class="clearfix">&nbsp;</p>
-</div><!--/form-->
+        <p class="clearfix">&nbsp;</p>
+    </div><!--/form-->
+{% endif %}
 {% if self.rules %}
-    <div class="page_container rich">
+    <div class="post_body rich">
         <h2>Competition Rules</h2>
         <p>
             {{ self.rules|safe }}

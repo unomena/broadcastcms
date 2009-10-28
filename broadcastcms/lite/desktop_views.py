@@ -19,6 +19,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
+from django.views.generic import list_detail
 
 from friends.models import FriendshipInvitation, Friendship
 
@@ -252,47 +253,53 @@ def account_friends(request):
 
 # Chart
 
-def chart(request, slug):
-    if slug:
-        chart = get_object_or_404(Chart, slug=slug, is_public=True)
-    else:
+class ChartView(object):
+    def get_latest_chart(self):
         charts = Chart.permitted.order_by('-modified')
         if not charts:
             raise Http404
         else:
-            chart = charts[0]
+            return charts[0]
 
-    context = RequestContext(request, {})
-    entries = chart.chartentries.permitted().order_by('current_position')
-    pager = utils.paging(entries, 'page', request, 10)
-    paginator = pager.paginator
-    per_page = paginator.per_page
+    def get_latest_chart_entries(self):
+        chart = self.get_latest_chart()
+        return chart.chartentries.permitted().order_by('current_position')
     
-    pages = []
-    for page in paginator.page_range:
-        page_dict = {'number': page, 'start': per_page * page - 9, 'end': per_page * page}
-        if page == pager.number:
-            page_dict.update({'current': True})
-        pages.append(page_dict)
-        
-    context.update({
-        'chart': chart,
-        'pager': pager,
-        'pages': pages,
-    })
-    return render_to_response('desktop/content/charts/chart.html', context)
+    def __call__(self, request, template_name='desktop/generic/object_listing_wide.html'):
+        queryset=self.get_latest_chart_entries() 
+        chart = self.get_latest_chart()
+        page_menu=utils.ChartPageMenu(request, chart)
+        queryset_modifiers = [page_menu.queryset_modifier,]
+        for queryset_modifier in queryset_modifiers:
+            queryset = queryset_modifier.updateQuery(queryset)
+
+        return list_detail.object_list(
+            request=request,
+            queryset=queryset,
+            template_name=template_name,
+            extra_context={
+                'page_title': chart.title,
+                'page_menu': page_menu,
+                'header_includes': ['desktop/includes/charts/header.html',]
+            },
+        )
 
 # Competitions
 
-def competitions(request):
-    context = RequestContext(request, {})
-    competitions = Competition.permitted.order_by('-created')
-    pager = utils.paging(competitions, 'page', request, 10)
-    
-    context.update({
-        'pager': pager,
-    })
-    return render_to_response('desktop/content/competitions/competitions.html', context)
+def competitions(request, template_name='desktop/generic/object_listing_wide.html'):
+    queryset = Competition.permitted.order_by('-created')
+    page_menu = utils.CompetitionsPageMenu(request)
+
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        paginate_by=10,
+        extra_context={
+            'page_title': 'Competitions',
+            'page_menu': page_menu,
+        },
+    )
 
 def competitions_rules(request):
     context = RequestContext(request, {})
@@ -455,16 +462,23 @@ def validate_captcha(request):
     raise Http404
 
 # Galleries
-def galleries(request):
-    context = RequestContext(request, {})
-    sorter = utils.Sorter(Gallery.permitted, 'galleries', 'by', request)
-    pager = utils.paging(sorter.object_list, 'page', request, 18)
+def galleries(request, template_name='desktop/generic/object_listing_block.html'):
+    queryset=Gallery.permitted.all()
+    page_menu=utils.OrderPageMenu(request)
+    queryset_modifiers = [page_menu.queryset_modifier,]
+    for queryset_modifier in queryset_modifiers:
+        queryset = queryset_modifier.updateQuery(queryset)
 
-    context.update({
-        'pager': pager,
-        'sorter': sorter,
-    })
-    return render_to_response('desktop/content/galleries/galleries.html', context)
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        paginate_by=15,
+        extra_context={
+            'page_title': 'Galleries',
+            'page_menu': page_menu,
+        },
+    )
 
 def galleries_content(request, slug):
     content = get_object_or_404(Gallery, slug=slug, is_public=True)
@@ -476,7 +490,6 @@ def galleries_content(request, slug):
         'sorter': sorter,
     })
     return render_to_response('desktop/content/galleries/content.html', context)
-
 
 # Misc
 def account_links(request):
@@ -788,16 +801,23 @@ def modals_password_reset(request):
     return render_to_response('desktop/modals/password_reset.html', context)
 
 # News
-def news(request, sorter='most-recent'):
-    context = RequestContext(request, {})
-    sorter = utils.Sorter(Post.permitted, 'news', 'by', request)
-    pager = utils.paging(sorter.object_list, 'page', request, 10)
+def news(request, template_name='desktop/generic/object_listing_wide.html'):
+    queryset=Post.permitted.all()
+    page_menu=utils.OrderPageMenu(request)
+    queryset_modifiers = [page_menu.queryset_modifier,]
+    for queryset_modifier in queryset_modifiers:
+        queryset = queryset_modifier.updateQuery(queryset)
 
-    context.update({
-        'pager': pager,
-        'sorter': sorter,
-    })
-    return render_to_response('desktop/content/news/news.html', context)
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        paginate_by=10,
+        extra_context={
+            'page_title': 'News',
+            'page_menu': page_menu,
+        },
+    )
 
 def news_content(request, slug):
     content = get_object_or_404(ContentBase, slug=slug, is_public=True)
@@ -832,42 +852,29 @@ def studio_cam(request):
     return render_to_response('desktop/popups/studio_cam.html', context)
 
 # Shows
-def shows_line_up(request, day='monday'):
-    context = RequestContext(request, {})
-    days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+def shows_line_up(request, template_name='desktop/generic/object_listing_block.html'):
+    queryset=Entry.objects.permitted().by_content_type(Show).order_by('start') 
+    page_menu=utils.EntryWeekPageMenu(request)
+    queryset_modifiers = [page_menu.queryset_modifier,]
+    for queryset_modifier in queryset_modifiers:
+        queryset = queryset_modifier.updateQuery(queryset)
 
-    if day in days:
-        offset = days.index(day) - today.weekday()
-    else:
-        offset = 0
-        day = 'monday'
-
-    entries = Entry.objects.permitted().by_content_type(Show).day(offset).order_by('start')
-    valid_entries = []
-    for entry in entries:
-        if entry.content.is_public:
-            valid_entries.append(entry)
-    
-    today = str(calendar.day_name[datetime.now().weekday()]).lower()
-  
-    pager = utils.paging(valid_entries, 'page', request, 18)
-    
-    context.update({
-        'pager': pager,
-        'today': today,
-        'day': day,
-        'days': days,
-    })
-
-    return render_to_response('desktop/content/shows/line_up.html', context)
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        extra_context={
+            'page_title': 'Shows &amp; DJs',
+            'page_menu': page_menu,
+        },
+    )
 
 def shows_dj_blog(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
     context = RequestContext(request, {})
 
     owner = castmember.owner
-    instances = ContentBase.permitted.filter(owner=owner).exclude(classname__exact="castmember").order_by("-created") if owner else []
+    instances = ContentBase.permitted.filter(owner=owner).exclude(classname__in=['CastMember', 'Show']).order_by("-created") if owner else []
     pager = utils.paging(instances, 'page', request, 10)
 
     context.update({
@@ -1044,7 +1051,7 @@ class ContentBaseViews(object):
         return render_to_string('desktop/content/contentbase/post_head.html', context)
 
 class ChartEntryViews(object):
-    def render_chart(self, context):
+    def render_listing(self, context):
         song = self.song
         now = datetime.now()
         week_start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -1100,7 +1107,7 @@ class EntryViews(object):
             'castmember_url': castmember_url,
         }
         return render_to_string('desktop/content/entry/block.html', context)
-    
+
 class EventViews(object):
     def render_article_body(self, context):
         entries = Entry.objects.permitted().upcoming().filter(content=self).order_by('start')

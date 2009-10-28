@@ -1,0 +1,8 @@
+{% extends "desktop/generic/base_object_listing.html" %}
+{% load public_tags %}
+
+{% block listing %}
+    {% for entry in object_list %}
+        {% call_view entry render_listing %}
+    {% endfor %}
+{% endblock %}

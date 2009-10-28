@@ -21,6 +21,6 @@ class URLSwitchMiddleware(object):
         else:
             return
       
-        # only change ROOT_URLCONF when a valid switch is found
+        # only change urlconf if a valid switch is found
         if url_switches.has_key(host):
-            settings.ROOT_URLCONF = url_switches[host]
+            request.urlconf = url_switches[host]
