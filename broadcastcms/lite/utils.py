@@ -137,10 +137,10 @@ class PageMenu(object):
             for item in self.items:
                 if item.has_key('get_value'):
                     valid_get_values.append(item['get_value'])
-            if get_value not in valid_get_values:
-                return valid_get_values[0] if valid_get_values else None
-            else:
+            if get_value in valid_get_values:
                 return get_value
+
+        return None
 
     @property
     def active_item(self):
@@ -160,23 +160,21 @@ class PageMenu(object):
 
             if active:
                 return item
-                
-        """
-        if self.get_value not in [item['get_value'] for item in self.items]:
-            return self.items[0]
-        else:
-            for item in self.items:
-                if self.get_value == item['get_value']:
-                    return item
-        """
 
+        for item in self.items:
+            if item.has_key('default'):
+                if item['default']:
+                    return item
+
+        return self.items[0]
+                
     @property
     def title(self):
         return self.active_item['title'] if self.active_item else None
 
     @property
     def queryset_modifier(self):
-        return self.active_item['queryset_modifier'](self.get_value) if self.active_item else None
+        return self.active_item['queryset_modifier'](self.active_item['get_value']) if self.active_item else None
         
 class ChartPageMenu(PageMenu):
     request_key = 'page'
@@ -197,7 +195,7 @@ class ChartPageMenu(PageMenu):
     
     @property
     def queryset_modifier(self):
-        return self.active_item['queryset_modifier'](self.get_value, self.page_length) if self.active_item else None
+        return self.active_item['queryset_modifier'](self.active_item['get_value'], self.page_length) if self.active_item else None
 
 class CompetitionsPageMenu(PageMenu):
     items = [
@@ -218,6 +216,7 @@ class EntryWeekPageMenu(PageMenu):
             'title': day[0],
             'get_value': day[1],
             'queryset_modifier': EntryWeekQuerysetModifier,
+            'default': (str(calendar.day_name[datetime.now().weekday()]).lower() == day[1]),
         }
     for day in [('Mon', 'monday'), ('Tue', 'tuesday'), ('Wed', 'wednesday'), ('Thu', 'thursday'), ('Fri', 'friday'), ('Sat', 'saturday'), ('Sun', 'sunday'),]]
 
