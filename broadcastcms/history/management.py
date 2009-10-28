@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
 
 from friends.models import Friendship
+from voting.models import Vote
 
 from broadcastcms.history.models import HistoryEvent
 
@@ -22,11 +23,20 @@ def record_friendship(sender, instance, raw, created, **kwargs):
     if created:
         HistoryEvent.objects.create(user=instance.to_user,
             event_type=HistoryEvent.EVENT_FRIEND,
-            content_type=ContentType.get_for_model(instance.from_user),
+            content_type=ContentType.objects.get_for_model(instance.from_user),
             object_id=instance.from_user.pk)
         HistoryEvent.objects.create(user=instance.from_user,
             event_type=HistoryEvent.EVENT_FRIEND,
-            content_type=ContentType.get_for_model(instance.to_user),
+            content_type=ContentType.objects.get_for_model(instance.to_user),
             object_id=instance.to_user.pk)
 
 post_save.connect(record_friendship, sender=Friendship)
+
+def record_vote(sender, instance, raw, created, **kwargs):
+    if created:
+        HistoryEvent.objects.create(user=instance.user,
+            event_type=HistoryEvent.EVENT_VOTE,
+            content_type=ContentType.objects.get_for_model(instance),
+            object_id=instance.pk)
+
+post_save.connect(record_vote, sender=Vote)
