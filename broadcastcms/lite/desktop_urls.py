@@ -3,6 +3,7 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 
 from broadcastcms.base.models import ContentBase
+import broadcastcms.lite.management
 
 from desktop_views import *
 from voting.views import xmlhttprequest_vote_on_object
@@ -11,6 +12,23 @@ admin.autodiscover()
 
 handler404 = 'broadcastcms.lite.desktop_views.handler404'
 handler500 = 'broadcastcms.lite.desktop_views.handler500'
+
+messages_urls = patterns('user_messages.views',
+    url(r'^inbox/$', 'inbox',
+        {'template_name': 'desktop/content/account/messages/inbox.html'},
+        name='messages_inbox'),
+    url(r'^create/$', 'message_create',
+        {'template_name': 'desktop/content/account/messages/create.html', 'multiple': True},
+        name='message_create'),
+    url(r'^create/(?P<user_id>\d+)/$', 'message_create',
+        {'template_name': 'desktop/content/account/messages/create.html', 'multiple': True},
+        name='message_create'),
+    url(r'^thread/(?P<thread_id>\d+)/$', 'thread_detail',
+        {'template_name': 'desktop/content/account/messages/thread_detail.html'},
+        name='messages_thread_detail'),
+    url(r'^thread/(?P<thread_id>\d+)/delete/$', 'thread_delete',
+        name='messages_thread_delete'),
+)
 
 urlpatterns = patterns('',
     url(r'^$', home, name='home'),
@@ -27,6 +45,8 @@ urlpatterns = patterns('',
     url(r'^account/friends/$', account_friends, name='account_friends'),
     url(r'^account/friends/find/$', account_friends_find, name='account_friends_find'),
     url(r'^account/friends/response/(\d+)/$', 'friends.views.respond_to_friendship_invitation', {'redirect_to_view': 'account_friends'}, name='account_friends_reply'),
+    url(r'^account/messages/', include(messages_urls)),
+    
     
     url(r'chart/$', ChartView(), name='chart'),
     

@@ -1,0 +1,8 @@
+Hello {{ user }},
+
+You have a new message from {{ message.sender }}:
+
+Subject: {{ thread.subject }}
+Message: {{ message.content }}
+
+To reply to this message follow this link: http://{{ site.domain }}{{ thread.get_absolute_url }}

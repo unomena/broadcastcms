@@ -93,6 +93,7 @@ INSTALLED_APPS = (
 
     'voting',
     'friends',
+    'user_messages',
 
     'broadcastcms.banner',
     'broadcastcms.base',
@@ -109,6 +110,10 @@ INSTALLED_APPS = (
     'broadcastcms.chart',
     'broadcastcms.lite',
 )
+
+ABSOLUTE_URL_OVERRIDES = {
+    "user_messages.thread": lambda o: "/account/messages/thread/%s/" % o.pk
+}
 
 IMAGE_SCALES = {
     'base': {

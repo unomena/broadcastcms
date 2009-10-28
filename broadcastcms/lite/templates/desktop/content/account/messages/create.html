@@ -1,0 +1,19 @@
+{% extends "desktop/sections/base_section.html" %}
+
+{% load desktop_inclusion_tags %}
+{% load friends_tags %}
+
+{% block left %}
+    {% account_menu %}
+    {% account_thanks %}
+    
+    <div class="page_form">
+        <h2>Compose Message</h2>
+        <form action="{% url message_create %}" method="post">
+            <table>
+                {{ form }}
+            </table>
+            <input type="submit" value="Send message" />
+        </form>
+    </div>
+{% endblock %}
