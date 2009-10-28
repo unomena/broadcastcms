@@ -182,8 +182,14 @@ class ProfileForm(forms.Form):
 
         # Validate image size
         if not self._errors.has_key('password_confirm'):
-            password_confirm = self.fields['password_confirm'].widget.value_from_datadict(self.data, self.files, self.add_prefix('password_confirm'))
-            password = self.fields['password'].widget.value_from_datadict(self.data, self.files, self.add_prefix('password'))
+            try:
+                password_confirm = self.fields['password_confirm'].widget.value_from_datadict(self.data, self.files, self.add_prefix('password_confirm'))
+            except KeyError:
+                password_confirm = None
+            try:
+                password = self.fields['password'].widget.value_from_datadict(self.data, self.files, self.add_prefix('password'))
+            except KeyError:
+                password = None
             if password and password_confirm:
                 if password != password_confirm:
                     self._errors['password_confirm'] = ['Passwords do not match.',]
