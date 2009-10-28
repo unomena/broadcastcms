@@ -831,7 +831,7 @@ def shows_dj_blog(request, slug):
     context = RequestContext(request, {})
 
     owner = castmember.owner
-    instances = ContentBase.permitted.filter(owner=owner).exclude(classname__exact="castmember").order_by("-created") if owner else []
+    instances = ContentBase.permitted.filter(owner=owner).exclude(classname__in=['CastMember', 'Show']).order_by("-created") if owner else []
     pager = utils.paging(instances, 'page', request, 10)
 
     context.update({
