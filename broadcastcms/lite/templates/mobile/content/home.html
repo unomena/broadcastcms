@@ -1,20 +1,14 @@
 {% extends "mobile/sections/base.html" %}
+{% load mobile_inclusion_tags %}
 
 {% block head %}
 {% endblock %}
 
 {% block content_body %}
-<h2>On-Air: 15:00 - 19:00</h2>
 
-<div class="section">
-    <div class="abstract">
-        <img src="/media/bcmslite/pics/content/dj.png" class="thumb" />
+{% on_air %}
 
-        <h3>Fast Forward with <a href="dj.html">Nathi Buzani</a> &amp; <a href="dj.html">Andile Ncube</a></h3>
-        <div class="tag nowplaying" title="Now Playing"><strong>Katy Perry</strong> - Leaving Las Vegas</div>
-    </div>	
-</div>
-
+{# Latest updates #}
 <h2>Updates</h2>
 
 <div class="section">
