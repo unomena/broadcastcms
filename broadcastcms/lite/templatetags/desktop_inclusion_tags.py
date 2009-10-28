@@ -5,6 +5,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 
+from user_messages.models import Thread
+
 from broadcastcms.calendar.models import Entry
 from broadcastcms.show.models import Credit, Show
 from broadcastcms.base.models import ContentBase, ModelBase
@@ -412,6 +414,11 @@ def account_menu(parser, token):
 class AccountMenuNode(template.Node):
     def render(self, context):
         request = context['request']
+        
+        messages = Thread.objects.unread(request.user).count()
+        msg = "Messages"
+        if messages:
+            msg += " (%s)" % messages
 
         menu_items = [{
                 'title': 'Profile',
@@ -434,7 +441,7 @@ class AccountMenuNode(template.Node):
                 'url': reverse('account_friends_find'),
             },
             {
-                'title': 'Messages',
+                'title': msg,
                 'section': 'messages',
                 'url': reverse('messages_inbox'),
             },
