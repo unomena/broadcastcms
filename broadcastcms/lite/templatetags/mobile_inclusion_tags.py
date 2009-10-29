@@ -67,6 +67,7 @@ class OnAirNode(template.Node):
         song_entry = self.get_public_on_air_entry(Song)
         song = song_entry.content.as_leaf_class() if song_entry else None
         artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
+        artist = artist[0].artist if artist else None
 
         context.update({
             'entry': show_entry,
