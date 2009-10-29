@@ -40,7 +40,8 @@ class OnAirNode(template.Node):
         """
         Returns all public castmembers for the given show.
         """
-        credits = show.credits.all().filter(castmember__is_public=True).order_by('role')
+        credits = show.credits.filter(castmember__is_public=True, role=1)
+        # TODO: Ask Shaun if their is a reason they use .all() since you can just filter directly
         return credits if credits else None
     
     def render(self, context):
