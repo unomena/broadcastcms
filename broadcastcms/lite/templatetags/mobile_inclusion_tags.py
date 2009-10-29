@@ -40,7 +40,8 @@ class OnAirNode(template.Node):
         """
         Returns all public castmembers for the given show.
         """
-        credits = show.credits.all().filter(castmember__is_public=True).order_by('role')
+        credits = show.credits.filter(castmember__is_public=True, role=1)
+        # TODO: Ask Shaun if their is a reason they use .all() since you can just filter directly
         return credits if credits else None
     
     def render(self, context):
@@ -67,6 +68,7 @@ class OnAirNode(template.Node):
         song_entry = self.get_public_on_air_entry(Song)
         song = song_entry.content.as_leaf_class() if song_entry else None
         artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
+        artist = artist[0].artist if artist else None
 
         context.update({
             'entry': show_entry,

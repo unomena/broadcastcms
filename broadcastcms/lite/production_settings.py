@@ -173,6 +173,7 @@ IMAGE_SCALES = {
             'image': (
                 (216, 77), 
                 (188, 104),
+                (55, 55),
             )
         },
         'CastMember': {
