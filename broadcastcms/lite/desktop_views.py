@@ -700,6 +700,8 @@ def mailer_new_user(request, username, password):
 
 # Modals
 def modals_login(request):
+    if not request.is_ajax():
+        raise Http404
     
     if request.method == 'POST':
         form = LoginForm(request.POST)
