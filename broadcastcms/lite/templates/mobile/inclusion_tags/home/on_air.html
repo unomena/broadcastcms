@@ -7,7 +7,7 @@
     <div class="abstract">
         <img src="{% scaled_image_url show  55 55 %}" class="thumb" />
 
-        <h3>{{ show.title }} {% if all_castmembers %}{% for credit in all_castmembers %}<a href="{{ credit.castmember.get_absolute_url }}">{{ credit.castmember.title }}</a>{% if not forloop.last %} &amp;{% endif %}{% endfor %}{% endif %}</h3>
+        <h3>{{ show.title }} {% if all_castmembers %}{% for credit in all_castmembers %}<a href="{{ credit.castmember.get_absolute_url }}">{{ credit.castmember.title }}</a>{% if not forloop.last %} &amp; {% endif %}{% endfor %}{% endif %}</h3>
         {% if song %}
         <div class="tag nowplaying" title="Now Playing">{% if artist %}<strong>{{ artist.title }}</strong> - {% endif %}{{ song.title }}</div>
         {% endif %}
