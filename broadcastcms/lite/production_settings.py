@@ -58,6 +58,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'broadcastcms.facebook_integration.middleware.FacebookConnectMiddleware',
     'broadcastcms.lite.middleware.URLSwitchMiddleware',
 )
 
@@ -72,6 +73,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'broadcastcms.lite.context_processors.settings',
     'broadcastcms.lite.context_processors.section',
     'broadcastcms.lite.context_processors.site',
+    'broadcastcms.lite.context_processors.facebook',
 )
 
 TEMPLATE_DIRS = (
@@ -99,6 +101,7 @@ INSTALLED_APPS = (
     'broadcastcms.base',
     'broadcastcms.calendar',
     'broadcastcms.competition',
+    'broadcastcms.facebook_integration',
     'broadcastcms.gallery',
     'broadcastcms.event',
     'broadcastcms.label',

@@ -33,6 +33,8 @@ messages_urls = patterns('user_messages.views',
 urlpatterns = patterns('',
     url(r'^$', home, name='home'),
     
+    url(r'^facebook/', include('broadcastcms.facebook_integration.urls')),
+    
     url(r'account-links/$', account_links, name='account_links'),
     url(r'logout/$', logout, name='logout'),
     url(r'comment-add/$', comment_add, name='comment_add'),

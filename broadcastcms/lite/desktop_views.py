@@ -700,8 +700,6 @@ def mailer_new_user(request, username, password):
 
 # Modals
 def modals_login(request):
-    if not request.is_ajax():
-        raise Http404
     
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -721,7 +719,10 @@ def modals_login(request):
     else:
         form = LoginForm()
 
-    return render_to_response('desktop/modals/login.html', {'form': form})
+    return render_to_response('desktop/modals/login.html', {
+        'form': form,
+        'FACEBOOK_API_KEY': settings.FACEBOOK_API_KEY,
+    })
 
 def modals_content(request, slug):
     if not request.is_ajax():
