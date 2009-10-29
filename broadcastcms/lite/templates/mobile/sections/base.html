@@ -3,19 +3,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-	<title>Broadcast CMS Mobile</title>
+        <title>{{ site_name }}{% if page_title %} | {{ page_title|safe }} {% endif %}</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no" />
 	<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
-	<link rel="apple-touch-icon" href="/media/bcmslite/pics/icons/apple-touch-icon.png" />
-	<link rel="stylesheet" href="/media/bcmslite/css/mobile.css" type="text/css" />
+	<link rel="apple-touch-icon" href="/media/bcms/mobile/pics/icons/apple-touch-icon.png" />
+	<link rel="stylesheet" href="/media/bcms/mobile/css/mobile.css" type="text/css" />
         {% block head %}{% endblock %}
 </head>
 <body>
     {% block body %}
 	<div id="header">
-		<div id="logo"><a href="index.html"><img src="/media/bcmslite/pics/header/logo.png" alt="Broadcast CMS" /></a></div>
+            <div id="logo"><a href="{% url home %}"><img src="/media/bcms/mobile/pics/header/logo.png" alt="Broadcast CMS" /></a></div>
 		<div id="header-tools"><a href="sign-in.html">Sign In</a></div>
 	</div>
+
 	<div id="content">
             {% block content_body %}{% endblock %}
 	</div>
@@ -29,3 +30,4 @@
     {% endcomment %}
 </body>
 </html>
+
