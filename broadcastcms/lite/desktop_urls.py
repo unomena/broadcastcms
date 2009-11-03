@@ -48,7 +48,7 @@ urlpatterns = patterns('',
     url(r'^account/friends/find/$', account_friends_find, name='account_friends_find'),
     url(r'^account/friends/response/(\d+)/$', 'friends.views.respond_to_friendship_invitation', {'redirect_to_view': 'account_friends'}, name='account_friends_reply'),
     url(r'^account/messages/', include(messages_urls)),
-    url(r'^account/history/$', include("broadcastcms.history.urls")),
+    url(r'^account/history/', include("broadcastcms.history.urls")),
     
     url(r'chart/$', ChartView(), name='chart'),
     
