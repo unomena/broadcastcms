@@ -1,0 +1,16 @@
+{% load scaled_image_tags %}
+
+{% if show %}
+<h2>{% if on_air %}On-Air{% else %}Coming Up{% endif %}: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</h2>
+
+<div class="section">
+    <div class="abstract">
+        <img src="{% scaled_image_url show  55 55 %}" class="thumb" />
+
+        <h3>{{ show.title }} {% if all_castmembers %}with {% for credit in all_castmembers %}<a href="{{ credit.castmember.get_absolute_url }}">{{ credit.castmember.title }}</a>{% if not forloop.last %} &amp; {% endif %}{% endfor %}{% endif %}</h3>
+        {% if song %}
+        <div class="tag nowplaying" title="Now Playing">{% if artist %}<strong>{{ artist.title }}</strong> - {% endif %}{{ song.title }}</div>
+        {% endif %}
+    </div>	
+</div>
+{% endif %}

@@ -31,6 +31,8 @@
 	<script type="text/javascript" src="/media/bcms/includes/modal-routines.js"></script>
     <!--Recaptcha-->
     <script type="text/javascript" src="http://api.recaptcha.net/js/recaptcha_ajax.js"></script>
+    <!--Facebook-->
+    <script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php" type="text/javascript"></script>
     {% block head %}{% endblock %}
 </head>
 
@@ -59,6 +61,12 @@
     {% endblock %}
 
     {% metrics %}
+    
+    {% if request.fb_authenticated %}
+        <script type="text/javascript">
+            FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
+        </script>
+    {% endif %}
 
 </body>
 </html>

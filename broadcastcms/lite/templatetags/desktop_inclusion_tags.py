@@ -39,6 +39,7 @@ class AccountLinksNode(template.Node):
         context.update({
             'user': user,
             'profile': profile,
+            'fb_authenticated': request.fb_authenticated,
         })
         return render_to_string('desktop/inclusion_tags/skeleton/account_links.html', context)
 

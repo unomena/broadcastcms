@@ -722,7 +722,10 @@ def modals_login(request):
     else:
         form = LoginForm()
 
-    return render_to_response('desktop/modals/login.html', {'form': form})
+    return render_to_response('desktop/modals/login.html', {
+        'form': form,
+        'FACEBOOK_API_KEY': settings.FACEBOOK_API_KEY,
+    })
 
 def modals_content(request, slug):
     if not request.is_ajax():

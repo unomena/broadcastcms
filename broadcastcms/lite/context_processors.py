@@ -43,3 +43,10 @@ def site(request):
         site_info['site_domain'] = site.domain
         site_info['site_name'] = site.name
     return site_info
+
+
+def facebook(request):
+    from django.conf import settings
+    return {
+        "FACEBOOK_API_KEY": settings.FACEBOOK_API_KEY,
+    }

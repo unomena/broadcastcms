@@ -1,0 +1,55 @@
+{% extends "desktop/sections/base_section.html" %}
+
+{% block left %}
+    <div class="page_head">
+        <h1>Hello {{ first_name }}</h1>
+    </div>
+    <div class="page_form">
+        <h2 class="smaller">You're almost done. We need a few more details from you to complete your {{ site_name }} Profile:</h2>
+        <form id="frmRegister" action="" class="cmxform" method="post">
+            {% with form.username as field %}
+                <div class="page_form_row">
+                    {{ field.label_tag }}
+                    <p class="text_input shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+                    {% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+                </div>
+            {% endwith %}
+            {% with form.email as field %}
+                <div class="page_form_row">
+                    {{ field.label_tag }}
+                    <p class="text_input shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+                    {% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+                </div>
+            {% endwith %}
+            {% with form.email_subscribe as field %}
+                <div class="modal_row">
+                    <label for="email_alerts">Options:</label>
+                    {{ field.errors }}
+                    <p class="checkbox_short">{{ field }} {{ field.help_text }}</p>
+                </div>
+            {% endwith %}
+            <div class="page_form_row no-pad">
+                <p class="label">&nbsp;</p>
+                <p class="btn"><input type="image" src="/media/bcms/images/forms/btn-submit.jpg" name="submit" /></p>
+            </div>
+        </form>
+    </div>
+{% endblock %}
