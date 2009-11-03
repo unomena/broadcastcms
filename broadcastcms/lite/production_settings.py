@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'broadcastcms.show',
     'broadcastcms.chart',
     'broadcastcms.activity',
+    'broadcastcms.status',
     'broadcastcms.lite',
 )
 
