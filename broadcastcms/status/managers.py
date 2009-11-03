@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class StatusUpdateManger(models.Manager):
+class StatusUpdateManager(models.Manager):
     def current_status(self, user):
         try:
             return self.filter(user=user)[0]
