@@ -36,3 +36,9 @@ def finish_signup(request):
         "form": form,
         "first_name": user_info["first_name"],
     })
+
+
+def invite(request):
+    return direct_to_template(request, 
+        "desktop/facebook_integration/invite.html", {
+        })

@@ -1,0 +1,9 @@
+{% extends "desktop/sections/base_section.html" %}
+
+{% block left %}
+    <div class="page_form">
+        <fb:request-form action="" method="POST" invite="true" content="Invite your friends to {{ site_name }}">
+            <fb:multi-friend-selector max="20" />
+        </fb:request-form>
+    </div>
+{% endblock %}
