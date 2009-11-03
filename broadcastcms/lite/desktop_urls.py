@@ -49,6 +49,7 @@ urlpatterns = patterns('',
     url(r'^account/friends/response/(\d+)/$', 'friends.views.respond_to_friendship_invitation', {'redirect_to_view': 'account_friends'}, name='account_friends_reply'),
     url(r'^account/messages/', include(messages_urls)),
     url(r'^account/activity/', include("broadcastcms.activity.urls")),
+    url(r'^accounts/status/', include('broadcastcms.status.urls')),
     
     url(r'chart/$', ChartView(), name='chart'),
     
