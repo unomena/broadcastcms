@@ -48,5 +48,5 @@ def site(request):
 def facebook(request):
     from django.conf import settings
     return {
-        "FACEBOOK_API_KEY": settings.FACEBOOK_API_KEY,
+        "FACEBOOK_API_KEY": getattr(settings, "FACEBOOK_API_KEY", None),
     }
