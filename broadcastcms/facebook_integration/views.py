@@ -39,7 +39,7 @@ def finish_signup(request):
     })
 
 
-@facebook_reqired
+@facebook_required
 def invite(request):
     return direct_to_template(request, 
         "desktop/facebook_integration/invite.html", {
