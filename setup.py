@@ -21,6 +21,7 @@ setup(
         'PIL==1.1.6',
         'simplejson==2.0.9',
         'windmill==1.3',
+        'python-twitter==0.6',
     ],
     include_package_data=True,    
 )
