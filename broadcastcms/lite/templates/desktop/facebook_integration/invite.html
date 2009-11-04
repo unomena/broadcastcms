@@ -1,5 +1,9 @@
 {% extends "desktop/sections/base_section.html" %}
 
+{% block extra_html %}{% spaceless %}
+    xmlns:fb="http://www.facebook.com/2008/fbml"
+{% endspaceless %}{% endblock %}
+
 {% block left %}
     <div class="page_form">
         <fb:request-form action="" method="POST" invite="true" content="Invite your friends to {{ site_name }}">
