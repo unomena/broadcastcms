@@ -4,6 +4,7 @@ from django.views.generic.simple import direct_to_template
 
 from django.contrib import auth
 
+from broadcastcms.facebook_integration.decorators import facebook_required
 from broadcastcms.facebook_integration.forms import FacebookRegistrationForm
 
 
@@ -38,6 +39,7 @@ def finish_signup(request):
     })
 
 
+@facebook_reqired
 def invite(request):
     return direct_to_template(request, 
         "desktop/facebook_integration/invite.html", {
