@@ -13,7 +13,7 @@
                         action="http://{{ site_domain }}{% url account_friends_facebook_invite %}"
                         method="POST"
                         invite="true"
-                        content="You< have been invited to {{ site_name }}{% filter force_escape %}<fb:req-choice url="{% url home %}" label="Confirm" />{% endfilter %}"
+                        content="You have been invited to {{ site_name }}{% filter force_escape %}<fb:req-choice url="{% url home %}" label="Confirm" />{% endfilter %}"
                         type="{{ site_name }}"
                     >
                         <fb:multi-friend-selector showborder="true" actiontext="Invite your friends to bcms" cols="4" />
