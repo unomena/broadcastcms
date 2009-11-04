@@ -1,0 +1,17 @@
+{% load scaled_image_tags %}
+{% load template_tags %}
+
+{% if entries %}
+<h2>Updates</h2>
+
+<div class="section">
+    {% for entry in entries %}
+    <div class="abstract">
+        <a href="comps.html"><img src="{% scaled_image_url entry  55 55 %}" class="thumb" /></a>
+        <div class="tag"><a href="comps.html">{{ entry.classname }}</a> - {% get_time_difference entry %} Ago</div>
+        <h3><a href="comp-item.html">{{ entry.description|truncatewords:"7" }}</a></h3>
+    </div>
+    {% if not forloop.counter|divisibleby:"5" %}<hr />{% endif %}
+    {% endfor %}
+</div>
+{% endif %}

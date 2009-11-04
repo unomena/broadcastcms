@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
+    {% block head %}
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-        <title>{{ site_name }}{% if page_title %} | {{ page_title|safe }} {% endif %}</title>
+	<title>Broadcast CMS</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no" />
 	<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
 	<link rel="apple-touch-icon" href="/media/bcms/mobile/pics/icons/apple-touch-icon.png" />
 	<link rel="stylesheet" href="/media/bcms/mobile/css/mobile.css" type="text/css" />
-        {% block head %}{% endblock %}
+    {% endblock %}
 </head>
 <body>
-    {% block body %}
 	<div id="header">
-            <div id="logo"><a href="{% url home %}"><img src="/media/bcms/mobile/pics/header/logo.png" alt="Broadcast CMS" /></a></div>
-		<div id="header-tools"><a href="sign-in.html">Sign In</a></div>
+		<div id="logo"><a href="index.html"><img src="/media/bcms/mobile/pics/header/logo.png" alt="Broadcast CMS" /></a></div>
+		<div id="header-tools"><a href="/sign-in/">Sign In</a></div>
 	</div>
-
 	<div id="content">
-            {% block content_body %}{% endblock %}
-	</div>
-
-
-	<div id="footer">&copy;2009 Broadcast CMS. Powered by <a href="#">Broadcast CMS</a>. <a href="terms.html">Terms</a>. <a href="privacy.html">Privacy</a>. <a href="#">Web Version</a></div>
-    {% endblock %}
-
-    {% comment %}
-    {% metrics %}
-    {% endcomment %}
+        {% block content_body %}{% endblock %}
+        {% block search %}
+        <h2>Search</h2>
+        <div class="section">
+            <div id="search">
+                <form action="search-results.html" method="get" id="search-form">
+                    <input type="text" maxlength="255" id="search-input" size="12" name="search-input" />
+                    <input type="submit" id="search-submit" name="search-submit" value="Search" />
+                </form>
+            </div>
+        </div>
+        {% endblock %}
+        {% block menu %}
+        <h2>Menu</h2>
+        <div id="nav">
+            <ul>
+                <li {% ifequal request.path "/shows/" %}class="active_lnk"{% endifequal %}><a href="/shows/">Shows &amp; DJs <span class="red">&raquo;</span></a></li>
+                <li {% ifequal request.path "/news/" %}class="active_lnk"{% endifequal %}><a href="/news/">News <span class="red">&raquo;</span></a></li>
+                <li {% ifequal request.path "/events/" %}class="active_lnk"{% endifequal %}><a href="/events/">Events &amp; Gigs <span class="red">&raquo;</span></a></li>
+                <li {% ifequal request.path "/shows/" %}class="active_lnk"{% endifequal %}><a href="/competions/">Competitions <span class="red">&raquo;</span></a></li>
+                <li {% ifequal request.path "/shows/" %}class="active_lnk"{% endifequal %}><a href="/galleries/">Galleries <span class="red">&raquo;</span></a></li>
+                <li {% ifequal request.path "/about/" %}class="active_lnk"{% endifequal %}><a href="/about/">About <span class="red">&raquo;</span></a></li>
+                <li {% ifequal request.path "/shows/" %}class="active_lnk"{% endifequal %}><a href="/contact/">Contact Us <span class="red">&raquo;</span></a></li>
+                <li class="last {% ifequal request.path "/shows/" %}active_lnk{% endifequal %}"><a href="/sign-in/">My Account <span class="red">&raquo;</span></a></li>
+            </ul>
+        </div>
+        {% endblock %}
+    </div>
+    <div id="footer">&copy; 2009 Broadcast CMS. Powered by <a href="#">Broadcast CMS</a>. <a href="terms.html">Terms</a>. <a href="privacy.html">Privacy</a>. <a href="#">Web Version</a></div>
 </body>
 </html>
-
