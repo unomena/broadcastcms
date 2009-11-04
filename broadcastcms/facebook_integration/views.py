@@ -3,9 +3,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.simple import direct_to_template
 
 from django.contrib import auth
+from django.contrib.auth.decorators import login_required
 
 from broadcastcms.facebook_integration.decorators import facebook_required
 from broadcastcms.facebook_integration.forms import FacebookRegistrationForm
+from broadcastcms.facebook_integration.models import FacebookFriendInvite
 
 
 def finish_signup(request):
@@ -40,9 +42,14 @@ def finish_signup(request):
 
 
 @facebook_required
+@login_required
 def invite(request):
     if request.method == "POST":
-        return HttpResponse("%s" % request.POST.getlist("ids"))
+        fb_ids = request.POST.getlist("ids")
+        for fb_id in fb_ids:
+            FacebookFriendInvite.objects.create(user=request.user,
+                fb_user_id=fb_id)
+        return HttpResponseRedirect(reverse(invite))
     return direct_to_template(request, 
         "desktop/facebook_integration/invite.html", {
         })
