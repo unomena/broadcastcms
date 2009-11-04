@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 
+import twitter
+
 from broadcastcms.banner.models import Banner
 from broadcastcms.base.models import ContentBase
 from broadcastcms.event.models import Province
@@ -266,6 +268,10 @@ class UserProfile(models.Model):
                     pmailer.unsubscribe()
 
         super(UserProfile, self).save(*args, **kwargs)
+    
+    def tweets(self):
+        api = twitter.Api()
+        return api.GetUserTimeline("brosner")
 
 # Create User profile property which gets or creates an empty profile for the given user
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
