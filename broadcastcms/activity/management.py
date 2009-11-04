@@ -10,6 +10,7 @@ from friends.models import Friendship
 from voting.models import Vote
 
 from broadcastcms.activity.models import ActivityEvent
+from broadcastcms.status.models import StatusUpdate
 
 
 def record_comment(sender, comment, request, **kwargs):
@@ -40,3 +41,12 @@ def record_vote(sender, instance, raw, created, **kwargs):
             object_id=instance.pk)
 
 post_save.connect(record_vote, sender=Vote)
+
+def record_status_update(sender, instance, raw, created, **kwargs):
+    if created:
+        ActivityEvent.objects.create(user=instance.user,
+            event_type=ActivityEvent.EVENT_STATUS,
+            content_type=ContentType.objects.get_for_model(instance),
+            object_id=instance.pk)
+
+post_save.connect(record_status_update, sender=StatusUpdate)
