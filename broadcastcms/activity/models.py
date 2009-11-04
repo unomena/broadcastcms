@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
-class HistoryEvent(models.Model):
+class ActivityEvent(models.Model):
     EVENT_LIKED = 0
     EVENT_COMMENT = 1
     EVENT_STATUS = 2

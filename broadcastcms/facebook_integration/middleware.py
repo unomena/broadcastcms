@@ -6,6 +6,7 @@ import urllib
 from datetime import datetime
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.hashcompat import md5_constructor
@@ -19,7 +20,7 @@ from broadcastcms.lite.models import UserProfile
 class FacebookConnectMiddleware(object):
     
     def process_request(self, request):
-        API_KEY = settings.FACEBOOK_API_KEY
+        API_KEY = getattr(settings, "FACEBOOK_API_KEY", None)
         
         request.delete_facebook_cookies = False
         request.fb_authenticated = False
@@ -85,7 +86,7 @@ class FacebookConnectMiddleware(object):
                 request.fb_authenticated = True
     
     def process_response(self, request, response):
-        API_KEY = settings.FACEBOOK_API_KEY
+        API_KEY = getattr(settings, "FACEBOOK_API_KEY", None)
         
         if hasattr(request, "delete_facebook_cookies") and request.delete_facebook_cookies:
             response.delete_cookie(API_KEY + "_user")
@@ -98,9 +99,11 @@ class FacebookConnectMiddleware(object):
         return response
     
     def facebook_signature(self, values, cookie_check=False):
-        API_KEY = settings.FACEBOOK_API_KEY
-        API_SECRET = settings.FACEBOOK_API_SECRET
+        API_KEY = getattr(settings, "FACEBOOK_API_KEY", None)
+        API_SECRET = getattr(settings, "FACEBOOK_API_SECRET", None)
         signature_keys = []
+        
+        self._check_settings(API_KEY, API_SECRET)
         
         for key in sorted(values.keys()):
             if cookie_check:
@@ -119,3 +122,10 @@ class FacebookConnectMiddleware(object):
         signature.append(API_SECRET)
         
         return md5_constructor("".join(signature)).hexdigest()
+    
+    def _check_settings(API_KEY, API_SECRET):
+        message = "You must provide %s in your settings before using Facebook."
+        if not API_KEY:
+            raise ImproperlyConfigured(message % "FACEBOOK_API_KEY")
+        if not API_SECRET:
+            raise ImproperlyConfigured(message % "FACEBOOK_API_SECRET")

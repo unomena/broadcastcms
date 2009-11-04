@@ -4,22 +4,22 @@ from django.template import RequestContext
 
 from friends.models import Friendship
 
-from broadcastcms.history.models import HistoryEvent
+from broadcastcms.activity.models import ActivityEvent
 
 
 @login_required
-def my_history(request):
-    events = HistoryEvent.objects.filter(user=request.user)
-    return render_to_response("desktop/content/account/history/my_history.html", {
+def my_activity(request):
+    events = ActivityEvent.objects.filter(user=request.user)
+    return render_to_response("desktop/content/account/activity/my_activity.html", {
         "events": events,
     }, context_instance=RequestContext(request))
 
 
 @login_required
-def friends_history(request):
+def friends_activity(request):
     friends = Friendship.objects.friends_for_user(request.user)
     friends = [o["friend"] for o in friends]
-    events = HistoryEvent.objects.filter(user__in=friends)
-    return render_to_response("desktop/content/account/history/friends_history.html", {
+    events = ActivityEvent.objects.filter(user__in=friends)
+    return render_to_response("desktop/content/account/activity/friends_activity.html", {
         "events": events,
     }, context_instance=RequestContext(request))

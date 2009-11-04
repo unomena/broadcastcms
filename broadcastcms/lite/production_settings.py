@@ -74,6 +74,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'broadcastcms.lite.context_processors.section',
     'broadcastcms.lite.context_processors.site',
     'broadcastcms.lite.context_processors.facebook',
+    'broadcastcms.status.context_processors.current_status',
 )
 
 TEMPLATE_DIRS = (
@@ -111,7 +112,8 @@ INSTALLED_APPS = (
     'broadcastcms.scaledimage',
     'broadcastcms.show',
     'broadcastcms.chart',
-    'broadcastcms.history',
+    'broadcastcms.activity',
+    'broadcastcms.status',
     'broadcastcms.lite',
 )
 
