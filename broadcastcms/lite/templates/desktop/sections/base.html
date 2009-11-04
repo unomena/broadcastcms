@@ -31,8 +31,10 @@
 	<script type="text/javascript" src="/media/bcms/includes/modal-routines.js"></script>
     <!--Recaptcha-->
     <script type="text/javascript" src="http://api.recaptcha.net/js/recaptcha_ajax.js"></script>
+    {% if FACEBOOK_API_KEY %}
     <!--Facebook-->
     <script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php" type="text/javascript"></script>
+    {% endif %}
     {% block head %}{% endblock %}
 </head>
 
