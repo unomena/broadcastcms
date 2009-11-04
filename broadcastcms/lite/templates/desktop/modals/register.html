@@ -98,10 +98,12 @@
                 </li>
             </ul>
 		</form>
-	
-	    <script type="text/javascript">
-            FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
-        </script>
+	    
+	    {% if FACEBOOK_API_KEY %}
+    	    <script type="text/javascript">
+                FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
+            </script>
+        {% endif %}
 	
 	</div><!--/MODAL-->
 </body>
