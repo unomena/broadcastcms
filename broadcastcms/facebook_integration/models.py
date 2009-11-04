@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from broadastcms.facebook_integration.managers import (
+from broadcastcms.facebook_integration.managers import (
     FacebookFriendInviteManager
 )
 
