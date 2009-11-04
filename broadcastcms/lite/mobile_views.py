@@ -5,10 +5,6 @@ from django.core.urlresolvers import reverse
 from broadcastcms import public
 from broadcastcms.show.models import Show, CastMember
 
-def home(request):
-    context = RequestContext(request, {})
-    return render_to_response('mobile/content/home.html', context)
-
 
 class CastMemberViews(object):
     def get_absolute_url(self):
