@@ -10,4 +10,9 @@
             <fb:multi-friend-selector max="20" />
         </fb:request-form>
     </div>
+    <script type="text/javascript">
+        FB_RequireFeatures(["XFBML"], function(){
+            FB.Facebook.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
+        });
+    </script>
 {% endblock %}
