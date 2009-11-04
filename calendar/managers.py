@@ -67,8 +67,10 @@ class CalendarQuerySet(ModelBaseQuerySet):
 
     def nextmonth(self):
         now = datetime.now()
-        start = datetime(now.year, (now.month+1), 1)
-        end = datetime(now.year, (now.month+2), 1)
+        start = datetime(now.year, now.month, 1) + timedelta(days=32)
+        start = datetime(start.year, start.month, 1)
+        end = datetime(start.year, start.month, 1) + timedelta(days=32)
+        end = datetime(end.year, end.month, 1)
         return self._model_specific(start, end)
 
     def by_content_type(self, model):
