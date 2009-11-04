@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 
+from broadcastcms.base.models import ContentBase
 from broadcastcms.calendar.models import Entry
 from broadcastcms.show.models import Show
 from broadcastcms.radio.models import Song
@@ -67,7 +68,7 @@ class OnAirNode(template.Node):
         # get the current playing song and artist info
         song_entry = self.get_public_on_air_entry(Song)
         song = song_entry.content.as_leaf_class() if song_entry else None
-        artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
+        artist = song.credits.filter(artist__is_public=True).order_by('role') if song else None
         artist = artist[0].artist if artist else None
 
         context.update({
@@ -80,5 +81,40 @@ class OnAirNode(template.Node):
             'artist': artist,
         })
         return render_to_string('mobile/inclusion_tags/home/on_air.html', context)
+        
+        
+class EntryUpdatesNode(template.Node):
+    def __init__(self, count=5):
+        self.count = count
+        super(EntryUpdatesNode, self).__init__()
+
+    def get_instances(self, settings):
+        """
+        Returns public instance for those types specified in the Settings object's
+        update_types field, sorted on created date descending. The number of items returned
+        is limited to the value of self.count.
+        """
+        # get the update types from settings
+        update_types = [update_type.model_class().__name__ for update_type in settings.update_types.all()]
+
+        # collect public instances, limited to count, sorted on created descending
+        instances = ContentBase.permitted.filter(classname__in=update_types).order_by("-created")[:self.count]
+        
+        # return list of instance leaves
+        return [instance.as_leaf_class() for instance in instances]
+
+    def render(self, context):
+        """
+        Renders the latest update entries as filterd by cast member or type.
+        """
+        entries = self.get_instances(context['settings'])
+        context.update({
+            'entries': entries,
+        })
+        return render_to_string('mobile/inclusion_tags/misc/updates.html', context)
+
+@register.tag
+def homepage_updates(parser, token):
+    return EntryUpdatesNode(count=5)
 
 
