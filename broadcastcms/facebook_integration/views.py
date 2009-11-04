@@ -41,6 +41,8 @@ def finish_signup(request):
 
 @facebook_required
 def invite(request):
+    if request.method == "POST":
+        return HttpResponse("%s" % request.POST.getlist("ids"))
     return direct_to_template(request, 
         "desktop/facebook_integration/invite.html", {
         })
