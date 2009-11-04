@@ -123,7 +123,7 @@ class FacebookConnectMiddleware(object):
         
         return md5_constructor("".join(signature)).hexdigest()
     
-    def _check_settings(API_KEY, API_SECRET):
+    def _check_settings(self, API_KEY, API_SECRET):
         message = "You must provide %s in your settings before using Facebook."
         if not API_KEY:
             raise ImproperlyConfigured(message % "FACEBOOK_API_KEY")
