@@ -8,9 +8,11 @@
     <div class="page_form">
         <fb:serverfbml>
             <script type="text/fbml">
-                <fb:request-form action="" method="POST" invite="true" content="Invite your friends to {{ site_name }}">
-                    <fb:multi-friend-selector max="20" />
-                </fb:request-form>
+                <fb:fbml>
+                    <fb:request-form action="" method="POST" invite="true" content="Invite your friends to {{ site_name }}">
+                        <fb:multi-friend-selector max="20" />
+                    </fb:request-form>
+                </fb:fbml>
             </script>
         </fb:serverfbml>
     </div>
