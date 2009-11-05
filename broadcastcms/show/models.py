@@ -78,6 +78,21 @@ class Show(ContentBase):
             time_list.append(item)
         return time_list
 
+   
+    @property
+    def primary_castmembers(self):
+        """
+        Returns all castmembers that have a role of 1
+        """
+        return self.castmembers.filter(credits__role=1)
+        
+    @property
+    def ordered_castmembers(self):
+        """
+        Returns all castmembers ordered by role
+        """
+        return self.castmembers.order_by('credits__role')
+
     class Meta:
         verbose_name = 'Show'
         verbose_name_plural = 'Shows'
