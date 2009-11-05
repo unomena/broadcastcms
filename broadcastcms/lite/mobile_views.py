@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import date as datefilter
+from django.http import Http404
 
 from broadcastcms import public
 from broadcastcms.show.models import Show, CastMember
@@ -11,43 +12,31 @@ from broadcastcms.base.models import ContentBase
 from broadcastcms.calendar.models import Entry
 
 
-
 def shows(request, weekday=None):
     context = RequestContext(request, {})
     
     weekdays = ['monday', 'tuesday', 'wednesday' , 'thursday', 'friday', 'saturday', 'sunday']
-    
     day_offset = datetime.date.today().weekday()
     if weekday:
+        if not weekday in weekdays:
+            raise Http404
         day_offset = weekdays.index(weekday)
+        is_today = False
+    else:
+        weekday = weekdays[day_offset]
         
-    queryset = Entry.objects.permitted().day(day_offset).by_content_type(Show).order_by('start')
+    is_today = day_offset == datetime.date.today().weekday()
+        
+    obj_list = Entry.objects.permitted().day(day_offset).by_content_type(Show).order_by('start')
     context.update({
-        'obj_list': queryset,
+        'weekdays': weekdays,
+        'weekday': weekday,
+        'is_today': is_today,
+        'obj_list': obj_list,
     })
     
     return render_to_response('mobile/content/shows/shows.html', context)
 
-
-def search_results(request):
-    context = RequestContext(request, {})
-    
-def shows_line_up(request, template_name='desktop/generic/object_listing_block.html'):
-    queryset=Entry.objects.permitted().by_content_type(Show).order_by('start') 
-    page_menu=utils.EntryWeekPageMenu(request)
-    queryset_modifiers = [page_menu.queryset_modifier,]
-    for queryset_modifier in queryset_modifiers:
-        queryset = queryset_modifier.updateQuery(queryset)
-
-    return list_detail.object_list(
-        request=request,
-        queryset=queryset,
-        template_name=template_name,
-        extra_context={
-            'page_title': 'Shows &amp; DJs',
-            'page_menu': page_menu,
-        },
-    )
 
 class CastMemberViews(object):
     def get_absolute_url(self):
