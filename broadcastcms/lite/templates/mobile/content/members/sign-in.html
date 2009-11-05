@@ -1,0 +1,18 @@
+{% extends "mobile/sections/base.html" %}
+{% load mobile_inclusion_tags %}
+
+{% block content_body %}
+        <h2>Sign In</h2>
+		<div class="section">
+			<div class="clear">&nbsp;</div>
+			<form action="#" method="get" id="signin-form">
+				<label for="signin-mobile" class="line">Your Mobile:</label>
+				<input type="text" maxlength="255" id="signin-mobile" size="12" name="signin-mobile" class="text" />
+				<input type="submit" id="signin-submit" name="signin-submit" value="Send" class="btn btn-b" />
+			</form>
+			<div id="article">
+				<p><a href="sign-up.html">Sign up here</a> if you don't already have an account.</p>
+				<p><strong>Tip:</strong> If you've signed up already on our website, you can sign-in here without signing-up.</p>
+			</div>
+		</div>
+{% endblock %}
