@@ -20,9 +20,9 @@ urlpatterns = patterns('',
     #(r'competitions/(?P<slug>[\w-]+)/$', content_details, {'mode':'general'}),
     
     # Shows and DJ pages
-    #(r'shows/lineup/(?P<weekday>[\w-]+)/$', shows),
-    #(r'shows/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', content_details, {'mode':'djcontent'}),
-    #(r'shows/(?P<dj_slug>[\w-]+)/$', dj_page, {'template':'mobile/content/shows/shows.html'}),
+    (r'shows/(?P<weekday>[\w-]+)/$', shows),
+    #(r'shows/djs/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', content_details, {'mode':'djcontent'}),
+    #(r'shows/djs/(?P<dj_slug>[\w-]+)/$', dj_page, {'template':'mobile/content/shows/shows.html'}),
     (r'shows/$', shows),
     
     
