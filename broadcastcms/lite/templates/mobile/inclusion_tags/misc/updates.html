@@ -1,15 +1,16 @@
 {% load scaled_image_tags %}
 {% load template_tags %}
+{% load mobile_inclusion_tags %}
 
-{% if entries %}
+{% if instances %}
 <h2>Updates</h2>
 
 <div class="section">
-    {% for entry in entries %}
+    {% for instance in instances %}
     <div class="abstract">
-        <a href="comps.html"><img src="{% scaled_image_url entry  55 55 %}" class="thumb" /></a>
-        <div class="tag"><a href="comps.html">{{ entry.classname }}</a> - {% get_time_difference entry %} Ago</div>
-        <h3><a href="comp-item.html">{{ entry.description|truncatewords:"7" }}</a></h3>
+        <a href="{{ instance.get_absolute_url }}"><img src="{% scaled_image_url instance  55 55 %}" class="thumb" /></a>
+        <div class="tag"><a href="{{ instance.get_absolute_url }}">{% get_classname instance %}</a> - {% get_time_difference instance %} Ago</div>
+        <h3><a href="{{ instance.get_absolute_url }}">{{ instance.description|truncatewords:"7" }}</a></h3>
     </div>
     {% if not forloop.counter|divisibleby:"5" %}<hr />{% endif %}
     {% endfor %}
