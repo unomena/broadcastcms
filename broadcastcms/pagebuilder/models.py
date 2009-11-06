@@ -28,6 +28,8 @@ class Page(ModelBase):
         return queryset
 
     def get_menu(self, request):
+        """
+        """
         from broadcastcms.lite.utils import *
         class_name = self.menu.replace('\r\n', '\n')
         compiled_class_name = compile(class_name, '<string>', 'eval')
