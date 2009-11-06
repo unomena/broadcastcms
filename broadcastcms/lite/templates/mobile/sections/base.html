@@ -14,7 +14,7 @@
 </head>
 <body>
 	<div id="header">
-		<div id="logo"><a href="index.html"><img src="/media/bcms/mobile/pics/header/logo.png" alt="Broadcast CMS" /></a></div>
+		<div id="logo"><a href="/"><img src="/media/bcms/mobile/pics/header/logo.png" alt="Broadcast CMS" /></a></div>
 		<div id="header-tools"><a href="/sign-in/">Sign In</a></div>
 	</div>
 	<div id="content">
@@ -37,11 +37,11 @@
                 <li {% ifequal request.path "/shows/" %}class="active_lnk"{% endifequal %}><a href="/shows/">Shows &amp; DJs <span class="red">&raquo;</span></a></li>
                 <li {% ifequal request.path "/news/" %}class="active_lnk"{% endifequal %}><a href="/news/">News <span class="red">&raquo;</span></a></li>
                 <li {% ifequal request.path "/events/" %}class="active_lnk"{% endifequal %}><a href="/events/">Events &amp; Gigs <span class="red">&raquo;</span></a></li>
-                <li {% ifequal request.path "/shows/" %}class="active_lnk"{% endifequal %}><a href="/competions/">Competitions <span class="red">&raquo;</span></a></li>
-                <li {% ifequal request.path "/shows/" %}class="active_lnk"{% endifequal %}><a href="/galleries/">Galleries <span class="red">&raquo;</span></a></li>
+                <li {% ifequal request.path "/competitions/" %}class="active_lnk"{% endifequal %}><a href="/competitions/">Competitions <span class="red">&raquo;</span></a></li>
+                <li {% ifequal request.path "/galleries/" %}class="active_lnk"{% endifequal %}><a href="/galleries/">Galleries <span class="red">&raquo;</span></a></li>
                 <li {% ifequal request.path "/about/" %}class="active_lnk"{% endifequal %}><a href="/about/">About <span class="red">&raquo;</span></a></li>
-                <li {% ifequal request.path "/shows/" %}class="active_lnk"{% endifequal %}><a href="/contact/">Contact Us <span class="red">&raquo;</span></a></li>
-                <li class="last {% ifequal request.path "/shows/" %}active_lnk{% endifequal %}"><a href="/sign-in/">My Account <span class="red">&raquo;</span></a></li>
+                <li {% ifequal request.path "/contact/" %}class="active_lnk"{% endifequal %}><a href="/contact/">Contact Us <span class="red">&raquo;</span></a></li>
+                <li class="last {% ifequal request.path "/sign-in/" %}active_lnk{% endifequal %}"><a href="/sign-in/">My Account <span class="red">&raquo;</span></a></li>
             </ul>
         </div>
         {% endblock %}

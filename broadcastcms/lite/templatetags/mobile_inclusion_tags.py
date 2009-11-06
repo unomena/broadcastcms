@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 
 from broadcastcms.base.models import ContentBase
 from broadcastcms.calendar.models import Entry
-from broadcastcms.show.models import Show
+from broadcastcms.show.models import Show, CastMember
 from broadcastcms.radio.models import Song
 
 register = template.Library()
@@ -42,7 +42,6 @@ class OnAirNode(template.Node):
         Returns all public castmembers for the given show.
         """
         credits = show.credits.filter(castmember__is_public=True, role=1)
-        # TODO: Ask Shaun if their is a reason they use .all() since you can just filter directly
         return credits if credits else None
     
     def render(self, context):
@@ -107,14 +106,39 @@ class EntryUpdatesNode(template.Node):
         """
         Renders the latest update entries as filterd by cast member or type.
         """
-        entries = self.get_instances(context['settings'])
+        instances = self.get_instances(context['settings'])
         context.update({
-            'entries': entries,
+            'instances': instances,
         })
         return render_to_string('mobile/inclusion_tags/misc/updates.html', context)
 
 @register.tag
 def homepage_updates(parser, token):
     return EntryUpdatesNode(count=5)
+
+
+class UpdateClassnameNode(template.Node):
+    def __init__(self, obj_name):
+        self.obj_name = obj_name
+
+    def render(self, context):
+        obj = context[self.obj_name]
+        classname = obj.classname
+        if obj.owner:
+            castmembers = CastMember.permitted.filter(owner=obj.owner)
+            if castmembers:
+                return castmembers[0].title
+        if classname == 'Post':
+            return 'News'
+        return classname
+    
+@register.tag
+def get_classname(parser, token):
+    try:
+        tag_name, obj_name = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError, "%s requires exactly one argument" % token.contents
+    
+    return UpdateClassnameNode(obj_name)
 
 
