@@ -719,7 +719,7 @@ def modals_login(request):
 
     return render_to_response('desktop/modals/login.html', {
         'form': form,
-        'FACEBOOK_API_KEY': settings.FACEBOOK_API_KEY,
+        'FACEBOOK_API_KEY': getattr(settings, "FACEBOOK_API_KEY", None),
     })
 
 def modals_content(request, slug):
