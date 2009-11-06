@@ -15,7 +15,11 @@
 <body>
 	<div id="header">
 		<div id="logo"><a href="/"><img src="/media/bcms/mobile/pics/header/logo.png" alt="Broadcast CMS" /></a></div>
-		<div id="header-tools"><a href="/sign-in/">Sign In</a></div>
+		{% if request.user.is_authenticated %}
+        <div id="header-tools"><a href="/account/sign-out/">Sign Out</a> &nbsp; | &nbsp; Hello {{ request.user.username|title }}</div>
+        {% else %}
+        <div id="header-tools"><a href="/account/sign-in/">Sign In</a> &nbsp; | &nbsp; <a href="/account/sign-up/">Sign Up</a></div>
+        {% endif %}
 	</div>
 	<div id="content">
         {% block content_body %}{% endblock %}
@@ -34,14 +38,14 @@
         <h2>Menu</h2>
         <div id="nav">
             <ul>
-                <li {% ifequal request.path "/shows/" %}class="active_lnk"{% endifequal %}><a href="/shows/">Shows &amp; DJs <span class="red">&raquo;</span></a></li>
-                <li {% ifequal request.path "/news/" %}class="active_lnk"{% endifequal %}><a href="/news/">News <span class="red">&raquo;</span></a></li>
-                <li {% ifequal request.path "/events/" %}class="active_lnk"{% endifequal %}><a href="/events/">Events &amp; Gigs <span class="red">&raquo;</span></a></li>
-                <li {% ifequal request.path "/competitions/" %}class="active_lnk"{% endifequal %}><a href="/competitions/">Competitions <span class="red">&raquo;</span></a></li>
-                <li {% ifequal request.path "/galleries/" %}class="active_lnk"{% endifequal %}><a href="/galleries/">Galleries <span class="red">&raquo;</span></a></li>
-                <li {% ifequal request.path "/about/" %}class="active_lnk"{% endifequal %}><a href="/about/">About <span class="red">&raquo;</span></a></li>
-                <li {% ifequal request.path "/contact/" %}class="active_lnk"{% endifequal %}><a href="/contact/">Contact Us <span class="red">&raquo;</span></a></li>
-                <li class="last {% ifequal request.path "/sign-in/" %}active_lnk{% endifequal %}"><a href="/sign-in/">My Account <span class="red">&raquo;</span></a></li>
+                <li {% block shows_active %}{% endblock %}><a href="/show/">Shows &amp; DJs <span class="red">&raquo;</span></a></li>
+                <li {% block news_active %}{% endblock %}><a href="/news/">News <span class="red">&raquo;</span></a></li>
+                <li {% block events_active %}{% endblock %}><a href="/event/">Events &amp; Gigs <span class="red">&raquo;</span></a></li>
+                <li {% block competitions_active %}{% endblock %}><a href="/competition/">Competitions <span class="red">&raquo;</span></a></li>
+                <li {% block galleries_active %}{% endblock %}><a href="/gallery/">Galleries <span class="red">&raquo;</span></a></li>
+                <li {% block about_active %}{% endblock %}><a href="/about/">About <span class="red">&raquo;</span></a></li>
+                <li {% block contact_active %}{% endblock %}><a href="/contact/">Contact Us <span class="red">&raquo;</span></a></li>
+                <li {% block account_active %}{% endblock %}"><a href="/account/sign-in/">My Account <span class="red">&raquo;</span></a></li>
             </ul>
         </div>
         {% endblock %}
