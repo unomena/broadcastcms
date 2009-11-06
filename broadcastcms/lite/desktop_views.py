@@ -319,11 +319,8 @@ def events_content(request, slug):
     content = get_object_or_404(Event, slug=slug, is_public=True)
     context = RequestContext(request, {})
     
-    sorter = utils.EventSorter([], 'events', 'by', request)
-    
     context.update({
         'content': content,
-        'sorter': sorter,
     })
     return render_to_response('desktop/content/events/content.html', context)
 
@@ -441,10 +438,8 @@ def galleries_content(request, slug):
     content = get_object_or_404(Gallery, slug=slug, is_public=True)
     context = RequestContext(request, {})
     
-    sorter = utils.Sorter([], 'galleries', 'by', request)
     context.update({
         'content': content,
-        'sorter': sorter,
     })
     return render_to_response('desktop/content/galleries/content.html', context)
 
@@ -781,10 +776,8 @@ def news_content(request, slug):
     content = content.as_leaf_class()
     context = RequestContext(request, {})
     
-    sorter = utils.Sorter([], 'news', 'by', request)
     context.update({
         'content': content,
-        'sorter': sorter,
     })
     return render_to_response('desktop/content/news/content.html', context)
 
