@@ -8,8 +8,8 @@
             {% for obj in obj_list %}
                 {% if obj.content.show %}
                 <div class="abstract">
-                    <a href="dj.html"><img src="{% scaled_image_url obj.content.show 55 55 %}" class="thumb" /></a>
-                    <div class="tag">{{ obj.start|date:"H:i" }} - {{ obj.end|date:"H:i" }}</div>
+                    <a href="{{ obj.content.show.primary_castmembers.permitted.0.get_absolute_url }}"><img src="{% scaled_image_url obj.content.show 55 55 %}" class="thumb" /></a>
+                    <div class="tag">{{ obj.start|date:"H:i" }}-{{ obj.end|date:"H:i" }}</div>
                     <h3>
                         {{ obj.content.show.title }}
                         {% if obj.content.show.primary_castmembers.permitted %}with 
@@ -20,16 +20,17 @@
                         {% endif %}
                     </h3>
                 </div>
-                <hr />
+                {% if not forloop.last  %}<hr />{% endif %}
                 {% endif %}
             {% endfor %}
         </div>
         <div class="filter">
 			<ul>
                 {% for day in weekdays %}
-				<li{% ifequal day weekday %} class="active"{% endifequal %}><a href="/shows/{{ day }}">{{ day|title }}</a></li>
+				<li{% ifequal day weekday %} class="active"{% endifequal %}><a href="/show/lineup/{{ day }}/">{{ day|title }}</a></li>
                 {% endfor %}
 			</ul>
         </div>
         {% endif %}
 {% endblock %}
+{% block shows_active %}class="active_lnk"{% endblock %}

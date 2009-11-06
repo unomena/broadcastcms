@@ -15,25 +15,31 @@ def direct_to_template(request, template):
 # Url patterns
 urlpatterns = patterns('',
     # Competition
-    (r'competitions/$', direct_to_template, {'template':'mobile/content/competitions/competitions.html'}),
+    (r'competition/$', direct_to_template, {'template':'mobile/content/competitions/competitions.html'}),
     #(r'competions/rules/$', direct_to_template, {'template':'mobile/content/comps.html'}),
     #(r'competitions/(?P<slug>[\w-]+)/$', content_details, {'mode':'general'}),
     
     # Shows and DJ pages
-    (r'shows/(?P<weekday>[\w-]+)/$', shows),
-    #(r'shows/djs/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', content_details, {'mode':'djcontent'}),
-    #(r'shows/djs/(?P<dj_slug>[\w-]+)/$', dj_page, {'template':'mobile/content/shows/shows.html'}),
-    (r'shows/$', shows),
+    (r'show/lineup/(?P<weekday>[\w-]+)/$', shows_line_up),
+    #(r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', content_details, {'mode':'djcontent'}),
+    (r'show/(?P<dj_slug>[\w-]+)/$', shows_dj_blog),
+    (r'show/$', shows_line_up),
     
+    # Accounts
+    (r'account/sign-in/$', account_login),
+    (r'account/sign-out/$', account_logout),
+    
+    # Foooter links
+    (r'privacy/$', direct_to_template, {'template':'mobile/content/footer/privacy.html'}),
+    (r'terms/$', direct_to_template, {'template':'mobile/content/footer/terms.html'}),
     
     # Static urls
     (r'^$', direct_to_template, {'template':'mobile/content/home.html'}),
     (r'news/$', direct_to_template, {'template':'mobile/content/news/news.html'}),
-    (r'events/$', direct_to_template, {'template':'mobile/content/events/events.html'}),
-    (r'galleries/$', direct_to_template, {'template':'mobile/content/galleries/galleries.html'}),
+    (r'event/$', direct_to_template, {'template':'mobile/content/events/events.html'}),
+    (r'gallery/$', direct_to_template, {'template':'mobile/content/galleries/galleries.html'}),
     (r'about/$', direct_to_template, {'template':'mobile/content/about.html'}),
     (r'contact/$', direct_to_template, {'template':'mobile/content/contact.html'}),
-    (r'sign-in/$', direct_to_template, {'template':'mobile/content/members/sign-in.html'}),
 )
 
 
