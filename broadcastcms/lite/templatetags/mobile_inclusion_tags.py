@@ -1,10 +1,15 @@
+import calendar
+
 from django import template
 from django.conf import settings
+from django.contrib import auth
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
+from django.template.defaultfilters import pluralize
 
+from broadcastcms.base.models import ContentBase
 from broadcastcms.calendar.models import Entry
-from broadcastcms.show.models import Show
+from broadcastcms.show.models import Show, CastMember
 from broadcastcms.radio.models import Song
 
 register = template.Library()
@@ -41,7 +46,6 @@ class OnAirNode(template.Node):
         Returns all public castmembers for the given show.
         """
         credits = show.credits.filter(castmember__is_public=True, role=1)
-        # TODO: Ask Shaun if their is a reason they use .all() since you can just filter directly
         return credits if credits else None
     
     def render(self, context):
@@ -67,7 +71,7 @@ class OnAirNode(template.Node):
         # get the current playing song and artist info
         song_entry = self.get_public_on_air_entry(Song)
         song = song_entry.content.as_leaf_class() if song_entry else None
-        artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
+        artist = song.credits.filter(artist__is_public=True).order_by('role') if song else None
         artist = artist[0].artist if artist else None
 
         context.update({
@@ -80,5 +84,101 @@ class OnAirNode(template.Node):
             'artist': artist,
         })
         return render_to_string('mobile/inclusion_tags/home/on_air.html', context)
+        
+        
+class EntryUpdatesNode(template.Node):
+    def __init__(self, count=5, mode=None, castmember=None):
+        self.count = count
+        self.mode = mode
+        self.castmember = castmember
+        super(EntryUpdatesNode, self).__init__()
+
+    def get_instances(self, context, settings):
+        """
+        Returns public instance for those types specified in the Settings object's
+        update_types field, sorted on created date descending. The number of items returned
+        is limited to the value of self.count.
+        """
+        # get the update types from settings
+        if self.mode:
+            update_types = [self.mode]
+        else:
+            update_types = [update_type.model_class().__name__ for update_type in settings.update_types.all()]
+
+        # collect public instances, filter, limited to count, sorted on created descending
+        instances = ContentBase.permitted.filter(classname__in=update_types).order_by("-created")
+        if self.castmember:
+            owner = context[self.castmember].owner
+            instances = instances.filter(owner=owner).exclude(classname__in=['CastMember', 'Show']) if owner else []
+        
+        # return list of instance leaves
+        return [instance.as_leaf_class() for instance in instances]
+
+    def render(self, context):
+        """
+        Renders the latest update entries as filterd by cast member or type.
+        """
+        instances = self.get_instances(context, context['settings'])[:self.count]
+        context.update({
+            'instances': instances,
+        })
+        return render_to_string('mobile/inclusion_tags/misc/updates.html', context)
+
+@register.tag
+def homepage_updates(parser, token):
+    return EntryUpdatesNode(count=5)
+
+@register.tag
+def dj_updates(parser, token):
+    try:
+        tag_name, castmember = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError, "%s requires exactly one argument" % token.contents
+    return EntryUpdatesNode(count=5, castmember=castmember)
+
+
+class UpdateClassnameNode(template.Node):
+    def __init__(self, obj_name):
+        self.obj_name = obj_name
+
+    def render(self, context):
+        obj = context[self.obj_name]
+        classname = obj.classname
+        if obj.owner and not context.get('is_castmember'):
+            castmembers = CastMember.permitted.filter(owner=obj.owner)
+            if castmembers:
+                return '<a href="%s">%s</a>' % (castmembers[0].get_absolute_url(), castmembers[0].title)
+        if classname == 'Post':
+            return '<a href="/news/">News</a>' % obj.get_absolute_url()
+        return '<a href="/%s/">%s</a>' % (classname.lower(), classname)
+    
+@register.tag
+def get_classname(parser, token):
+    try:
+        tag_name, obj_name = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError, "%s requires exactly one argument" % token.contents
+    return UpdateClassnameNode(obj_name)
+
+
+class DJHeaderNode(template.Node):
+    def render(self, context):
+        obj = context['obj']
+        shows = obj.show_set.permitted()
+        show_times = []
+        for show in shows:
+            show_times += show.show_times()
+            if len(show_times) > 2:
+                break
+        show_times = show_times[:2]
+        
+        context.update({
+            'show_times': show_times,
+        })
+        return render_to_string('mobile/inclusion_tags/shows/dj_header.html', context)
+    
+@register.tag
+def dj_header(parser, token):
+    return DJHeaderNode()
 
 
