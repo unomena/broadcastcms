@@ -2,10 +2,11 @@
 {% load mobile_inclusion_tags %}
 
 {% block content_body %}
-        <h2>About Us</h2>
-		<div class="section">
-			<div id="article">
-				<p>{{ settings.about|linebreaksbr }}</p>
-			</div>	
-		</div>
+<h2>About Us</h2>
+<div class="section">
+    <div id="article">
+        <p>{{ settings.about|linebreaksbr }}</p>
+    </div>	
+</div>
 {% endblock %}
+{% block about_active %}class="active_lnk"{% endblock %}
