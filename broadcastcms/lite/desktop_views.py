@@ -251,6 +251,7 @@ def account_friends(request):
         'invitations': invitations,
     }, context_instance=RequestContext(request))
 
+
 # Chart
 
 class ChartView(object):

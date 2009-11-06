@@ -111,6 +111,7 @@ INSTALLED_APPS = (
     'broadcastcms.scaledimage',
     'broadcastcms.show',
     'broadcastcms.chart',
+    'broadcastcms.history',
     'broadcastcms.lite',
 )
 
