@@ -976,6 +976,7 @@ class ContentBaseViews(object):
 %s
 %s""" % (share_url, self.title, self.description),
         })
+        mailto_url = mailto_url.replace('+', ' ')
 
         # build facebook url
         facebook_url = "http://www.facebook.com/sharer.php?%s" % urlencode({'u': share_url})
