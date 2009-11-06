@@ -38,6 +38,28 @@ from forms import make_competition_form, make_contact_form, LoginForm, ProfileFo
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode
 import utils
 
+
+from broadcastcms.pagebuilder.models import Page
+def page(request, slug):
+    page = get_object_or_404(Page, slug=slug, is_public=True)
+    queryset = page.get_queryset()
+    template_name= page.view
+    page_menu = page.get_menu(request)
+
+    queryset_modifiers = [page_menu.queryset_modifier,]
+    for queryset_modifier in queryset_modifiers:
+        queryset = queryset_modifier.updateQuery(queryset)
+
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        extra_context={
+            'page_title': page.title,
+            'page_menu': page_menu,
+        },
+    )
+
 # Account
 
 def account_picture(request):

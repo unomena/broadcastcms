@@ -66,6 +66,8 @@ urlpatterns = patterns('',
 
     url(r'voting/(?P<slug>[\w-]+)/$', xmlhttprequest_vote_on_object, {'model': ContentBase, 'slug_field': 'slug', 'direction': 'up'}, name='xmlhttprequest_vote_on_object'),
 
+    url(r'page/(?P<slug>[\w-]+)/$', page, name='page'),
+    
     url(r'(?P<pk>[\w-]+)/$', short_redirect,  name='short_redirect'),
 )
 

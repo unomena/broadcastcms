@@ -107,6 +107,7 @@ INSTALLED_APPS = (
     'broadcastcms.show',
     'broadcastcms.chart',
     'broadcastcms.lite',
+    'broadcastcms.pagebuilder',
 )
 
 IMAGE_SCALES = {
