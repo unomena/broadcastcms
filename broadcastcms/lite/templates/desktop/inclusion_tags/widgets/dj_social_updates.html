@@ -1,0 +1,8 @@
+<div class="box dark">
+    <h1>Social Updates</h1>
+    <ul>
+        {% for tweet in tweets %}
+            <li>{{ tweet.created_at }} {{ tweet.text }}</li>
+        {% endfor %}
+    </ul>
+</div><!--/box-->
