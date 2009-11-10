@@ -83,4 +83,4 @@ def permissions(request):
         form = FacebookPermissionForm(instance=request.user.profile)
     return direct_to_template(request,"desktop/facebook_integration/permissions.html", {
         "form": form,
-    }
+    })
