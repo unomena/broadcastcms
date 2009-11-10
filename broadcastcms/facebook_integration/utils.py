@@ -11,6 +11,9 @@ API_KEY = getattr(settings, "FACEBOOK_API_KEY", None)
 API_SECRET = getattr(settings, "FACEBOOK_API_SECRET", None)
 
 
+class FacebookError(Exception):
+    pass
+
 def facebook_signature(values, cookie_check=False):
     signature_keys = []
     
@@ -53,7 +56,10 @@ def facebook_api_request(method, **params):
     }
     defaults.update(params)
     defaults["sig"] = facebook_signature(defaults)
-    return json.load(urllib.urlopen(
+    result = json.load(urllib.urlopen(
         "http://api.facebook.com/restserver.php",
         urllib.urlencode(defaults),
     ))
+    if result.get("error_code"):
+        raise FacebookError("%s: %s" % (result["error_code"], result["error_msg"]))
+    return result
