@@ -52,5 +52,5 @@ class FacebookRegistrationForm(forms.Form):
 class FacebookPermissionsForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ("facebook_publish_comments", "facebook_publish_status",
-            "facebook_publish_likes")
+        fields = ("publish_facebook_comments", "publish_facebook_status",
+            "publish_facebook_likes")
