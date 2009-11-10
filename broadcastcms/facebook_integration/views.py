@@ -4,6 +4,7 @@ from django.views.generic.simple import direct_to_template
 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 from friends.models import Friendship
 
