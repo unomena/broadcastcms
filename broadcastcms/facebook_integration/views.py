@@ -61,7 +61,7 @@ def invite(request):
 @login_required
 @facebook_required
 def add_facebook_friends(request):
-    uid = reuest.COOKIES[API_KEY + "_session_key"]
+    uid = request.COOKIES[API_KEY + "_session_key"]
     fb_friends = facebook_api_request("friends.get", session_key=uid)
     users = User.objects.filter(userprofile__facebook_id__in=fb_friends)
     return direct_to_template(request,
