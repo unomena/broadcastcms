@@ -8,11 +8,11 @@
     {% account_thanks %}
     
     <div class="page_form">
-        <form action="{% url status_update %}" method="post">
+        <form id="status_form" action="{% url status_update %}" method="post">
             <div class="page_form_row">
                 <label for="text">What's your status?</label>
                 <p class="text_input shift">
-                    <input type="text" name="text" value="{{ current_status.text|default:"" }}" />
+                    <input id="id_text" type="text" name="text" value="{{ current_status.text|default:"" }}" />
                 </p>
                 <p class="btn">
                     <input type="submit" value="Update" />
@@ -20,4 +20,22 @@
             </div>
         </form>
     </div>
+    {% if user.profile.facebook_id and user.profile.publish_facebook_status %}
+        <script type="text/javascript">
+            $(function() {
+                $("#status_form").submit(function() {
+                    Facebook.publish_stream({
+                        auto_publish: true,
+                        user_message: "updated their status on {{ site_name }}",
+                        attachment: {
+                            name: "{{ site_name }}",
+                            href: {% url home %},
+                            description: $("#id_text").val()
+                        }
+                    });
+                    return true;
+                });
+            });
+        </script>
+    {% endif %}
 {% endblock %}
