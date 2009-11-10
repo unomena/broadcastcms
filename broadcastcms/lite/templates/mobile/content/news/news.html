@@ -1,0 +1,20 @@
+{% extends "mobile/sections/base.html" %}
+{% load mobile_inclusion_tags %}
+
+{% block content_body %}
+       <h2>News Updates</h2>
+		<div class="section">
+			<div class="abstract">
+				<a href="news-article.html"><img src="pics/content/1.jpg" class="thumb" /></a>
+				<div class="tag">30 Mins Ago</div>
+				<h3><a href="news-article.html">Pet bear kills Pennsylvania woman</a></h3>
+			</div>
+			<hr />
+        </div>
+		<div class="filter">
+			<ul>
+				<li><a href="#">See More <span class="red">&raquo;</span></a></li>
+			</ul>
+		</div>
+{% endblock %}
+{% block news_active %}class="active_lnk"{% endblock %}
