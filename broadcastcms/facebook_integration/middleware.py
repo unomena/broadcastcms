@@ -1,27 +1,20 @@
 # based on http://nyquistrate.com/django/facebook-connect/
 
-import time
-import urllib
-
 from datetime import datetime
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from django.utils.hashcompat import md5_constructor
-from django.utils import simplejson as json
 
 from django.contrib import auth
 
+from broadcastcms.facebook_integration.utils import (facebook_signature,
+    facebook_api_request, API_KEY)
 from broadcastcms.lite.models import UserProfile
 
 
 class FacebookConnectMiddleware(object):
     
     def process_request(self, request):
-        API_KEY = getattr(settings, "FACEBOOK_API_KEY", None)
-        
         request.delete_facebook_cookies = False
         request.fb_authenticated = False
         
@@ -34,26 +27,17 @@ class FacebookConnectMiddleware(object):
         
         if not request.user.is_authenticated():
             if API_KEY in request.COOKIES:
-                signature_hash = self.facebook_signature(request.COOKIES, True)
+                signature_hash = facebook_signature(request.COOKIES, True)
                 if signature_hash == request.COOKIES[API_KEY]:
                     expiration = datetime.fromtimestamp(
                         float(request.COOKIES[API_KEY + "_expires"])
                     )
                     if expiration > datetime.now():
                         params = {
-                            "method": "users.getInfo",
-                            "api_key": API_KEY,
-                            "call_id": time.time(),
-                            "v": "1.0",
                             "uids": request.COOKIES[API_KEY + "_user"],
                             "fields": "profile_url,first_name,last_name",
-                            "format": "json",
                         }
-                        params["sig"] = self.facebook_signature(params)
-                        result = json.load(urllib.urlopen(
-                            "http://api.facebook.com/restserver.php",
-                            urllib.urlencode(params),
-                        ))
+                        result = facebook_api_request("users.getInfo", **params)
                         user_info = result[0]
                         
                         try:
@@ -86,8 +70,6 @@ class FacebookConnectMiddleware(object):
                 request.fb_authenticated = True
     
     def process_response(self, request, response):
-        API_KEY = getattr(settings, "FACEBOOK_API_KEY", None)
-        
         if hasattr(request, "delete_facebook_cookies") and request.delete_facebook_cookies:
             response.delete_cookie(API_KEY + "_user")
             response.delete_cookie(API_KEY + "_session_key")
@@ -97,35 +79,3 @@ class FacebookConnectMiddleware(object):
             response.delete_cookie("fbsetting_" + API_KEY)
         
         return response
-    
-    def facebook_signature(self, values, cookie_check=False):
-        API_KEY = getattr(settings, "FACEBOOK_API_KEY", None)
-        API_SECRET = getattr(settings, "FACEBOOK_API_SECRET", None)
-        signature_keys = []
-        
-        self._check_settings(API_KEY, API_SECRET)
-        
-        for key in sorted(values.keys()):
-            if cookie_check:
-                if key.startswith("%s_" % API_KEY):
-                    signature_keys.append(key)
-            else:
-                signature_keys.append(key)
-        
-        signature = []
-        for key in signature_keys:
-            if cookie_check:
-                k = key.replace("%s_" % API_KEY, "")
-                signature.append("%s=%s" % (k, values[key]))
-            else:
-                signature.append("%s=%s" % (key, values[key]))
-        signature.append(API_SECRET)
-        
-        return md5_constructor("".join(signature)).hexdigest()
-    
-    def _check_settings(self, API_KEY, API_SECRET):
-        message = "You must provide %s in your settings before using Facebook."
-        if not API_KEY:
-            raise ImproperlyConfigured(message % "FACEBOOK_API_KEY")
-        if not API_SECRET:
-            raise ImproperlyConfigured(message % "FACEBOOK_API_SECRET")

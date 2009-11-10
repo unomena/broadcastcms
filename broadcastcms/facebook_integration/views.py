@@ -41,8 +41,8 @@ def finish_signup(request):
     })
 
 
-@facebook_required
 @login_required
+@facebook_required
 def invite(request):
     if request.method == "POST":
         fb_ids = request.POST.getlist("ids")
@@ -53,3 +53,9 @@ def invite(request):
     return direct_to_template(request, 
         "desktop/facebook_integration/invite.html", {
         })
+
+
+@login_required
+@facebook_required
+def add_facebook_friends(request):
+    pass
