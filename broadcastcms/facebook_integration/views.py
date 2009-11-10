@@ -75,12 +75,12 @@ def add_facebook_friends(request):
 @facebook_required
 def permissions(request):
     if request.method == "POST":
-        form = FacebookPermissionForm(request.POST, instance=request.user.profile)
+        form = FacebookPermissionsForm(request.POST, instance=request.user.profile)
         if form.is_valid():
             form.save()
             return redirect(request.get_full_path())
     else:
-        form = FacebookPermissionForm(instance=request.user.profile)
+        form = FacebookPermissionsForm(instance=request.user.profile)
     return direct_to_template(request,"desktop/facebook_integration/permissions.html", {
         "form": form,
     })
