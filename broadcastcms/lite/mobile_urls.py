@@ -29,6 +29,10 @@ urlpatterns = patterns('',
     (r'account/sign-in/$', account_login),
     (r'account/sign-out/$', account_logout),
     
+    # Foooter links
+    (r'privacy/$', direct_to_template, {'template':'mobile/content/footer/privacy.html'}),
+    (r'terms/$', direct_to_template, {'template':'mobile/content/footer/terms.html'}),
+    
     # Static urls
     (r'^$', direct_to_template, {'template':'mobile/content/home.html'}),
     (r'news/$', direct_to_template, {'template':'mobile/content/news/news.html'}),

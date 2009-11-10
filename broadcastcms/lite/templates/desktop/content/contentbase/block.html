@@ -1,0 +1,6 @@
+{% load scaled_image_tags %}
+
+<div class="block">
+    <p class="block_pic"><a href="{{ url }}"><img src="{% scaled_image_url object 188 104 %}" width="188" height="104" alt="" /></a></p>
+	<p class="block_name"><a href="{{ url }}">{{ object.title }}</a></p>
+</div>

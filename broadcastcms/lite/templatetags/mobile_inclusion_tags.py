@@ -149,7 +149,7 @@ class UpdateClassnameNode(template.Node):
             if castmembers:
                 return '<a href="%s">%s</a>' % (castmembers[0].get_absolute_url(), castmembers[0].title)
         if classname == 'Post':
-            return '<a href="/news/">News</a>' % obj.get_absolute_url()
+            return '<a href="/news/">News</a>'
         return '<a href="/%s/">%s</a>' % (classname.lower(), classname)
     
 @register.tag
