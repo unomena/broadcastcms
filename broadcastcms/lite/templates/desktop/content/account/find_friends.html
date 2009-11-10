@@ -26,7 +26,7 @@
             {% for user in users %}
                 <div>
                     <p>{{ user.username }}</p>
-                    <form action="{% url account_friends_find %}" method="post">
+                    <form action="{% url account_friends_add %}" method="post">
                         <input type="hidden" name="user_id" value="{{ user.id }}" />
                         <input type="submit" value="make friends" />
                     </form>

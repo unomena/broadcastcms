@@ -215,6 +215,21 @@ def account_subscriptions(request):
 
 @login_required
 def account_friends_find(request):
+    if request.GET.get('q'):
+        q = request.GET['q']
+        users = User.objects.filter(
+            Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) |
+            Q(username__icontains=q)
+        )
+    else:
+        users = None
+    return render_to_response('desktop/content/account/find_friends.html', {
+        'users': users,
+    }, context_instance=RequestContext(request))
+
+@login_required
+def account_friends_add(request):
     if request.method == 'POST' and request.POST.get('user_id'):
         user = get_object_or_404(User, pk=request.POST['user_id'])
         inv = FriendshipInvitation.objects.create_friendship_request(request.user,
@@ -228,19 +243,8 @@ def account_friends_find(request):
         subject = render_to_string("desktop/mailers/account/friend_request_subject.txt", ctx).strip()
         body = render_to_string("desktop/mailers/account/friend_request_body.html", ctx)
         send_mail(subject, body, settings.SERVER_EMAIL, [user.email])
-        return HttpResponseRedirect(reverse("account_friends_find"))
-    elif request.GET.get('q'):
-        q = request.GET['q']
-        users = User.objects.filter(
-            Q(first_name__icontains=q) |
-            Q(last_name__icontains=q) |
-            Q(username__icontains=q)
-        )
-    else:
-        users = None
-    return render_to_response('desktop/content/account/find_friends.html', {
-        'users': users,
-    }, context_instance=RequestContext(request))
+    return HttpResponseRedirect(request.META["HTTP_REFERER"])
+
 
 @login_required
 def account_friends(request):
