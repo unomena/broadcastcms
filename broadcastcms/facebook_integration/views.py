@@ -10,7 +10,7 @@ from friends.models import Friendship
 
 from broadcastcms.facebook_integration.decorators import facebook_required
 from broadcastcms.facebook_integration.forms import (FacebookRegistrationForm,
-    FacebookPermissionForm)
+    FacebookPermissionsForm)
 from broadcastcms.facebook_integration.models import FacebookFriendInvite
 from broadcastcms.facebook_integration.utils import facebook_api_request, API_KEY
 
