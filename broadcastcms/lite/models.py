@@ -272,7 +272,9 @@ class UserProfile(models.Model):
     
     def tweets(self):
         api = twitter.Api()
-        return api.GetUserTimeline("brosner")
+        # @@@ how does twitter_url get set?
+        username = self.twitter_url.split("/")[-1]
+        return api.GetUserTimeline(username)
 
 # Create User profile property which gets or creates an empty profile for the given user
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
