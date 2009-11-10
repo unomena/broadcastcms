@@ -1,0 +1,20 @@
+{% extends "mobile/sections/base.html" %}
+{% load mobile_inclusion_tags %}
+
+{% block content_body %}
+        <h2>Contact Us</h2>
+		<div class="section">
+			<h3>Use the form below to get in touch:</h3>
+			<div class="clear">&nbsp;</div>
+			<form action="contact-thanks.html" method="get" id="contact-form">
+				<label for="comp-input" class="line">Your Name:</label>
+				<input type="text" maxlength="255" id="contact-name" size="12" name="contact-name" class="text" />
+				<label for="comp-input" class="line">Your Mobile:</label>
+				<input type="text" maxlength="255" id="contact-mobile" size="12" name="contact-mobile" class="text" />
+				<label for="comp-answer" class="line">Your Message:</label>
+				<textarea name="comment" id="comment"></textarea>
+				<input type="submit" id="comp-submit" name="comp-submit" value="Send" class="btn btn-b" />
+			</form>
+		</div>
+{% endblock %}
+{% block contact_active %}class="active_lnk"{% endblock %}

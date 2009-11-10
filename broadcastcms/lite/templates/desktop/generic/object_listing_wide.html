@@ -1,7 +1,7 @@
-{% extends "desktop/generic/base_object_listing.html" %}
+{% extends "desktop/generic/base_generic.html" %}
 {% load public_tags %}
 
-{% block listing %}
+{% block generic %}
     {% for entry in object_list %}
         {% call_view entry render_listing %}
     {% endfor %}

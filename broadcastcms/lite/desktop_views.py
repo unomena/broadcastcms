@@ -297,7 +297,7 @@ def competitions(request, template_name='desktop/generic/object_listing_wide.htm
         template_name=template_name,
         paginate_by=10,
         extra_context={
-            'page_title': 'Competitions',
+            'page_title': 'Win',
             'page_menu': page_menu,
         },
     )
@@ -308,15 +308,20 @@ def competitions_rules(request):
         raise Http404
     return render_to_response('desktop/content/competitions/rules.html', context)
 
-def competitions_content(request, slug):
-    content = get_object_or_404(Competition, slug=slug, is_public=True)
-    context = RequestContext(request, {})
-    
-    context.update({
-        'content': content,
-    })
-    return render_to_response('desktop/content/competitions/content.html', context)
+def competitions_content(request, slug, template_name='desktop/generic/object_detail.html'):
+    queryset = Competition.permitted
+    page_menu = utils.CompetitionsPageMenu(request)
 
+    return list_detail.object_detail(
+        request=request,
+        queryset=queryset,
+        slug=slug,
+        template_name=template_name,
+        extra_context={
+            'page_title': 'Win',
+            'page_menu': page_menu,
+        },
+    )
 
 # Events
 def events(request):
@@ -363,11 +368,8 @@ def events_content(request, slug):
     content = get_object_or_404(Event, slug=slug, is_public=True)
     context = RequestContext(request, {})
     
-    sorter = utils.EventSorter([], 'events', 'by', request)
-    
     context.update({
         'content': content,
-        'sorter': sorter,
     })
     return render_to_response('desktop/content/events/content.html', context)
 
@@ -485,10 +487,8 @@ def galleries_content(request, slug):
     content = get_object_or_404(Gallery, slug=slug, is_public=True)
     context = RequestContext(request, {})
     
-    sorter = utils.Sorter([], 'galleries', 'by', request)
     context.update({
         'content': content,
-        'sorter': sorter,
     })
     return render_to_response('desktop/content/galleries/content.html', context)
 
@@ -828,10 +828,8 @@ def news_content(request, slug):
     content = content.as_leaf_class()
     context = RequestContext(request, {})
     
-    sorter = utils.Sorter([], 'news', 'by', request)
     context.update({
         'content': content,
-        'sorter': sorter,
     })
     return render_to_response('desktop/content/news/content.html', context)
 
@@ -940,6 +938,13 @@ class ContentBaseViews(object):
             'self': self,
         })
         return render_to_response('desktop/content/contentbase/modals_content.html', context)
+    
+    def render_block(self, context):
+        context = {
+            'object': self,
+            'url': self.url(context),
+        }
+        return render_to_string('desktop/content/contentbase/block.html', context)
         
     def render_listing(self, context):
         context = {
@@ -1030,6 +1035,7 @@ class ContentBaseViews(object):
 %s
 %s""" % (share_url, self.title, self.description),
         })
+        mailto_url = mailto_url.replace('+', ' ')
 
         # build facebook url
         facebook_url = "http://www.facebook.com/sharer.php?%s" % urlencode({'u': share_url})
@@ -1147,7 +1153,7 @@ class GalleryViews(object):
         return render_to_string('desktop/content/galleries/article_body.html', context)
 
 class CastMemberViews(object):
-    def url(self):
+    def url(self, context=None):
         return reverse('shows_dj_blog', kwargs={'slug': self.slug})
 
 class PostViews(object):

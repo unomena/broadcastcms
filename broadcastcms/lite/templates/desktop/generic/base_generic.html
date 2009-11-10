@@ -18,7 +18,7 @@
     {% for template_name in header_includes %}
         {% include template_name %}
     {% endfor %}
-    {% block listing %}
+    {% block generic %}
     {% endblock %}
     {% if is_paginated %}
         {% paging page_obj %}

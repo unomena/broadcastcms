@@ -9,6 +9,18 @@
 	<script type="text/javascript" src="/media/bcms/includes/coda-slider.js"></script>
 	
     <link rel="stylesheet" type="text/css" href="/media/bcms/includes/popups.css" />
+    
+    <script type="text/javascript">
+            $('a:not(.close, .thumb, .selected, .thickbox)').live("click", function() {
+                if (window.opener) {
+                    window.opener.location = $(this).attr("href");
+                    return false;
+                }
+                else {
+                    $(this).attr("target", "_blank");
+                }
+            });
+    </script>
 {% endblock %}
 
 {% block body %}

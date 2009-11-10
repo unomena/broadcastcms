@@ -1,0 +1,12 @@
+{% extends "mobile/sections/base.html" %}
+{% load mobile_inclusion_tags %}
+
+{% block content_body %}
+<h2>Terms and Conditions</h2>
+<div class="section">
+    <div id="article">
+        <p>{{ settings.terms|linebreaksbr }}</p>
+    </div>
+</div>
+{% endblock %}
+{% block about_active %}class="active_lnk"{% endblock %}
