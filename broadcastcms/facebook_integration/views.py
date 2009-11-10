@@ -66,3 +66,4 @@ def add_facebook_friends(request):
         "desktop/facebook_integration/add_facebook_friends.html", {
             "users": users,
         }
+    )
