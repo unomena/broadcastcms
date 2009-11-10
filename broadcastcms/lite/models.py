@@ -271,10 +271,11 @@ class UserProfile(models.Model):
         super(UserProfile, self).save(*args, **kwargs)
     
     def tweets(self):
-        api = twitter.Api()
-        # @@@ how does twitter_url get set?
-        username = self.twitter_url.split("/")[-1]
-        return api.GetUserTimeline(username)
+        from broadcastcms.status.models import StatusUpdate
+        return StatusUpdate.objects.filter(
+            user = self.user,
+            source = StatusUpdate.TWITTER_SOURCE
+        )
 
 # Create User profile property which gets or creates an empty profile for the given user
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])

@@ -632,7 +632,7 @@ class SocialUpdatesNode(template.Node):
         
         if profile:
             context.update({
-                'tweets': profile.tweets(),
+                'updates': profile.tweets(),
             })
         
         return render_to_string('desktop/inclusion_tags/widgets/dj_social_updates.html', context)
