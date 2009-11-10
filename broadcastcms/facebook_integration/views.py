@@ -7,8 +7,6 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from friends.models import Friendship
-
 from broadcastcms.facebook_integration.decorators import facebook_required
 from broadcastcms.facebook_integration.forms import (FacebookRegistrationForm,
     FacebookPermissionsForm)
