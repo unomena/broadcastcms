@@ -36,7 +36,8 @@
 	    bindForm();
         validateComments();
         submit_facebook_comment = function(text) {
-            {% if request.user.profile.facebook_id %}{# TODO: add a check for the setting as well #}
+            {% if request.user.profile.facebook_id and request.user.profile.publish_facebook_comments %}
+                {# TODO: add a check for the setting as well #}
                 Facebook.publish_stream({
                     auto_publish: true,
                     user_message: "commented on {{ site_name }}",

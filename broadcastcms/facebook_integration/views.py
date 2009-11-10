@@ -9,7 +9,8 @@ from django.contrib.auth.models import User
 from friends.models import Friendship
 
 from broadcastcms.facebook_integration.decorators import facebook_required
-from broadcastcms.facebook_integration.forms import FacebookRegistrationForm
+from broadcastcms.facebook_integration.forms import (FacebookRegistrationForm,
+    FacebookPermissionForm)
 from broadcastcms.facebook_integration.models import FacebookFriendInvite
 from broadcastcms.facebook_integration.utils import facebook_api_request, API_KEY
 
@@ -69,3 +70,17 @@ def add_facebook_friends(request):
             "users": users,
         }
     )
+
+@login_required
+@facebook_required
+def permissions(request):
+    if request.method == "POST":
+        form = FacebookPermissionForm(request.POST, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            return redirect(request.get_full_path())
+    else:
+        form = FacebookPermissionForm(instance=request.user.profile)
+    return direct_to_template(request,"desktop/facebook_integration/permissions.html", {
+        "form": form,
+    }
