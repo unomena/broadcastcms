@@ -11,7 +11,7 @@ from friends.models import Friendship
 from broadcastcms.facebook_integration.decorators import facebook_required
 from broadcastcms.facebook_integration.forms import FacebookRegistrationForm
 from broadcastcms.facebook_integration.models import FacebookFriendInvite
-from broadcastcms.facebook_integration.utils import facebook_api_request
+from broadcastcms.facebook_integration.utils import facebook_api_request, API_KEY
 
 def finish_signup(request):
     template_name = "desktop/facebook_integration/finish_signup.html"
@@ -61,7 +61,8 @@ def invite(request):
 @login_required
 @facebook_required
 def add_facebook_friends(request):
-    fb_friends = facebook_api_request("friends.get", uid=request.user.profile.facebook_id)
+    uid = reuest.COOKIES[API_KEY + "_session_key"]
+    fb_friends = facebook_api_request("friends.get", session_key=uid)
     users = User.objects.filter(userprofile__facebook_id__in=fb_friends)
     return direct_to_template(request,
         "desktop/facebook_integration/add_facebook_friends.html", {
