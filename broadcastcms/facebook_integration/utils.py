@@ -60,6 +60,6 @@ def facebook_api_request(method, **params):
         "http://api.facebook.com/restserver.php",
         urllib.urlencode(defaults),
     ))
-    if isinstance(result, dict) result.get("error_code"):
+    if isinstance(result, dict) and result.get("error_code"):
         raise FacebookError("%s: %s" % (result["error_code"], result["error_msg"]))
     return result
