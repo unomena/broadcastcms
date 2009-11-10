@@ -41,6 +41,7 @@ class FacebookRegistrationForm(forms.Form):
         # Create profile
         profile = user.profile
         profile.facebook_url = self.user_info["profile_url"]
+        profile.facebook_id = self.user_info["uid"]
         profile.email_subscribe = self.cleaned_data["email_subscribe"]
         profile.save()
         

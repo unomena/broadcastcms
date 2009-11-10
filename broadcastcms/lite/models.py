@@ -234,6 +234,7 @@ class UserProfile(models.Model):
         blank=True,
         null=True,
     )
+    facebook_id = models.IntegerField(blank=True, null=True)
     twitter_url = models.URLField(
         blank=True,
         null=True,
