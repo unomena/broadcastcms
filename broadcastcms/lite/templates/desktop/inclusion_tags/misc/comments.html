@@ -36,6 +36,7 @@
 	    bindForm();
         validateComments();
         function submit_facebook_comment(text) {
+            {{ request|default:"NO REQUEST" }}
             {% if request.user.facebook_id %}{# TODO: add a check for the setting as well #}
                 Facebook.publish_stream({
                     auto_publish: true,
