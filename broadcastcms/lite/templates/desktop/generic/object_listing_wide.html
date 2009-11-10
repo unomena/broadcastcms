@@ -2,7 +2,9 @@
 {% load public_tags %}
 
 {% block listing %}
-    {% for entry in object_list %}
-        {% call_view entry render_listing %}
+    {% for object in object_list %}
+        {% with object.as_leaf_class as object %}
+            {% call_view object render_listing %}
+        {% endwith %}
     {% endfor %}
 {% endblock %}

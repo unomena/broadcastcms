@@ -118,6 +118,7 @@ IMAGE_SCALES = {
                 (107, 60), 
                 (424, 260),
                 (55, 55),
+                (188, 104),
             )
         },
     },
@@ -137,11 +138,6 @@ IMAGE_SCALES = {
         },
     },
     'gallery': {
-        'Gallery': {
-            'image': (
-                (188, 104),
-            )
-        },
         'GalleryImage': {
             'image': (
                 (80, 53),
@@ -168,7 +164,6 @@ IMAGE_SCALES = {
         'Show': {
             'image': (
                 (216, 77), 
-                (188, 104),
             )
         },
         'CastMember': {

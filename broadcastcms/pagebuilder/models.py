@@ -21,7 +21,7 @@ class Page(ModelBase):
         null=True,
     )
 
-    def get_queryset(self):
+    def get_queryset(self, context):
         query = self.query.replace('\r\n', '\n')
         compiled_query = compile(query, '<string>', 'exec')
         exec compiled_query
@@ -31,6 +31,18 @@ class Page(ModelBase):
         """
         """
         from broadcastcms.lite.utils import *
-        class_name = self.menu.replace('\r\n', '\n')
-        compiled_class_name = compile(class_name, '<string>', 'eval')
-        return eval(compiled_class_name)(request)
+        if self.menu:
+            class_name = self.menu.replace('\r\n', '\n')
+            compiled_class_name = compile(class_name, '<string>', 'eval')
+            return eval(compiled_class_name)(request)
+        else:
+            return None
+    
+    def __unicode__(self):
+        return self.title
+
+
+class OutgoingPage(models.Model):
+    content_type = models.CharField(max_length='256')
+    page = models.ForeignKey(Page, related_name='outgoing_pages')
+    outgoing_page = models.ForeignKey(Page, related_name='outgoing_page')

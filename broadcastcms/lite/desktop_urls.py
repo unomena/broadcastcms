@@ -21,6 +21,9 @@ urlpatterns = patterns('',
     
     url(r'^admin/(.*)', admin.site.root),
 
+    url(r'(?P<page_slug>[\w-]+)/(?P<content_slug>[\w-]+)/$', content_page, name='content_page'),
+    url(r'(?P<page_slug>[\w-]+)/$', page, name='page'),
+    
     url(r'account/picture/$', account_picture, name='account_picture'),
     url(r'account/profile/$', account_profile, name='account_profile'),
     url(r'account/subscriptions/$', account_subscriptions, name='account_subscriptions'),
@@ -66,8 +69,6 @@ urlpatterns = patterns('',
 
     url(r'voting/(?P<slug>[\w-]+)/$', xmlhttprequest_vote_on_object, {'model': ContentBase, 'slug_field': 'slug', 'direction': 'up'}, name='xmlhttprequest_vote_on_object'),
 
-    url(r'page/(?P<slug>[\w-]+)/$', page, name='page'),
-    
     url(r'(?P<pk>[\w-]+)/$', short_redirect,  name='short_redirect'),
 )
 

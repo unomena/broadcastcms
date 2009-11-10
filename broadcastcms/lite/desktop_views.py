@@ -40,15 +40,46 @@ import utils
 
 
 from broadcastcms.pagebuilder.models import Page
-def page(request, slug):
-    page = get_object_or_404(Page, slug=slug, is_public=True)
-    queryset = page.get_queryset()
+def page(request, page_slug):
+    page = get_object_or_404(Page, slug=page_slug, is_public=True)
+    context = RequestContext(request, {})
+    
+    queryset = page.get_queryset(context)
     template_name= page.view
     page_menu = page.get_menu(request)
 
-    queryset_modifiers = [page_menu.queryset_modifier,]
-    for queryset_modifier in queryset_modifiers:
-        queryset = queryset_modifier.updateQuery(queryset)
+    if page_menu:
+        queryset_modifiers = [page_menu.queryset_modifier,]
+        for queryset_modifier in queryset_modifiers:
+            queryset = queryset_modifier.updateQuery(queryset)
+
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        extra_context={
+            'page_title': page.title,
+            #'page_menu': page_menu,
+            'page': page,
+        },
+    )
+
+def content_page(request, page_slug, content_slug):
+    page = get_object_or_404(Page, slug=page_slug, is_public=True)
+    content = get_object_or_404(ContentBase, slug=content_slug, is_public=True)
+    context = RequestContext(request, {})
+    context.update({
+        'content': content
+    })
+
+    queryset = page.get_queryset(context)
+    template_name= page.view
+    page_menu = page.get_menu(context)
+
+    #if page_menu:
+    #    queryset_modifiers = [page_menu.queryset_modifier,]
+    #    for queryset_modifier in queryset_modifiers:
+    #        queryset = queryset_modifier.updateQuery(queryset)
 
     return list_detail.object_list(
         request=request,
@@ -57,6 +88,7 @@ def page(request, slug):
         extra_context={
             'page_title': page.title,
             'page_menu': page_menu,
+            'page': page,
         },
     )
 
@@ -918,10 +950,17 @@ class ContentBaseViews(object):
         
     def render_listing(self, context):
         context = {
-            'self': self,
+            'object': self,
             'url': self.url(context),
         }
         return render_to_string('desktop/content/contentbase/listing.html', context)
+
+    def render_block(self, context):
+        context = {
+            'object': self,
+            'url': self.url(context),
+        }
+        return render_to_string('desktop/content/contentbase/block.html', context)
 
     def render_article(self, context):
         context = RequestContext(context['request'], {})
@@ -1122,8 +1161,12 @@ class GalleryViews(object):
         return render_to_string('desktop/content/galleries/article_body.html', context)
 
 class CastMemberViews(object):
-    def url(self):
-        return reverse('shows_dj_blog', kwargs={'slug': self.slug})
+    def url(self, context):
+        page = context['page']
+        outgoing_pages = page.outgoing_pages.filter(content_type__iexact=self.classname)
+        outgoing_page = outgoing_pages[0].outgoing_page if outgoing_pages else None
+        url = reverse('content_page', kwargs={'page_slug': outgoing_page.slug, 'content_slug': self.slug}) if outgoing_page else ''
+        return url
 
 class PostViews(object):
     def render_article_body(self, context):

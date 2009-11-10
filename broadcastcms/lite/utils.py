@@ -243,3 +243,14 @@ class OrderPageMenu(PageMenu):
             'queryset_modifier': MostLikedQuerysetModifier,
         }
     ]
+
+class CastMemberPageMenu(PageMenu):
+    def __init__(self, context):
+        content = context['content']
+        self.items = []
+
+        self.items.append({
+            'title': 'Blog',
+            'url': content.url(context)
+        })
+        super(CastMemberPageMenu, self).__init__(context)
