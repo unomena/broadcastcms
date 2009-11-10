@@ -1,5 +1,4 @@
 from django import forms
-
 from django.contrib.auth.models import User, UserManager
 from django.contrib.sites.models import Site
 
