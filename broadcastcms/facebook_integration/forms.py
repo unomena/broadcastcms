@@ -3,6 +3,8 @@ from django import forms
 from django.contrib.auth.models import User, UserManager
 from django.contrib.sites.models import Site
 
+from broadcastcms.facebook_integration.models import FacebookFriendInvite
+
 
 class FacebookRegistrationForm(forms.Form):
     username = forms.CharField()
@@ -33,9 +35,13 @@ class FacebookRegistrationForm(forms.Form):
         user.last_name = self.user_info["last_name"]
         user.save()
         
+        FacebookFriendInvite.objects.create_friendships(user,
+            self.user_info["uid"])
+        
         # Create profile
         profile = user.profile
         profile.facebook_url = self.user_info["profile_url"]
+        profile.facebook_id = self.user_info["uid"]
         profile.email_subscribe = self.cleaned_data["email_subscribe"]
         profile.save()
         
