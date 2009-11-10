@@ -51,8 +51,9 @@ def facebook_api_request(method, **params):
         "v": "1.0",
         "format": "json",
     }
-    params["sig"] = facebook_signature(params)
+    defaults.update(params)
+    defaults["sig"] = facebook_signature(defaults)
     return json.load(urllib.urlopen(
         "http://api.facebook.com/restserver.php",
-        urllib.urlencode(params),
+        urllib.urlencode(defaults),
     ))
