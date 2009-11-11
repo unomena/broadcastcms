@@ -15,7 +15,7 @@ class FacebookRegistrationForm(forms.Form):
     )
     use_facebook_picture = forms.BooleanField(
         required = False,
-        label = "I want to use my Facebook picture on this site."
+        help_text = "I want to use my Facebook picture on this site."
     )
     
     def __init__(self, *args, **kwargs):
