@@ -1,9 +1,9 @@
 from django import forms
-
 from django.contrib.auth.models import User, UserManager
 from django.contrib.sites.models import Site
 
 from broadcastcms.facebook_integration.models import FacebookFriendInvite
+from broadcastcms.lite.models import UserProfile
 
 
 class FacebookRegistrationForm(forms.Form):
@@ -46,3 +46,10 @@ class FacebookRegistrationForm(forms.Form):
         profile.save()
         
         return username, password
+
+
+class FacebookPermissionsForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ("publish_facebook_comments", "publish_facebook_status",
+            "publish_facebook_likes")
