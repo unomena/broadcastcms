@@ -238,6 +238,7 @@ class UserProfile(models.Model):
     publish_facebook_comments = models.BooleanField(default=False)
     publish_facebook_status = models.BooleanField(default=False)
     publish_facebook_likes = models.BooleanField(default=False)
+    use_facebook_picture = models.BooleanField(default=False)
     twitter_url = models.URLField(
         blank=True,
         null=True,

@@ -13,6 +13,10 @@ class FacebookRegistrationForm(forms.Form):
         required = False,
         help_text = u"Yes, %(site_name)s may send me updates via email."
     )
+    use_facebook_picture = forms.BooleanField(
+        required = False,
+        label = "I want to use my Facebook picture on this site."
+    )
     
     def __init__(self, *args, **kwargs):
         self.user_info = kwargs.pop("user_info", None)
@@ -43,6 +47,7 @@ class FacebookRegistrationForm(forms.Form):
         profile.facebook_url = self.user_info["profile_url"]
         profile.facebook_id = self.user_info["uid"]
         profile.email_subscribe = self.cleaned_data["email_subscribe"]
+        profile.use_facebook_picture = self.cleaned_data["use_facebook_picture"]
         profile.save()
         
         return username, password
@@ -52,4 +57,4 @@ class FacebookPermissionsForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ("publish_facebook_comments", "publish_facebook_status",
-            "publish_facebook_likes")
+            "publish_facebook_likes", "use_facebook_picture")
