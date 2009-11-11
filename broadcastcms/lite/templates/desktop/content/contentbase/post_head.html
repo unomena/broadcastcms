@@ -10,7 +10,7 @@
             <script type="text/javascript">
                 $(function() {
                     submit_facebook_vote = function() {
-                        {% if user.profile.facebook_id and user.profile.publish_facebook_liks %}
+                        {% if user.profile.facebook_id and user.profile.publish_facebook_likes %}
                             Facebook.publish_stream({
                                 auto_publish: true,
                                 user_message: "liked something on {{ site_name }}",
