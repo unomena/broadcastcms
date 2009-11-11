@@ -31,9 +31,12 @@
                             name: "{{ site_name }}",
                             href: "http://{{ site_domain }}{% url home %}",
                             description: $("#id_text").val()
+                        },
+                        callback: function() {
+                            $("#status_form").submit();
                         }
                     });
-                    return true;
+                    return false;
                 });
             });
         </script>
