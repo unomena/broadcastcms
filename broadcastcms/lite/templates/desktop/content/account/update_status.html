@@ -33,7 +33,7 @@
                             description: $("#id_text").val()
                         },
                         callback: function() {
-                            $("#status_form").submit();
+                            $("#status_form").get(0).submit();
                         }
                     });
                     return false;
