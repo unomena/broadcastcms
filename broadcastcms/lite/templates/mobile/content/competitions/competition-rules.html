@@ -1,0 +1,14 @@
+{% extends "mobile/sections/base.html" %}
+ 
+{% block content_body %}
+    <h2>Competition Rules</h2>
+		<div class="section">
+            {{ settings.competition_general_rules }}	
+		</div>
+		<div class="filter">
+			<ul>
+				<li><a href="/competition/">More Competitions <span class="red">&raquo;</span></a></li>
+			</ul>
+		</div>
+{% endblock %}
+{% block competition_active %}class="active_lnk"{% endblock %}

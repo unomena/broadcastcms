@@ -1,0 +1,23 @@
+{% load comments voting_tags public_tags template_tags %}
+{% get_comment_list for instance as comment_list %}
+<span id="comments">
+    {% if comment_list %}
+        <h2>{{ comment_count }} Comments</h2>
+        {% for comment in comment_list %}
+            {% with comment.user as user %}
+            <div class="section">
+                <div class="comment">
+                    <div class="tag">{{ comment.id }}. {{ user.username|default:"Anonymous" }} - {% get_time_difference comment %} Ago</div>
+                    <p>{{ comment.comment|linebreaksbr }}</p>
+                </div>
+                {% if not forloop.last %}<hr />{% endif %}
+            </div>
+            {% endwith %}
+        {% endfor %}
+            <div class="filter">
+                <ul>
+                    <li><a href="post-comment.html">Add your comment <span class="red">&raquo;</span></a></li>
+                </ul>
+            </div>
+    {% endif %}
+</div>
