@@ -164,6 +164,12 @@ class ContentBase(ModelBase):
         null=True,
     )
 
+    featured = models.BooleanField(
+        default=False,
+        help_text="Select this item to be listed under featured content. Remember to remove other featured content to make space for this one."
+    )
+
+
     def save(self, *args, **kwargs):
         if not self.id and not self.created:
             self.created = datetime.now()

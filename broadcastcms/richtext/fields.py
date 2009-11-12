@@ -32,6 +32,7 @@ class RichTextField(models.TextField):
         }
         defaults.update(kwargs)
         return super(RichTextField, self).formfield(**defaults)
+
         
 
 class RichTextFormField(forms.fields.Field):

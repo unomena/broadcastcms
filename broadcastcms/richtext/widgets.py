@@ -44,11 +44,9 @@ class RichTextWidget(forms.TextInput):
             <script type="text/javascript">
                 %(id)s = new nicEditor({
                     iconsPath:'%(media_url)s/img/nicEditorIcons.gif',
+                    xhtml:true,
                     buttonList: [
-                        'bold', 'italic', 'fontSize', 'fontFormat', 'undeline', 'left', 'center', 'right',
-                        'justify', 'ol', 'ul', 'strikethrough', 'removeformat',
-                        'indent', 'outdent', 'hr', 'forecolor', 'link', 'unlink',
-                        'xhtml'
+                        'bold', 'italic','removeformat','xhtml'
                     ]
                 }).panelInstance('%(id)s');
             </script>
