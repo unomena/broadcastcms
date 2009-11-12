@@ -4,12 +4,11 @@
 
 {% if instances %}
 <h2>Updates</h2>
-
 <div class="section">
     {% for instance in instances %}
     <div class="abstract">
         <a href="{{ instance.get_absolute_url }}"><img src="{% scaled_image_url instance  55 55 %}" class="thumb" /></a>
-        <div class="tag"><a href="{{ instance.shows.castmembers.get_absolute_url }}">{% get_classname instance %}</a> - {% get_time_difference instance %} Ago</div>
+        <div class="tag">{% get_classname instance %} - {% get_time_difference instance %} Ago</div>
         <h3><a href="{{ instance.get_absolute_url }}">{{ instance.description|truncatewords:"7" }}</a></h3>
     </div>
     {% if not forloop.counter|divisibleby:"5" %}<hr />{% endif %}
