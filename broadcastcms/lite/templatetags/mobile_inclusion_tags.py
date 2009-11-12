@@ -14,10 +14,6 @@ from broadcastcms.radio.models import Song
 
 register = template.Library()
 
-@register.tag
-def on_air(parser, token):
-    return OnAirNode()
-
 class OnAirNode(template.Node):
     def get_public_on_air_entry(self, content_type):
         """
@@ -84,12 +80,15 @@ class OnAirNode(template.Node):
             'artist': artist,
         })
         return render_to_string('mobile/inclusion_tags/home/on_air.html', context)
-        
-        
+
+@register.tag
+def on_air(parser, token):
+    return OnAirNode()
+
+
 class EntryUpdatesNode(template.Node):
-    def __init__(self, count=5, mode=None, castmember=None):
+    def __init__(self, count=5, castmember=None):
         self.count = count
-        self.mode = mode
         self.castmember = castmember
         super(EntryUpdatesNode, self).__init__()
 
@@ -100,13 +99,11 @@ class EntryUpdatesNode(template.Node):
         is limited to the value of self.count.
         """
         # get the update types from settings
-        if self.mode:
-            update_types = [self.mode]
-        else:
-            update_types = [update_type.model_class().__name__ for update_type in settings.update_types.all()]
-
+        update_types = [update_type.model_class().__name__ for update_type in settings.update_types.all()]
+        
         # collect public instances, filter, limited to count, sorted on created descending
         instances = ContentBase.permitted.filter(classname__in=update_types).order_by("-created")
+        
         if self.castmember:
             owner = context[self.castmember].owner
             instances = instances.filter(owner=owner).exclude(classname__in=['CastMember', 'Show']) if owner else []
@@ -122,7 +119,7 @@ class EntryUpdatesNode(template.Node):
         context.update({
             'instances': instances,
         })
-        return render_to_string('mobile/inclusion_tags/misc/updates.html', context)
+        return render_to_string("mobile/inclusion_tags/misc/updates.html", context)
 
 @register.tag
 def homepage_updates(parser, token):
@@ -130,10 +127,7 @@ def homepage_updates(parser, token):
 
 @register.tag
 def dj_updates(parser, token):
-    try:
-        tag_name, castmember = token.split_contents()
-    except ValueError:
-        raise template.TemplateSyntaxError, "%s requires exactly one argument" % token.contents
+    tag_name, castmember = token.split_contents()
     return EntryUpdatesNode(count=5, castmember=castmember)
 
 
@@ -148,17 +142,32 @@ class UpdateClassnameNode(template.Node):
             castmembers = CastMember.permitted.filter(owner=obj.owner)
             if castmembers:
                 return '<a href="%s">%s</a>' % (castmembers[0].get_absolute_url(), castmembers[0].title)
+                
         if classname == 'Post':
             return '<a href="/news/">News</a>'
         return '<a href="/%s/">%s</a>' % (classname.lower(), classname)
-    
+
 @register.tag
 def get_classname(parser, token):
-    try:
-        tag_name, obj_name = token.split_contents()
-    except ValueError:
-        raise template.TemplateSyntaxError, "%s requires exactly one argument" % token.contents
+    tag_name, obj_name = token.split_contents()
     return UpdateClassnameNode(obj_name)
+
+
+class CommentsNode(template.Node):
+    def __init__(self, instance):
+        self.instance = template.Variable(instance)
+    
+    def render(self, context):
+        instance = self.instance.resolve(context)
+        context.update({
+            'instance': instance,
+        })
+        return render_to_string('mobile/inclusion_tags/misc/comments.html', context)
+
+@register.tag
+def comments(parser, token):
+    tag, instance = token.split_contents()
+    return CommentsNode(instance)
 
 
 class DJHeaderNode(template.Node):
@@ -180,5 +189,3 @@ class DJHeaderNode(template.Node):
 @register.tag
 def dj_header(parser, token):
     return DJHeaderNode()
-
-
