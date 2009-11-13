@@ -53,6 +53,14 @@ urlpatterns = patterns('',
     (r'competition/(?P<page>[0-9]+)/$', object_list, competition_list_params),
     (r'competition/(?P<slug>[\w-]+)/$', custom_object_detail, {'template': 'mobile/content/competitions/competition-details.html', 'classname': 'Competition'}),
     
+    # Gallery
+    (r'gallery/$', object_list, gallery_list_params),
+    (r'gallery/(?P<page>[0-9]+)/$', object_list, gallery_list_params),
+    
+    # Event
+    (r'event/$', object_list, event_list_params),
+    (r'event/(?P<page>[0-9]+)/$', object_list, event_list_params),
+    
     # News
     (r'news/$', object_list, news_list_params),
     (r'news/(?P<page>[0-9]+)/$', object_list, news_list_params),
@@ -79,8 +87,6 @@ urlpatterns = patterns('',
     # Static urls
     (r'^$', direct_to_template, {'template':'mobile/content/home.html'}),
     (r'news/$', direct_to_template, {'template':'mobile/content/news/news.html'}),
-    (r'event/$', direct_to_template, {'template':'mobile/content/events/events.html'}),
-    (r'gallery/$', direct_to_template, {'template':'mobile/content/galleries/galleries.html'}),
     (r'about/$', direct_to_template, {'template':'mobile/content/about.html'}),
     (r'contact/$', direct_to_template, {'template':'mobile/content/contact.html'}),
     
