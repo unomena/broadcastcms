@@ -16,6 +16,7 @@ class StatusUpdate(models.Model):
         (TWITTER_SOURCE, "twitter"),
     )
     
+    key = models.CharField(max_length=40, blank=True, editable=False)
     user = models.ForeignKey(User)
     timestamp = models.DateTimeField(default=datetime.now)
     

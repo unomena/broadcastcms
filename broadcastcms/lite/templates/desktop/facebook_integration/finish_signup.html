@@ -46,6 +46,13 @@
                     <p class="checkbox_short">{{ field }} {{ field.help_text }}</p>
                 </div>
             {% endwith %}
+            {% with form.use_facebook_picture as field %}
+                <div class="modal_row">
+                    <label for="email_alerts">Options:</label>
+                    {{ field.errors }}
+                    <p class="checkbox_short">{{ field }} {{ field.help_text }}</p>
+                </div>
+            {% endwith %}
             <div class="page_form_row no-pad">
                 <p class="label">&nbsp;</p>
                 <p class="btn"><input type="image" src="/media/bcms/images/forms/btn-submit.jpg" name="submit" /></p>

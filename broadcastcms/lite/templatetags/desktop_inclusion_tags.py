@@ -612,3 +612,27 @@ class DJHeaderNode(template.Node):
             'current_section': current_section,
         })
         return render_to_string('desktop/inclusion_tags/shows/dj_header.html', context)
+
+
+@register.tag
+def social_updates(parser, token):
+    return SocialUpdatesNode()
+
+
+class SocialUpdatesNode(template.Node):
+    
+    def render(self, context):
+        castmember = context['castmember']
+        
+        owner = castmember.owner
+        if owner:
+            profile = owner.profile
+        else:
+            profile = None
+        
+        if profile:
+            context.update({
+                'updates': profile.tweets(),
+            })
+        
+        return render_to_string('desktop/inclusion_tags/widgets/dj_social_updates.html', context)
