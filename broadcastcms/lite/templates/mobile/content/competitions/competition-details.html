@@ -10,7 +10,7 @@
     <div class="section">
         <div class="abstract">
             <img src="{% scaled_image_url obj  55 55 %}" class="thumb" />
-            <div class="tag">Closes: {{ obj.end|date:"d N 'y" }}</div>
+            <div class="tag">Closes: {{ obj.end|date }}</div>
             <h3>{{ obj.title }}</h3>
         </div>
         <div id="article">
