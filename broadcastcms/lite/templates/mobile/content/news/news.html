@@ -1,20 +1,31 @@
 {% extends "mobile/sections/base.html" %}
-{% load mobile_inclusion_tags %}
-
+{% load scaled_image_tags %}
+{% load template_tags %}
+ 
 {% block content_body %}
-       <h2>News Updates</h2>
-		<div class="section">
-			<div class="abstract">
-				<a href="news-article.html"><img src="pics/content/1.jpg" class="thumb" /></a>
-				<div class="tag">30 Mins Ago</div>
-				<h3><a href="news-article.html">Pet bear kills Pennsylvania woman</a></h3>
-			</div>
-			<hr />
+    {% if object_list %}
+    <h2>News Updates</h2>
+    <div class="section">
+        {% for obj in object_list %}
+        <div class="abstract">
+            <a href="{{ obj.get_absolute_url }}"><img src="{% scaled_image_url obj  55 55 %}" class="thumb" /></a>
+            <div class="tag">{% get_time_difference obj %} Ago</div>
+            <h3><a href="{{ obj.get_absolute_url }}">{{ obj.description }}</a></h3>
         </div>
-		<div class="filter">
-			<ul>
-				<li><a href="#">See More <span class="red">&raquo;</span></a></li>
-			</ul>
-		</div>
+        {% if not forloop.last %}<hr />{% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if is_paginated %}
+    <div class="filter">
+        <ul>
+            <li>
+                {% if has_previous %}<a href="/news/{{ previous }}/"><span class="red">&laquo;</span> Go Back</a>{% endif %}
+                {% if has_next and has_previous %} &nbsp; | &nbsp; {% endif %}
+                {% if has_next %}<a href="/news/{{ next }}/">See More <span class="red">&raquo;</span></a>{% endif %}
+            </li>
+        </ul>
+    </div>
+    {% endif %}
 {% endblock %}
 {% block news_active %}class="active_lnk"{% endblock %}
