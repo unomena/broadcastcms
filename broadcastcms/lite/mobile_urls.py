@@ -59,31 +59,32 @@ urlpatterns = patterns('',
     (r'competition/$', object_list, competition_list_params),
     (r'competition/rules/$', direct_to_template, {'template':'mobile/content/competitions/competition-rules.html'}),
     (r'competition/(?P<page>[0-9]+)/$', object_list, competition_list_params),
-    (r'competition/(?P<slug>[\w-]+)/$', custom_object_detail, {'template': 'mobile/content/competitions/competition-details.html', 'classname': 'Competition'}),
-    (r'competition/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'template': 'mobile/content/competition/competition-details.html', 'classname': 'Competition', 'comment_add': True}),
+    (r'competition/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Competition'}),
+    (r'competition/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Competition', 'comment_add': True}),
     
     # Event
     (r'event/$', object_list, event_list_params),
     (r'event/(?P<page>[0-9]+)/$', object_list, event_list_params),
-    (r'event/(?P<slug>[\w-]+)/$', custom_object_detail, {'template': 'mobile/content/events/event-details.html', 'classname': 'Event'}),
-    (r'event/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'template': 'mobile/content/events/event-details.html', 'classname': 'Event', 'comment_add': True}),
+    (r'event/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Event'}),
+    (r'event/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Event', 'comment_add': True}),
     
     # Gallery
     (r'gallery/$', object_list, gallery_list_params),
     (r'gallery/(?P<page>[0-9]+)/$', object_list, gallery_list_params),
-    (r'gallery/(?P<slug>[\w-]+)/$', custom_object_detail, {'template': 'mobile/content/galleries/galleries-details.html', 'classname': 'Post', 'comment_add': True}),
-    (r'gallery/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'template': 'mobile/content/galleries/galleries-details.html', 'classname': 'Post', 'comment_add': True}),
+    (r'gallery/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Gallery'}),
+    (r'gallery/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Post', 'comment_add': True}),
     
     # News
     (r'news/$', object_list, news_list_params),
     (r'news/(?P<page>[0-9]+)/$', object_list, news_list_params),
-    (r'news/(?P<slug>[\w-]+)/$', custom_object_detail, {'template': 'mobile/content/news/news-article.html', 'classname': 'Post'}),
-    (r'news/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'template': 'mobile/content/news/news-article.html', 'classname': 'Post', 'comment_add': True}),
+    (r'news/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Post'}),
+    (r'news/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Post', 'comment_add': True}),
     
     # Shows and DJ pages
     #(r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', content_details, {'mode':'djcontent'}),
     (r'show/$', shows_line_up),
     (r'show/(?P<dj_slug>[\w-]+)/$', shows_dj_blog),
+    (r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', custom_object_detail),
     (r'show/lineup/(?P<weekday>[\w-]+)/$', shows_line_up),
     
     # Contact
