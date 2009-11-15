@@ -17,6 +17,7 @@ from broadcastcms.base.models import ContentBase
 from broadcastcms.calendar.models import Entry
 from broadcastcms.competition.models import Competition
 from broadcastcms.event.models import Event
+#from broadcastcms.lite.forms import ContactForm
 from broadcastcms.gallery.models import Gallery
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.post.models import Post
@@ -47,11 +48,14 @@ def account_login(request):
     return render_to_response('mobile/accounts/sign-in.html', {'form': form})
     
 # Generic
-def custom_object_detail(request, slug, template, classname):
+def custom_object_detail(request, slug, template, classname, comment_add=False):
     context = RequestContext(request, {})
     obj = get_object_or_404(eval(classname), slug=slug)
+    if classname == 'Event':
+        obj = obj.entries.all()[0]
     context.update({
         'obj': obj,
+        'comment_add': comment_add,
     })
     
     return render_to_response(template, context)
