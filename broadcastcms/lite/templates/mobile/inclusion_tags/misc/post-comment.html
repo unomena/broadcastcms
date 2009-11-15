@@ -5,11 +5,11 @@
         <hr />
         <div class="abstract">
             <form id="frmComments" action="{% url comment_add %}" method="POST" class="cmxform">
-            {{ comment_form.comment }}
-            <label class="error" for="id_comment" generated="true" style="display: inline;">
-                {{ comment_form.errors.comment.0|default:"" }}
-            </label>
-            <p><input id="comment-submit" type="submit" value="Add Comment" name="comment-submit"/></p>
+                {{ comment_form.comment }}
+                <label class="error" for="id_comment" generated="true" style="display: inline;">
+                    {{ comment_form.errors.comment.0|default:"" }}
+                </label>
+                <p><input type="submit" value="Add Comment" name="comment-submit"/></p>
             </form>
         </div>	
     </div>
@@ -18,4 +18,3 @@
             <li><span class="red">&laquo;</span><a href="{% ifequal instance.classname 'Entry' %}{{ instance.content.get_absolute_url }}{% else %}{{ instance.get_absolute_url }}{% endifequal %}"> Go Back</a></li>
         </ul>
     </div>
-
