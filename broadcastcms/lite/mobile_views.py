@@ -48,9 +48,24 @@ def account_login(request):
     return render_to_response('mobile/accounts/sign-in.html', {'form': form})
     
 # Generic
-def custom_object_detail(request, slug, template, classname, comment_add=False):
+def custom_object_detail(request, slug, dj_slug=None, classname=None, comment_add=False):
     context = RequestContext(request, {})
-    obj = get_object_or_404(eval(classname), slug=slug)
+    template_dict = {
+        'Competition': 'mobile/content/competitions/competition-details.html',
+        'Event': 'mobile/content/events/event-details.html',
+        'Gallery': 'mobile/content/galleries/gallery-details.html',
+        'Post': 'mobile/content/news/news-article.html',
+    }
+    
+    if classname:
+        obj = get_object_or_404(eval(classname), slug=slug)
+    else:
+        obj = ContentBase.objects.permitted().filter(slug=slug)
+        obj = obj[0].as_leaf_class() if obj else None
+        classname = obj.classname
+        
+    if not obj: raise Http404
+        
     if classname == 'Event':
         obj = obj.entries.all()[0]
     context.update({
@@ -58,7 +73,7 @@ def custom_object_detail(request, slug, template, classname, comment_add=False):
         'comment_add': comment_add,
     })
     
-    return render_to_response(template, context)
+    return render_to_response(template_dict[classname], context)
 
 # Shows
 def shows_line_up(request, weekday=None):
@@ -167,10 +182,6 @@ def httprequest_vote_on_object(request, model, direction,
 class CastMemberViews(object):
     def get_absolute_url(self):
         return "/show/%s/" % self.slug
-    
-class PostViews(object):
-    def get_absolute_url(self):
-        return "/news/%s/" % self.slug
 
 class ContentBaseViews(object):
     def get_absolute_url(self):
@@ -192,5 +203,4 @@ class ContentBaseViews(object):
         return "/%s/%s/" % (url_prefix, self.slug)
 
 public.site.register(CastMember, CastMemberViews)
-public.site.register(Post, PostViews)
 public.site.register(ContentBase, ContentBaseViews)
