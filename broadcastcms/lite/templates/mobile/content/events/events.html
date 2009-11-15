@@ -1,14 +1,22 @@
 {% extends "mobile/sections/base.html" %}
-{% load mobile_inclusion_tags scaled_image_tags humanize %}
+{% load  scaled_image_tags humanize %}
 
 {% block content_body %}
     {% if object_list %}
+    <h2>Upcoming Events</h2>
     {% for obj in object_list %}
-        {% ifchanged %}<h2>{% if forloop.first %}Events - {% endif %}{{ obj.start|naturalday|title }}</h2>{% endifchanged %}
+        {% ifchanged %}<h2>{{ obj.start|naturalday|title }}</h2>{% endifchanged %}
         <div class="section">
             <div class="abstract">
                 <a href="{{ obj.content.get_absolute_url }}"><img src="{% scaled_image_url obj.content 55 55 %}" class="thumb" /></a>
-                <div class="tag">{{ obj.content.title }}</div>
+                <div class="tag">
+                    {% with obj.content.as_leaf_class.locations.permitted as locations %}
+                    {% for location in locations %}
+                        {{ location.venue }}{% if location.city %}, {{ location.city }}{% endif %}
+                        {% if not forloop.last %}<span>&nbsp; | &nbsp;</span>{% endif %}
+                    {% endfor %}
+                    {% endwith %}
+                </div>
                 <h3><a href="{{ obj.content.get_absolute_url }}">{{ obj.content.description }}</a></h3>
             </div>
             {% if not forloop.last %}<hr />{% endif %}
@@ -27,5 +35,4 @@
     </div>
     {% endif %}
 {% endblock %}
-{% block news_active %}class="active_lnk"{% endblock %}
- 
+{% block events_active %}class="active_lnk"{% endblock %}
