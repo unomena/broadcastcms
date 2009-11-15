@@ -10,21 +10,22 @@
     <div class="section">
         <div class="abstract">
             <img src="{% scaled_image_url obj  55 55 %}" class="thumb" />
-            <div class="tag">Closes: {{ obj.end|date }}</div>
+            <div class="tag">Closes: {{ obj.end|date }} &nbsp; | &nbsp; {{ score.score|default:"0" }}  Likes - <a href="/voting/{{ obj.slug }}/">I Like</a></div>
             <h3>{{ obj.title }}</h3>
         </div>
         <div id="article">
             <p><strong>{{ obj.description }}</strong></p>
             <p>{{ obj.content|safe }}</p>
         </div>
-        <h3>Rules</h3>
+        {% competition_entry_form %}
+        <h3>Rules:</h3>
         <p>
             {{ obj.rules|safe }}
         </p>
     </div>
     <div class="filter">
         <ul>
-            <li><a href="/competition/rules/">General Rules <span class="red">&raquo;</span></a></li>
+           {% if settings.competition_general_rules %}<li><a href="/competition/rules/">General Rules <span class="red">&raquo;</span></a></li>{% endif %}
             <li><a href="/competition/">More Competitions <span class="red">&raquo;</span></a></li>
         </ul>
 	</div>
