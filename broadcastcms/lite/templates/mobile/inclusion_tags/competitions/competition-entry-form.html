@@ -1,0 +1,36 @@
+{% if obj.question %}
+    {% if form.is_valid %}
+        <strong>Thank You!</strong>
+        <p>Your entry has been received. Good luck!</p>
+    {% else %}
+        <strong>{{ obj.question }}</strong>
+        {% if obj.question_blurb %}<p>{{ obj.question_blurb|safe }}</p>{% endif %}
+        {% if request.user.is_authenticated %}
+            <form id="frmEnterCompetition" action="{{ request.path }}" method="POST">
+                {% with form.answer as field %}
+                    <div>
+                        {{ field.label_tag }}
+                        <p>
+                            {{ field }}
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+                        {% if field.help_text %}
+                            <p class="note">
+                                {{ field.help_text }}
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endwith %}
+                <div>
+                    <p>&nbsp;</p>
+                    <p><input type="submit" name="submit" /></p>
+                </div>
+            </form>
+        {% else %}
+            <strong>Enter Now!</strong>
+            <p class="blurb"><a href="/account/sign-in/">Sign in</a> to enter this competition. Not yet a member? <a href="/account/sign-up/" class="thickbox">Sign up</a> now!</p>
+        {% endif %}
+    {% endif %}
+{% endif %}
