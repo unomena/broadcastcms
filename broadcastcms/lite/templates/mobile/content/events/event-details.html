@@ -1,0 +1,36 @@
+{% extends "mobile/sections/base.html" %}
+{% load scaled_image_tags comments voting_tags public_tags mobile_inclusion_tags %}
+{% score_for_object obj.contentbase as score %}
+
+{% block content_body %}
+    <h2>{% if comment_add %}Add Your Comment{% else %}Events{% endif %}</h2>
+    <div class="section">
+        <div class="abstract">
+            <img src="{% scaled_image_url obj.content  55 55 %}" class="thumb" />
+            <div class="tag">{{ obj.start|date:"d N" }} - {{ obj.end|date:"d N" }} '{{ obj.end|date:"Y" }} &nbsp; | &nbsp; {{ score.score|default:"0" }}  Likes - <a href="/voting/{{ obj.slug }}/">I Like</a></div>
+            <h3>{{ obj.content.title }}</a></h3>
+        </div>
+        {% if not comment_add %}
+        <div id="article">
+            <p><strong>
+            {% with obj.content.as_leaf_class.locations.permitted as locations %}
+            {% for location in locations %}
+                {{ location.venue }}{% if location.city %}, {{ location.city }}{% endif %}
+                {% if not forloop.last %}<span>&nbsp; | &nbsp;</span>{% endif %}
+            {% endfor %}
+            {% endwith %}
+            </strong></p>
+            <p>{{ obj.content.event.content }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% if not comment_add %}
+    <div class="filter">
+        <ul>
+            <li><a href="/event/">More Events <span class="red">&raquo;</span></a></li>
+        </ul>
+	</div>
+    {% endif %}
+    {% if comment_add %}{% comments_add_form obj %}{% else %}{% comments obj %}{% endif %}
+{% endblock %}
+{% block events_active %}class="active_lnk"{% endblock %}

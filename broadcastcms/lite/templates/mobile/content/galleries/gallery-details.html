@@ -6,17 +6,20 @@
  
 {% block content_body %}
     {% if obj %}
-    <h2>{% if comment_add %}Add Your Comment{% else %}News Updates{% endif %}</h2>
+    <h2>{% if comment_add %}Add Your Comment{% else %}Galleries{% endif %}</h2>
     <div class="section">
         <div class="abstract">
             <img src="{% scaled_image_url obj  55 55 %}" class="thumb" />
-            <div class="tag">{% get_time_difference obj %} Ago &nbsp; | &nbsp; {{ score.score|default:"0" }}  Likes - <a href="/voting/{{ obj.slug }}/">I Like</a></div>
+            <div class="tag">{{ obj.created|date }} &nbsp; | &nbsp; {{ score.score|default:"0" }}  Likes - <a href="/voting/{{ obj.slug }}/">I Like</a></div>
             <h3>{{ obj.title }}</h3>
         </div>
         {% if not comment_add %}
         <div id="article">
-            <p><strong>{{ obj.description }}</strong></p>
-            <p>{{ obj.content|safe }}</p>
+        <ul id="gal">
+            {% for image in obj.images.permitted %}
+    		    <li><a class="thumb" href="{{ image.image.url }}"><img src="{% scaled_image_url image 80 53 %}" width="80" height="53" /></a></li>
+            {% endfor %}
+        </ul>
         </div>
         {% endif %}
     </div>
@@ -30,4 +33,4 @@
     {% if comment_add %}{% comments_add_form obj %}{% else %}{% comments obj %}{% endif %}
     {% endif %}
 {% endblock %}
-{% block news_active %}class="active_lnk"{% endblock %}
+{% block gallery_active %}class="active_lnk"{% endblock %}

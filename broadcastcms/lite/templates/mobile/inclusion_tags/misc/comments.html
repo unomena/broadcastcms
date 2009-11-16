@@ -1,23 +1,25 @@
 {% load comments voting_tags public_tags template_tags %}
 {% get_comment_list for instance as comment_list %}
 <span id="comments">
+    <h2>{{ comment_count }} Comments</h2>
     {% if comment_list %}
-        <h2>{{ comment_count }} Comments</h2>
-        {% for comment in comment_list %}
-            {% with comment.user as user %}
-            <div class="section">
-                <div class="comment">
-                    <div class="tag">{{ comment.id }}. {{ user.username|default:"Anonymous" }} - {% get_time_difference comment %} Ago</div>
-                    <p>{{ comment.comment|linebreaksbr }}</p>
-                </div>
-                {% if not forloop.last %}<hr />{% endif %}
+    {% for comment in comment_list %}
+        {% with comment.user as user %}
+        <div class="section">
+            <div class="comment">
+                <div class="tag">{{ comment.id }}. {{ user.username|default:"Anonymous" }} - {% get_time_difference comment %} Ago</div>
+                <p>{{ comment.comment|linebreaksbr }}</p>
             </div>
-            {% endwith %}
-        {% endfor %}
-            <div class="filter">
-                <ul>
-                    <li><a href="post-comment.html">Add your comment <span class="red">&raquo;</span></a></li>
-                </ul>
-            </div>
+            {% if not forloop.last %}<hr />{% endif %}
+        </div>
+        {% endwith %}
+    {% endfor %}
+    {% else %}
+    <div class="section"><p>There are no comments. Be the first person to add a comment.</p></div>
     {% endif %}
+    <div class="filter">
+        <ul>
+            <li><a href="{{ instance.get_absolute_url }}comment/">Add your comment <span class="red">&raquo;</span></a></li>
+        </ul>
+    </div>
 </div>

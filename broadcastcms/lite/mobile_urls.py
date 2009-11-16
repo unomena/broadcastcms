@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.conf.urls.defaults import *
 from django.shortcuts import render_to_response
@@ -26,7 +28,7 @@ competition_list_params = {
     'template_name': 'mobile/content/competitions/competitions.html',
 }
 event_list_params = {
-    'queryset' : Entry.objects.permitted().upcoming().by_content_type(Event).order_by('start'),
+    'queryset' : Entry.objects.permitted().by_content_type(Event).order_by('start').filter(start__gte=datetime.datetime.now()),
     'allow_empty': True,
     'paginate_by': 5,
     'template_name': 'mobile/content/events/events.html',
@@ -48,38 +50,46 @@ news_list_params = {
 
 # Url patterns
 urlpatterns = patterns('',
+    
+    # Accounts
+    (r'account/sign-in/$', account_login),
+    (r'account/sign-out/$', account_logout),
+    
     # Competition
     (r'competition/$', object_list, competition_list_params),
     (r'competition/rules/$', direct_to_template, {'template':'mobile/content/competitions/competition-rules.html'}),
     (r'competition/(?P<page>[0-9]+)/$', object_list, competition_list_params),
-    (r'competition/(?P<slug>[\w-]+)/$', custom_object_detail, {'template': 'mobile/content/competitions/competition-details.html', 'classname': 'Competition'}),
+    (r'competition/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Competition'}),
+    (r'competition/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Competition', 'comment_add': True}),
     
     # Event
     (r'event/$', object_list, event_list_params),
     (r'event/(?P<page>[0-9]+)/$', object_list, event_list_params),
+    (r'event/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Event'}),
+    (r'event/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Event', 'comment_add': True}),
     
     # Gallery
     (r'gallery/$', object_list, gallery_list_params),
     (r'gallery/(?P<page>[0-9]+)/$', object_list, gallery_list_params),
+    (r'gallery/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Gallery'}),
+    (r'gallery/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Post', 'comment_add': True}),
     
     # News
     (r'news/$', object_list, news_list_params),
     (r'news/(?P<page>[0-9]+)/$', object_list, news_list_params),
-    (r'news/(?P<slug>[\w-]+)/$', custom_object_detail, {'template': 'mobile/content/news/news-article.html', 'classname': 'Post'}),
+    (r'news/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Post'}),
+    (r'news/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Post', 'comment_add': True}),
     
     # Shows and DJ pages
     #(r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', content_details, {'mode':'djcontent'}),
     (r'show/$', shows_line_up),
     (r'show/(?P<dj_slug>[\w-]+)/$', shows_dj_blog),
+    (r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', custom_object_detail),
     (r'show/lineup/(?P<weekday>[\w-]+)/$', shows_line_up),
     
     # Contact
     (r'contact/(?P<dj_slug>[\w-]+)/$', contact),
     (r'contact/$', contact),
-    
-    # Accounts
-    (r'account/sign-in/$', account_login),
-    (r'account/sign-out/$', account_logout),
     
     # Foooter links
     (r'privacy/$', direct_to_template, {'template':'mobile/content/footer/privacy.html'}),

@@ -11,6 +11,7 @@ from broadcastcms.base.models import ContentBase
 from broadcastcms.calendar.models import Entry
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.radio.models import Song
+from broadcastcms.lite.forms import make_competition_form
 
 register = template.Library()
 
@@ -170,6 +171,23 @@ def comments(parser, token):
     return CommentsNode(instance)
 
 
+class CommentsAddFormNode(template.Node):
+    def __init__(self, instance):
+        self.instance = template.Variable(instance)
+    
+    def render(self, context):
+        instance = self.instance.resolve(context)
+        context.update({
+            'instance': instance,
+        })
+        return render_to_string('mobile/inclusion_tags/misc/post-comment.html', context)
+
+@register.tag
+def comments_add_form(parser, token):
+    tag, instance = token.split_contents()
+    return CommentsAddFormNode(instance)
+
+
 class DJHeaderNode(template.Node):
     def render(self, context):
         obj = context['obj']
@@ -189,3 +207,27 @@ class DJHeaderNode(template.Node):
 @register.tag
 def dj_header(parser, token):
     return DJHeaderNode()
+
+
+class CompetitionEnterNode(template.Node):
+    def render(self, context):
+        obj = context['obj']
+        form_class = make_competition_form(obj)
+        request = context['request']
+        if request.POST:
+            form = form_class(request.POST)
+            if form.is_valid():
+                form.create_entry(self, request.user)
+        else:
+            form = form_class()
+
+        context.update({
+            'obj': obj,
+            'form': form,
+        })
+        return render_to_string('mobile/inclusion_tags/competitions/competition-entry-form.html', context)
+    
+@register.tag
+def competition_entry_form(parser, token):
+    return CompetitionEnterNode()
+    
