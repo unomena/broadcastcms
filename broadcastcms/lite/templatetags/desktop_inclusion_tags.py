@@ -142,6 +142,7 @@ def home_advert(parser, token):
     return HomeAdvertNode()
 
 class HomeAdvertNode(template.Node):
+    @cache_view_function(10*10)
     def render(self, context):
         """
         Render a single advertising banner as specified in the Settings 
@@ -157,6 +158,7 @@ def features(parser, token):
     return FeaturesNode()
 
 class FeaturesNode(template.Node):
+    @cache_view_function(10*10)
     def render(self, context):
         """
         Renders the homepage features box. Content is featured by labeling it
@@ -220,6 +222,7 @@ class OnAirNode(template.Node):
         credits = show.credits.all().filter(castmember__is_public=True).order_by('role')
         return credits[0].castmember if credits else None
     
+    @cache_view_function(2*10)
     def render(self, context):
         """
         Renders the homepage On Air box containing details on the
@@ -296,6 +299,7 @@ class SlidingUpdatesNode(template.Node):
 
         return panels
 
+    @cache_view_function(10*10, respect_path=True)
     def render(self, context):
         """
         Renders update box containing sliding panels, which contain
