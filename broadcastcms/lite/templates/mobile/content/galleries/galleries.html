@@ -1,20 +1,28 @@
 {% extends "mobile/sections/base.html" %}
-{% load mobile_inclusion_tags %}
+{% load scaled_image_tags %}
 
 {% block content_body %}
-       <h2>Galleries</h2>
-		<div class="section">
-			<div class="abstract">
-				<a href="gallery.html"><img src="pics/content/1.jpg" class="thumb" /></a>
-				<div class="tag">30 Sep '09</div>
-				<h3><a href="gallery.html">Glastonbury Festival 2009</a></h3>
-			</div>
-			<hr />
-		</div>
-		<div class="filter">
-			<ul>
-				<li><a href="#">See More <span class="red">&raquo;</span></a></li>
-			</ul>
-		</div>
+    <h2>Galleries</h2>
+     <div class="section">
+        {% for obj in object_list %}
+         <div class="abstract">
+             <a href="{{ obj.get_absolute_url }}"><img src="{% scaled_image_url obj 55 55 %}" class="thumb" /></a>
+             <div class="tag">{{ obj.created|date:"d N 'y" }}</div>
+             <h3><a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a></h3>
+         </div>
+         {% if not forloop.last %}<hr />{% endif %}
+         {% endfor %}
+     </div>
+     {% if is_paginated %}
+     <div class="filter">
+         <ul>
+             <li>
+                 {% if has_previous %}<a href="/gallery/{{ previous }}/"><span class="red">&laquo;</span> Go Back</a>{% endif %}
+                 {% if has_next and has_previous %} &nbsp; | &nbsp; {% endif %}
+                 {% if has_next %}<a href="/gallery/{{ next }}/">See More <span class="red">&raquo;</span></a>{% endif %}
+             </li>
+         </ul>
+     </div>
+     {% endif %}
 {% endblock %}
 {% block galleries_active %}class="active_lnk"{% endblock %}
