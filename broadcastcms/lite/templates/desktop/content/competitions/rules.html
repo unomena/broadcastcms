@@ -2,18 +2,9 @@
 {% load desktop_inclusion_tags %}
 
 {% block left %}
-    <div class="page_head">
-	    <h1>Win &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
-		<div class="page_menu">
-		    <h2>General Competition Rules</h2>
-		    <ul>
-		        <li><span class="pm_left"></span><a href="{% url competitions %}">Current Competitions</a><span class="pm_right"></span></li>
-			    {% if settings.competition_general_rules %}<li class="on"><span class="pm_left"></span><a href="{% url competitions_rules %}">General Competition Rules</a><span class="pm_right"></span></li>{% endif %}
-		    </ul>
-	    </div>
-	</div><!--/head-->
+    {{ header.render }}
 	<div class="page_container rich">
-        <p>
+	    <p>
             {{ settings.competition_general_rules|safe }}
         </p>
 	</div><!--/container-->
