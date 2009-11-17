@@ -465,7 +465,7 @@ def advert(parser, token):
     return AdvertNode()
 
 class AdvertNode(template.Node):
-    @cache_view_function(10*10)
+    @cache_view_function(10*10, respect_path=True)
     def render(self, context):
         section = context['section']
         settings = context['settings']
