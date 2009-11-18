@@ -1,0 +1,41 @@
+{% extends "desktop/sections/base_section.html" %}
+
+{% load desktop_inclusion_tags %}
+{% load friends_tags %}
+
+{% block left %}
+    {% account_menu %}
+    {% account_thanks %}
+    
+    <div class="page_form">
+        <form action="{% url account_friends_find %}" method="get">
+            <div class="page_form_row">
+                <label for="q">Who are you looking for?</label>
+                <p class="text_input shift">
+                    <input type="text" name="q" value="{{ request.GET.q }}" />
+                </p>
+                <p class="note">
+                    You can search for nicknames, first names, or surnames.
+                </p>
+                <p class="btn">
+                    <input type="submit" value="Search" />
+                </p>
+            </div>
+        </form>
+        {% if users %}
+            {% for user in users %}
+                <div>
+                    <p>{{ user.username }}</p>
+                    <form action="{% url account_friends_add %}" method="post">
+                        <input type="hidden" name="user_id" value="{{ user.id }}" />
+                        <input type="submit" value="make friends" />
+                    </form>
+                    {% friendship_status request.user user as status %}
+                    {% ifequal status "Sent" %}
+                        <p>Friendship request sent</p>
+                    {% endifequal %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

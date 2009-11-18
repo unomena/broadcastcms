@@ -5,6 +5,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 
+from user_messages.models import Thread
+
 from broadcastcms.calendar.models import Entry
 from broadcastcms.show.models import Credit, Show
 from broadcastcms.base.models import ContentBase, ModelBase
@@ -37,6 +39,7 @@ class AccountLinksNode(template.Node):
         context.update({
             'user': user,
             'profile': profile,
+            'fb_authenticated': request.fb_authenticated,
         })
         return render_to_string('desktop/inclusion_tags/skeleton/account_links.html', context)
 
@@ -420,6 +423,11 @@ def account_menu(parser, token):
 class AccountMenuNode(template.Node):
     def render(self, context):
         request = context['request']
+        
+        messages = Thread.objects.unread(request.user).count()
+        msg = "Messages"
+        if messages:
+            msg += " (%s)" % messages
 
         menu_items = [{
                 'title': 'Profile',
@@ -435,6 +443,16 @@ class AccountMenuNode(template.Node):
                 'title': 'Subscriptions',
                 'section': 'subscriptions',
                 'url': reverse('account_subscriptions'),
+            },
+            {
+                'title': 'Find Friends',
+                'section': 'friends',
+                'url': reverse('account_friends_find'),
+            },
+            {
+                'title': msg,
+                'section': 'messages',
+                'url': reverse('messages_inbox'),
             },
         ]
         account_section = request.path.split('/')[-2]
@@ -538,3 +556,93 @@ class UpdatesNode(SlidingUpdatesNode):
             'instances': instances,
         })
         return render_to_string('desktop/inclusion_tags/widgets/updates.html', context)
+
+# Shows
+
+@register.tag
+def dj_header(parser, token):
+    return DJHeaderNode()
+
+class DJHeaderNode(template.Node):
+    def get_sections(self, request, castmember):
+        sections = [
+        {
+            'slug': 'blog',
+            'title': 'Blog',
+            'url': reverse('shows_dj_blog', kwargs={'slug': castmember.slug}),
+        },
+        {
+            'slug': 'profile',
+            'title': 'Profile',
+            'url': reverse('shows_dj_profile', kwargs={'slug': castmember.slug}),
+        },
+        #{
+        #    'slug': 'contact',
+        #    'title': 'Contact',
+        #    'url': 'test',
+        #},
+        #{
+        #    'slug': 'appearances',
+        #    'title': 'Appearances',
+        #    'url': 'test',
+        #},
+        ]
+
+        current_section = request.path.split('/')[-2]
+        if current_section not in [s['slug'] for s in sections]:
+            current_section = 'blog'
+
+        for s in sections:
+            if current_section == s['slug']:
+                current_section = s
+                break
+
+        return sections, current_section
+
+    def render(self, context):
+        request = context['request']
+        castmember = context['castmember']
+        sections, current_section = self.get_sections(request, castmember)
+        
+        owner = castmember.owner
+        profile = owner.profile if owner else None
+
+        shows = castmember.show_set.permitted()
+        show_times = []
+        for show in shows:
+            show_times += show.show_times()
+            if len(show_times) > 2:
+                break
+        show_times =show_times[:2]
+
+        context.update({
+            'profile': profile,
+            'show_times': show_times,
+            'sections': sections,
+            'current_section': current_section,
+        })
+        return render_to_string('desktop/inclusion_tags/shows/dj_header.html', context)
+
+
+@register.tag
+def social_updates(parser, token):
+    return SocialUpdatesNode()
+
+
+class SocialUpdatesNode(template.Node):
+    
+    def render(self, context):
+        castmember = context['castmember']
+        
+        owner = castmember.owner
+        if owner:
+            profile = owner.profile
+        else:
+            profile = None
+        
+        if profile:
+            context.update({
+                'updates': profile.tweets(),
+            })
+        
+        return render_to_string('desktop/inclusion_tags/widgets/dj_social_updates.html', context)

@@ -1,12 +1,22 @@
 {% load scaled_image_tags %}
 <div class="page_head user">
-    <h1><span class="avatar"><img src="{% if profile.image %}{% scaled_image_url profile 41 41 %}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="41" height="41" alt="" /></span>{{ user.username }} &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
-	<div class="page_menu">
-	    <h2>{{ account_section.title }}</h2>
-		<ul>
+    <h1>
+        <span class="avatar">
+            {% if profile.facebook_id and profile.use_facebook_picture %}
+                <fb:profile-pic uid="{{ profile.faecbook_id }}" width="41" height="41" />
+            {% else %}
+                <img src="{% if profile.image %}{% scaled_image_url profile 41 41 %}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="41" height="41" alt="" />
+            {% endif %}
+        </span>
+        {{ user.username }} &nbsp;
+        <img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" />
+    </h1>
+    <div class="page_menu">
+        <h2>{{ account_section.title }}</h2>
+        <ul>
             {% for item in menu_items %}
-    			<li {% ifequal item.section account_section %}class="on"{% endifequal %}><span class="pm_left"></span><a href="{{ item.url }}">{{ item.title }}</a><span class="pm_right"></span></li>
+                <li {% ifequal item.section account_section %}class="on"{% endifequal %}><span class="pm_left"></span><a href="{{ item.url }}">{{ item.title }}</a><span class="pm_right"></span></li>
             {% endfor %}
-    	</ul>
-	</div>
+        </ul>
+    </div>
 </div><!--/head-->

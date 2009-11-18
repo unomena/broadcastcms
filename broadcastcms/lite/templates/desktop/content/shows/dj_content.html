@@ -1,0 +1,7 @@
+{% extends "desktop/content/shows/dj_base.html" %}
+{% load desktop_inclusion_tags public_tags %}
+
+{% block left %}
+    {% dj_header %}
+    {% call_view content render_article %}
+{% endblock %}

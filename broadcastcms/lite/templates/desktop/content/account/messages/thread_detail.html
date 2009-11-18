@@ -1,0 +1,25 @@
+{% extends "desktop/sections/base_section.html" %}
+
+{% load desktop_inclusion_tags %}
+
+{% block left %}
+    {% account_menu %}
+    {% account_thanks %}
+    
+    <div class="page_form">
+        <h2>{{ thread.subject }}</h2>
+        <ul>
+            {% for reply in thread.messages.all %}
+                <li>
+                    {{ reply.sender }} said {{ reply.content }}
+                </li>
+            {% endfor %}
+        </ul>
+        <form method="post" action="{{ thread.get_absolute_url }}">
+            <table>
+                {{ form }}
+            </table>
+            <input type="submit" />
+        </form>
+    </div>
+{% endblock %}

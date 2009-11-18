@@ -9,6 +9,7 @@
 
     <div class="mast_right">
         {% now_playing %}
+        {% block after_now_playing %}{% endblock %}
         {% advert %}
         {% updates %}
 	</div><!--/Mast_Right-->

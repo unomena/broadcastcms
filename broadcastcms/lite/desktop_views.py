@@ -4,12 +4,15 @@ import calendar
 from django.conf import settings
 from django.contrib import auth
 from django.contrib import comments
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.comments import signals
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.sites.models import Site
+from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import Q
 from django.forms.util import ValidationError
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
@@ -17,6 +20,8 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.views.generic import list_detail
+
+from friends.models import FriendshipInvitation, Friendship
 
 from broadcastcms import public
 from broadcastcms.banner.models import CodeBanner, ImageBanner
@@ -207,6 +212,49 @@ def account_subscriptions(request):
         'form': form,
     })
     return render_to_response('desktop/content/account/subscriptions.html', context)
+
+@login_required
+def account_friends_find(request):
+    if request.GET.get('q'):
+        q = request.GET['q']
+        users = User.objects.filter(
+            Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) |
+            Q(username__icontains=q)
+        )
+    else:
+        users = None
+    return render_to_response('desktop/content/account/find_friends.html', {
+        'users': users,
+    }, context_instance=RequestContext(request))
+
+@login_required
+def account_friends_add(request):
+    if request.method == 'POST' and request.POST.get('user_id'):
+        user = get_object_or_404(User, pk=request.POST['user_id'])
+        inv = FriendshipInvitation.objects.create_friendship_request(request.user,
+            user)
+        ctx = {
+            "to_user": user,
+            "from_user": request.user,
+            "invitation": inv,
+            "site": Site.objects.get_current(),
+        }
+        subject = render_to_string("desktop/mailers/account/friend_request_subject.txt", ctx).strip()
+        body = render_to_string("desktop/mailers/account/friend_request_body.html", ctx)
+        send_mail(subject, body, settings.SERVER_EMAIL, [user.email])
+    return HttpResponseRedirect(request.META["HTTP_REFERER"])
+
+
+@login_required
+def account_friends(request):
+    friends = Friendship.objects.friends_for_user(request.user)
+    invitations = FriendshipInvitation.objects.invitations(request.user)
+    return render_to_response('desktop/content/account/friends.html', {
+        'friends': [o['friend'] for o in friends],
+        'invitations': invitations,
+    }, context_instance=RequestContext(request))
+
 
 # Chart
 
@@ -683,7 +731,10 @@ def modals_login(request):
     else:
         form = LoginForm()
 
-    return render_to_response('desktop/modals/login.html', {'form': form})
+    return render_to_response('desktop/modals/login.html', {
+        'form': form,
+        'FACEBOOK_API_KEY': getattr(settings, "FACEBOOK_API_KEY", None),
+    })
 
 def modals_content(request, slug):
     if not request.is_ajax():

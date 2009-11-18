@@ -1,0 +1,5 @@
+{{ from_user }} wants to be your friend.
+
+To confirm his friendship go to: {{ site.domain }}{% url account_friends_reply invitation.pk %}?response=a
+
+To decline his friendship go to: {{ site.domain }}{% url account_friends_reply invitation.pk %}?response=d

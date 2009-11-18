@@ -24,4 +24,5 @@ class Command(BaseCommand):
                 pass
             else:
                 generate = imp.load_module(name + '.generate', *params)
-                generate.generate() 
+
+                generate.generate()

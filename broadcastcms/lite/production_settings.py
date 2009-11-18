@@ -58,6 +58,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'broadcastcms.facebook_integration.middleware.FacebookConnectMiddleware',
     'broadcastcms.lite.middleware.URLSwitchMiddleware',
 )
 
@@ -72,6 +73,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'broadcastcms.lite.context_processors.settings',
     'broadcastcms.lite.context_processors.section',
     'broadcastcms.lite.context_processors.site',
+    'broadcastcms.lite.context_processors.facebook',
+    'broadcastcms.status.context_processors.current_status',
 )
 
 TEMPLATE_DIRS = (
@@ -93,11 +96,14 @@ INSTALLED_APPS = (
     'django.contrib.sites',
 
     'voting',
+    'friends',
+    'user_messages',
 
     'broadcastcms.banner',
     'broadcastcms.base',
     'broadcastcms.calendar',
     'broadcastcms.competition',
+    'broadcastcms.facebook_integration',
     'broadcastcms.gallery',
     'broadcastcms.event',
     'broadcastcms.label',
@@ -107,8 +113,14 @@ INSTALLED_APPS = (
     'broadcastcms.scaledimage',
     'broadcastcms.show',
     'broadcastcms.chart',
+    'broadcastcms.activity',
+    'broadcastcms.status',
     'broadcastcms.lite',
 )
+
+ABSOLUTE_URL_OVERRIDES = {
+    "user_messages.thread": lambda o: "/account/messages/thread/%s/" % o.pk
+}
 
 IMAGE_SCALES = {
     'base': {

@@ -1,20 +1,26 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 <head>
 	<title>Login - Broadcast CMS</title>
 </head>
 
 <body>
+    {# @@@ append locale for other languages, e.g. http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/es_LA #}
+    {% url facebook_success_login as facebook_login_success_url %}
 	<script type="text/javascript">
 	    $().ready(function() {
 	        bindForm();
     	});
+    	function fb_onlogin() {
+    	    window.location.reload();
+    	}
 	</script>
 	<div class="modal">
-	
 		<div class="modal_title">
 			<h1>Sign In</h1>
+			<fb:login-button onlogin="fb_onlogin();"></fb:login-button>
+			<!-- <input type="button" onclick="init_fb_login(); return false;" value="facebook login" /> -->
 			<p><a href="javascript: void(0);" onclick="tb_remove()" id="TB_closeWindowButton" class="close">Close</a></p>
 			<p class="modal_intro">Not Registered? <a href="{% url modals_register %}?height=580&amp;width=515" class="thickbox">Create your free profile now</a></p>
 		</div>
@@ -31,7 +37,13 @@
 				{% comment %}<li class="mb_link"><a href="{% url modals_password_reset %}?height=230&amp;width=499" class="thickbox">Forgot your Password?</a></li>{% endcomment %}
 			</ul>
 		</form>
-	
+		
+		{% if FACEBOOK_API_KEY %}
+		    <script type="text/javascript">
+                FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
+            </script>
+        {% endif %}
+	    
 	</div><!--/MODAL-->
 </body>
 </html>
