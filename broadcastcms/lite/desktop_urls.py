@@ -52,7 +52,7 @@ urlpatterns = patterns('',
     url(r'modals/password_reset/$', modals_password_reset, name='modals_password_reset'),
     url(r'modals/register/$', modals_register, name='modals_register'),
 
-    url(r'shows/line-up/$', shows_line_up, name='shows_line_up'),
+    url(r'shows/line-up/$', ShowsLineUp(), name='shows_line_up'),
     url(r'shows/(?P<slug>[\w-]+)/$', shows_dj_blog, name='shows_dj_blog'),
     url(r'shows/(?P<slug>[\w-]+)/profile/$', shows_dj_profile, name='shows_dj_profile'),
     url(r'shows/(?P<slug>[\w-]+)/contact/$', shows_dj_contact, name='shows_dj_contact'),
