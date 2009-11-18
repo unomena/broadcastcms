@@ -866,21 +866,22 @@ def studio_cam(request):
     return render_to_response('desktop/popups/studio_cam.html', context)
 
 # Shows
-def shows_line_up(request, template_name='desktop/generic/object_listing_block.html'):
-    queryset=Entry.objects.permitted().by_content_type(Show).order_by('start') 
-    header = utils.ShowsHeader(request)
-    queryset_modifiers = [header.page_menu.queryset_modifier,]
-    for queryset_modifier in queryset_modifiers:
-        queryset = queryset_modifier.updateQuery(queryset)
+class ShowsLineUp(object):
+    def __call__(self, request, template_name='desktop/generic/object_listing_block.html'):
+        queryset = Entry.objects.permitted().by_content_type(Show).order_by('start')
+        header = utils.ShowsHeader(request)
+        queryset_modifiers = [header.page_menu.queryset_modifier,]
+        for queryset_modifier in queryset_modifiers:
+            queryset = queryset_modifier.updateQuery(queryset)
 
-    return list_detail.object_list(
-        request=request,
-        queryset=queryset,
-        template_name=template_name,
-        extra_context={
-            'header': header,
-        },
-    )
+        return list_detail.object_list(
+            request=request,
+            queryset=queryset,
+            template_name=template_name,
+            extra_context={
+                'header': header,
+            },
+        )
 
 def shows_dj_appearances(request, slug):
     return none

@@ -155,10 +155,11 @@ class PageMenu(object):
 
     @property
     def active_item(self):
+        get_value = self.get_value
         for item in self.items:
             active = False
             if item.has_key('get_value'):
-                if self.get_value == item['get_value']:
+                if get_value == item['get_value']:
                     active = True
                 else:
                     active = False
@@ -181,11 +182,19 @@ class PageMenu(object):
                 
     @property
     def title(self):
-        return self.active_item['title'] if self.active_item else None
+        active_item = self.active_item
+        if active_item:
+            return active_item['title']
+        else:
+            return None
 
     @property
     def queryset_modifier(self):
-        return self.active_item['queryset_modifier'](self.active_item['get_value']) if self.active_item else None
+        active_item = self.active_item
+        if active_item:
+            return active_item['queryset_modifier'](active_item['get_value']) 
+        else:
+            return None
        
     def render(self):
         return render_to_string('desktop/menus/generic.html', {'object': self})
@@ -210,7 +219,11 @@ class ChartPageMenu(PageMenu):
     
     @property
     def queryset_modifier(self):
-        return self.active_item['queryset_modifier'](self.active_item['get_value'], self.page_length) if self.active_item else None
+        active_item = self.active_item
+        if active_item:
+            return active_item['queryset_modifier'](active_item['get_value'], self.page_length)
+        else:
+            return None
 
 
 class CompetitionsPageMenu(PageMenu):
@@ -270,11 +283,12 @@ class EntryWeekPageMenu(PageMenu):
     @property
     def title(self):
         today = str(calendar.day_name[datetime.now().weekday()]).lower()
-        if self.active_item:
-            if self.active_item['get_value'] == today:
+        active_item = self.active_item
+        if active_item:
+            if active_item['get_value'] == today:
                 return 'Today'
             else:
-                return self.active_item['get_value'].title
+                return active_item['get_value'].title
 
 
 class OrderPageMenu(PageMenu):
