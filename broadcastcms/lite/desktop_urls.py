@@ -55,6 +55,8 @@ urlpatterns = patterns('',
     url(r'shows/line-up/$', shows_line_up, name='shows_line_up'),
     url(r'shows/(?P<slug>[\w-]+)/$', shows_dj_blog, name='shows_dj_blog'),
     url(r'shows/(?P<slug>[\w-]+)/profile/$', shows_dj_profile, name='shows_dj_profile'),
+    url(r'shows/(?P<slug>[\w-]+)/contact/$', shows_dj_contact, name='shows_dj_contact'),
+    url(r'shows/(?P<slug>[\w-]+)/appearances/$', shows_dj_appearances, name='shows_dj_appearances'),
     url(r'shows/(?P<castmember_slug>[\w-]+)/(?P<content_slug>[\w-]+)/$', shows_dj_content, name='shows_dj_content'),
 
     url(r'search-results/$', search_results, name='search_results'),

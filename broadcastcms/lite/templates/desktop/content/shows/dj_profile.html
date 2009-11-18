@@ -2,9 +2,9 @@
 {% load desktop_inclusion_tags %}
 
 {% block left %}
-    {% dj_header %}
+    {{ header.render }}
 	<div class="page_container rich">
-		<p>
+	    <p>
             {{ castmember.content|safe }}
         </p>
 	</div><!--/container-->

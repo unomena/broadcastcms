@@ -1,0 +1,8 @@
+<div class="page_menu">
+    <h2>{{ object.title }}</h2>
+	<ul>
+        {% for item in object.items %}
+	        <li {% ifequal item object.active_item %}class="on"{% endifequal %}><span class="pm_left"></span><a href="{{ item.url }}">{{ item.title }}</a><span class="pm_right"></span></li>
+        {% endfor %}
+	</ul>
+</div>

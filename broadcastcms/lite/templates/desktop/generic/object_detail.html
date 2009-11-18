@@ -1,6 +1,6 @@
 {% extends "desktop/generic/base_generic.html" %}
-{% load desktop_inclusion_tags scaled_image_tags public_tags %}
+{% load public_tags %}
 
-{% block generic %}	
-    {% call_view object render_article %}
+{% block generic %}
+    {% call_view object.as_leaf_class render_article %}
 {% endblock %}

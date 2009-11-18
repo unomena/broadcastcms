@@ -225,8 +225,8 @@ class ChartView(object):
     def __call__(self, request, template_name='desktop/generic/object_listing_wide.html'):
         queryset=self.get_latest_chart_entries() 
         chart = self.get_latest_chart()
-        page_menu=utils.ChartPageMenu(request, chart)
-        queryset_modifiers = [page_menu.queryset_modifier,]
+        header = utils.ChartHeader(request, chart)
+        queryset_modifiers = [header.page_menu.queryset_modifier,]
         for queryset_modifier in queryset_modifiers:
             queryset = queryset_modifier.updateQuery(queryset)
 
@@ -235,9 +235,7 @@ class ChartView(object):
             queryset=queryset,
             template_name=template_name,
             extra_context={
-                'page_title': chart.title,
-                'page_menu': page_menu,
-                'header_includes': ['desktop/includes/charts/header.html',]
+                'header': header,
             },
         )
 
@@ -245,7 +243,7 @@ class ChartView(object):
 
 def competitions(request, template_name='desktop/generic/object_listing_wide.html'):
     queryset = Competition.permitted.order_by('-created')
-    page_menu = utils.CompetitionsPageMenu(request)
+    header = utils.CompetitionsHeader(request)
 
     return list_detail.object_list(
         request=request,
@@ -253,8 +251,7 @@ def competitions(request, template_name='desktop/generic/object_listing_wide.htm
         template_name=template_name,
         paginate_by=10,
         extra_context={
-            'page_title': 'Win',
-            'page_menu': page_menu,
+            'header': header,
         },
     )
 
@@ -262,11 +259,16 @@ def competitions_rules(request):
     context = RequestContext(request, {})
     if not context['settings'].competition_general_rules:
         raise Http404
+   
+    header = utils.CompetitionsHeader(request)
+    context.update({
+        'header': header,
+    })
     return render_to_response('desktop/content/competitions/rules.html', context)
 
 def competitions_content(request, slug, template_name='desktop/generic/object_detail.html'):
     queryset = Competition.permitted
-    page_menu = utils.CompetitionsPageMenu(request)
+    header = utils.CompetitionHeader()
 
     return list_detail.object_detail(
         request=request,
@@ -274,8 +276,7 @@ def competitions_content(request, slug, template_name='desktop/generic/object_de
         slug=slug,
         template_name=template_name,
         extra_context={
-            'page_title': 'Win',
-            'page_menu': page_menu,
+            'header': header,
         },
     )
 
@@ -423,8 +424,8 @@ def validate_captcha(request):
 # Galleries
 def galleries(request, template_name='desktop/generic/object_listing_block.html'):
     queryset=Gallery.permitted.all()
-    page_menu=utils.OrderPageMenu(request)
-    queryset_modifiers = [page_menu.queryset_modifier,]
+    header = utils.GalleriesHeader(request)
+    queryset_modifiers = [header.page_menu.queryset_modifier,]
     for queryset_modifier in queryset_modifiers:
         queryset = queryset_modifier.updateQuery(queryset)
 
@@ -434,19 +435,23 @@ def galleries(request, template_name='desktop/generic/object_listing_block.html'
         template_name=template_name,
         paginate_by=15,
         extra_context={
-            'page_title': 'Galleries',
-            'page_menu': page_menu,
+            'header': header,
         },
     )
 
-def galleries_content(request, slug):
-    content = get_object_or_404(Gallery, slug=slug, is_public=True)
-    context = RequestContext(request, {})
-    
-    context.update({
-        'content': content,
-    })
-    return render_to_response('desktop/content/galleries/content.html', context)
+def galleries_content(request, slug, template_name='desktop/generic/object_detail.html'):
+    queryset = Gallery.permitted
+    header = utils.GalleryHeader()
+
+    return list_detail.object_detail(
+        request=request,
+        queryset=queryset,
+        slug=slug,
+        template_name=template_name,
+        extra_context={
+            'header': header,
+        },
+    )
 
 # Misc
 def account_links(request):
@@ -760,8 +765,8 @@ def modals_password_reset(request):
 # News
 def news(request, template_name='desktop/generic/object_listing_wide.html'):
     queryset=Post.permitted.all()
-    page_menu=utils.OrderPageMenu(request)
-    queryset_modifiers = [page_menu.queryset_modifier,]
+    header = utils.NewsHeader(request)
+    queryset_modifiers = [header.page_menu.queryset_modifier,]
     for queryset_modifier in queryset_modifiers:
         queryset = queryset_modifier.updateQuery(queryset)
 
@@ -771,20 +776,23 @@ def news(request, template_name='desktop/generic/object_listing_wide.html'):
         template_name=template_name,
         paginate_by=10,
         extra_context={
-            'page_title': 'News',
-            'page_menu': page_menu,
+            'header': header,
         },
     )
 
-def news_content(request, slug):
-    content = get_object_or_404(ContentBase, slug=slug, is_public=True)
-    content = content.as_leaf_class()
-    context = RequestContext(request, {})
-    
-    context.update({
-        'content': content,
-    })
-    return render_to_response('desktop/content/news/content.html', context)
+def news_content(request, slug, template_name='desktop/generic/object_detail.html'):
+    queryset = ContentBase.permitted
+    header = utils.NewsArticleHeader()
+
+    return list_detail.object_detail(
+        request=request,
+        queryset=queryset,
+        slug=slug,
+        template_name=template_name,
+        extra_context={
+            'header': header,
+        },
+    )
 
 # Popups     
 def listen_live(request):
@@ -809,8 +817,8 @@ def studio_cam(request):
 # Shows
 def shows_line_up(request, template_name='desktop/generic/object_listing_block.html'):
     queryset=Entry.objects.permitted().by_content_type(Show).order_by('start') 
-    page_menu=utils.EntryWeekPageMenu(request)
-    queryset_modifiers = [page_menu.queryset_modifier,]
+    header = utils.ShowsHeader(request)
+    queryset_modifiers = [header.page_menu.queryset_modifier,]
     for queryset_modifier in queryset_modifiers:
         queryset = queryset_modifier.updateQuery(queryset)
 
@@ -819,45 +827,57 @@ def shows_line_up(request, template_name='desktop/generic/object_listing_block.h
         queryset=queryset,
         template_name=template_name,
         extra_context={
-            'page_title': 'Shows &amp; DJs',
-            'page_menu': page_menu,
+            'header': header,
         },
     )
 
-def shows_dj_blog(request, slug):
+def shows_dj_appearances(request, slug):
+    return none
+
+def shows_dj_blog(request, slug, template_name='desktop/generic/object_listing_wide.html'):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
-    context = RequestContext(request, {})
+    owner = castmember.owner 
+    queryset = ContentBase.permitted.filter(owner=owner).exclude(classname__in=['CastMember', 'Show']).order_by("-created") if owner else []
+    header = utils.CastMemberHeader(request, castmember)
 
-    owner = castmember.owner
-    instances = ContentBase.permitted.filter(owner=owner).exclude(classname__in=['CastMember', 'Show']).order_by("-created") if owner else []
-    pager = utils.paging(instances, 'page', request, 10)
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        paginate_by=10,
+        extra_context={
+            'header': header,
+        },
+    )
 
-    context.update({
-        'castmember': castmember,
-        'pager': pager,
-    })
-    return render_to_response('desktop/content/shows/dj_blog.html', context)
+def shows_dj_contact(request, slug):
+    return none
 
 def shows_dj_profile(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
     context = RequestContext(request, {})
 
+    header = utils.CastMemberHeader(request, castmember)
     context.update({
+        'header': header,
         'castmember': castmember,
     })
     return render_to_response('desktop/content/shows/dj_profile.html', context)
 
-def shows_dj_content(request, castmember_slug, content_slug):
+def shows_dj_content(request, castmember_slug, content_slug, template_name='desktop/generic/object_detail.html'):
     castmember = get_object_or_404(CastMember, slug=castmember_slug, is_public=True)
-    content = get_object_or_404(ContentBase, slug=content_slug, is_public=True)
-    content = content.as_leaf_class()
-    context = RequestContext(request, {})
+    queryset = ContentBase.permitted
+    header = utils.CastMemberHeader(request, castmember)
 
-    context.update({
-        'castmember': castmember,
-        'content': content,
-    })
-    return render_to_response('desktop/content/shows/dj_content.html', context)
+    return list_detail.object_detail(
+        request=request,
+        queryset=queryset,
+        slug=content_slug,
+        template_name=template_name,
+        extra_context={
+            'header': header,
+        },
+    )
 
 # Model Views
 class CodeBannerViews(object):

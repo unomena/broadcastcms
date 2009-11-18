@@ -3,6 +3,7 @@ from datetime import date, datetime
 
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
+from django.template.loader import render_to_string
     
 from voting.models import Vote
 
@@ -63,6 +64,7 @@ class Sorter(object):
 
             self.object_list = self.sorter['sorter'](self.object_list)
 
+
 class EventSorter(Sorter):
     sorters = [
         {
@@ -81,7 +83,8 @@ class EventSorter(Sorter):
 class QuerysetModifier(object):
     def __init__(self, get_value):
         self.get_value = get_value
-        
+
+
 class EntryWeekQuerysetModifier(QuerysetModifier):
     def updateQuery(self, queryset):
         days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -93,6 +96,8 @@ class EntryWeekQuerysetModifier(QuerysetModifier):
             offset = 0
 
         return queryset.day(offset)
+
+
 class ChartQuerysetModifier(QuerysetModifier):
     def __init__(self, get_value, page_length):
         self.page_length = page_length
@@ -100,6 +105,7 @@ class ChartQuerysetModifier(QuerysetModifier):
 
     def updateQuery(self, queryset):
         return queryset[int(self.get_value): int(self.get_value) + self.page_length]
+
 
 class MostLikedQuerysetModifier(QuerysetModifier):
     def updateQuery(self, queryset):
@@ -111,10 +117,12 @@ class MostLikedQuerysetModifier(QuerysetModifier):
         queryset = queryset.order_by('-score', '-created')
         return queryset
 
+
 class MostRecentQuerysetModifier(QuerysetModifier):
     def updateQuery(self, queryset):
         return queryset.order_by("-created")
-    
+
+
 class PageMenu(object):
     request_key = None
 
@@ -122,7 +130,10 @@ class PageMenu(object):
         self.request = request
         for item in self.items:
             if item.has_key('view_name'):
-                item['path'] = reverse(item['view_name'])
+                if item.has_key('view_kwargs'):
+                    item['path'] = reverse(item['view_name'], kwargs=item['view_kwargs'])
+                else:
+                    item['path'] = reverse(item['view_name'])
             item['url'] = ''
             if item.has_key('path'):
                 item['url'] += item['path']
@@ -175,7 +186,11 @@ class PageMenu(object):
     @property
     def queryset_modifier(self):
         return self.active_item['queryset_modifier'](self.active_item['get_value']) if self.active_item else None
-        
+       
+    def render(self):
+        return render_to_string('desktop/menus/generic.html', {'object': self})
+
+
 class ChartPageMenu(PageMenu):
     request_key = 'page'
     page_length = 10
@@ -197,6 +212,7 @@ class ChartPageMenu(PageMenu):
     def queryset_modifier(self):
         return self.active_item['queryset_modifier'](self.active_item['get_value'], self.page_length) if self.active_item else None
 
+
 class CompetitionsPageMenu(PageMenu):
     items = [
         {
@@ -208,7 +224,38 @@ class CompetitionsPageMenu(PageMenu):
             'view_name': 'competitions_rules',
         }
     ]
-                
+
+
+class CastMemberPageMenu(PageMenu):
+    def __init__(self, request, castmember):
+        self.items = [
+            {
+                'title': 'Blog',
+                'view_name': 'shows_dj_blog',
+                'view_kwargs': {'slug': castmember.slug},
+            },
+            {
+                'title': 'Profile',
+                'view_name': 'shows_dj_profile',
+                'view_kwargs': {'slug': castmember.slug},
+            },
+            #{
+            #    'title': 'Contact',
+            #    'view_name': 'shows_dj_contact',
+            #    'view_kwargs': {'slug': castmember.slug},
+            #},
+            #{
+            #    'title': 'Appearances',
+            #    'view_name': 'shows_dj_appearances',
+            #    'view_kwargs': {'slug': castmember.slug},
+            #}
+        ]
+        super(CastMemberPageMenu, self).__init__(request)
+
+    def render(self):
+        return render_to_string('desktop/menus/generic.html', {'object': self})
+
+
 class EntryWeekPageMenu(PageMenu):
     request_key = 'day'
     items = [
@@ -229,6 +276,7 @@ class EntryWeekPageMenu(PageMenu):
             else:
                 return self.active_item['get_value'].title
 
+
 class OrderPageMenu(PageMenu):
     request_key = 'order-by'
     items = [
@@ -243,3 +291,104 @@ class OrderPageMenu(PageMenu):
             'queryset_modifier': MostLikedQuerysetModifier,
         }
     ]
+
+
+class Header(object):
+    @property
+    def render_context(self):
+        return {
+            'page_title': self.page_title,
+            'page_menu': self.page_menu,
+        }
+        
+    def render(self):
+        return render_to_string('desktop/headers/generic.html', self.render_context)
+
+
+class CastMemberHeader(Header):
+    page_title = 'Shows &amp; DJs'
+
+    def __init__(self, request, castmember):
+        self.castmember = castmember
+        self.page_menu = CastMemberPageMenu(request, castmember)
+    
+    def render(self):
+        # collect context variables
+        context = self.render_context
+        castmember = self.castmember
+        owner = castmember.owner
+        profile = owner.profile if owner else None
+        
+        # build show times
+        shows = castmember.show_set.permitted()
+        show_times = []
+        for show in shows:
+            show_times += show.show_times()
+            if len(show_times) > 2:
+                break
+        show_times =show_times[:2]
+
+        # update context
+        context.update({
+            'castmember': self.castmember,
+            'profile': profile,
+            'show_times': show_times,
+        })
+
+        return render_to_string('desktop/headers/castmember.html', context)
+
+
+class ChartHeader(Header):
+    def __init__(self, request, chart):
+        self.page_title = chart.title
+        self.page_menu = ChartPageMenu(request, chart)
+
+    @property
+    def render_context(self):
+        context = super(ChartHeader, self).render_context
+        context.update({
+            'header_includes': ['desktop/includes/charts/header.html',]
+        })
+        return context
+
+
+class CompetitionsHeader(Header):
+    page_title = 'Win' 
+    def __init__(self, request): 
+        self.page_menu = CompetitionsPageMenu(request)
+
+
+class CompetitionHeader(CompetitionsHeader):
+    def __init__(self):
+        self.page_menu = None
+
+
+class GalleriesHeader(Header):
+    page_title = 'Galleries'
+    
+    def __init__(self, request):
+        self.page_menu = OrderPageMenu(request)
+
+
+class GalleryHeader(GalleriesHeader):
+    def __init__(self):
+        self.page_menu = None
+
+
+class NewsHeader(Header):
+    page_title = 'News'
+    
+    def __init__(self, request):
+        self.page_menu = OrderPageMenu(request)
+
+
+class NewsArticleHeader(NewsHeader):
+    def __init__(self):
+        self.page_menu = None
+
+
+class ShowsHeader(Header):
+    page_title = 'Shows &amp; DJs'
+    
+    def __init__(self, request):
+        self.page_menu = EntryWeekPageMenu(request)
