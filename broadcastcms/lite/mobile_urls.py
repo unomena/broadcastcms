@@ -84,9 +84,9 @@ urlpatterns = patterns('',
     #(r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', content_details, {'mode':'djcontent'}),
     (r'show/$', shows_line_up),
     (r'show/(?P<dj_slug>[\w-]+)/$', shows_dj_blog),
+    (r'show/lineup/(?P<weekday>[\w-]+)/$', shows_line_up),
     (r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', custom_object_detail),
     (r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'comment_add': True}),
-    (r'show/lineup/(?P<weekday>[\w-]+)/$', shows_line_up),
     
     # Contact
     (r'contact/(?P<dj_slug>[\w-]+)/$', contact),
