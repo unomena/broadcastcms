@@ -45,6 +45,7 @@ def masthead(parser, token):
     return MastheadNode()
 
 class MastheadNode(template.Node):
+    @cache_view_function(10*60, respect_path=True, respect_user=True)
     def render(self, context):
         """
         Renders the sitewide masthead, including site logo, site section links, search and account links.
@@ -71,6 +72,7 @@ def mastfoot(parser, token):
     return MastfootNode()
 
 class MastfootNode(template.Node):
+    @cache_view_function(10*60)
     def render(self, context):
         """
         Renders the sitewide footer.
@@ -127,6 +129,7 @@ def metrics(parser, token):
     return MetricsNode()
 
 class MetricsNode(template.Node):
+    @cache_view_function(10*60)
     def render(self, context):
         settings = context['settings']
         metrics = settings.metrics
@@ -142,6 +145,7 @@ def home_advert(parser, token):
     return HomeAdvertNode()
 
 class HomeAdvertNode(template.Node):
+    @cache_view_function(10*60)
     def render(self, context):
         """
         Render a single advertising banner as specified in the Settings 
@@ -157,6 +161,7 @@ def features(parser, token):
     return FeaturesNode()
 
 class FeaturesNode(template.Node):
+    @cache_view_function(10*60)
     def render(self, context):
         """
         Renders the homepage features box. Content is featured by labeling it
@@ -220,6 +225,7 @@ class OnAirNode(template.Node):
         credits = show.credits.all().filter(castmember__is_public=True).order_by('role')
         return credits[0].castmember if credits else None
     
+    @cache_view_function(2*60)
     def render(self, context):
         """
         Renders the homepage On Air box containing details on the
@@ -296,6 +302,7 @@ class SlidingUpdatesNode(template.Node):
 
         return panels
 
+    @cache_view_function(10*60, respect_path=True)
     def render(self, context):
         """
         Renders update box containing sliding panels, which contain
@@ -461,6 +468,7 @@ def advert(parser, token):
     return AdvertNode()
 
 class AdvertNode(template.Node):
+    @cache_view_function(10*60, respect_path=True)
     def render(self, context):
         section = context['section']
         settings = context['settings']
@@ -488,6 +496,7 @@ class NowPlayingNode(OnAirNode):
 
         return valid_entry
 
+    @cache_view_function(2*60)
     def render(self, context):
         # get the current on air show
         show_entry = self.get_public_on_air_entry(Show)
@@ -522,6 +531,7 @@ def updates(parser, token):
 
 class UpdatesNode(SlidingUpdatesNode):
         
+    @cache_view_function(10*60)
     def render(self, context):
         instances = [instance.as_leaf_class() for instance in self.get_instances(context['settings'])[:5]]
         context.update({
