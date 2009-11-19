@@ -1,0 +1,18 @@
+{% extends "mobile/sections/base.html" %}
+{% load mobile_inclusion_tags %}
+
+{% block content_body %}
+    <h2>Sign Up</h2>
+    <div class="section">
+        <div class="clear">&nbsp;</div>
+        <div id="article">
+            <form method="post" name="signin-form">
+                <ul>
+                    {{ form.as_p }}
+                </ul>
+                <p><input type="submit" value="Sign Up" /></p>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block account_active %}class="active_lnk"{% endblock %}
