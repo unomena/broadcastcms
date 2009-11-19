@@ -25,7 +25,21 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(attrs={'class':'required'}),
         error_messages={'required': 'Please enter a password.'}
     )
-
+    
+class MobileLoginForm(forms.Form):
+    username = forms.CharField(
+        max_length=30,
+        label='Username:',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter a username.'}
+    )
+    password = forms.CharField(
+        max_length=30, 
+        label='Password:',
+        widget=forms.PasswordInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter a password.'}
+    )
+    
 class RegistrationForm(forms.Form):
     username = formfields.UsernameField(
         max_length=100,
@@ -82,6 +96,99 @@ class RegistrationForm(forms.Form):
         widget=forms.CheckboxInput(attrs={'class':'required'}),
         error_messages={'required': 'Please accept our terms &amp; conditions</a> to complete registration.'}
     )
+    
+class MobileRegistrationForm(forms.Form):
+    first_name = forms.CharField(
+        max_length=30,
+        label='Name:',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter your name.'}
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        label='Surname:',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter your surname.'}
+    )
+    mobile_number = forms.CharField(
+        max_length=20,
+        label='Mobile (Int. Format: +2782 123 4567):',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter your mobile number.'}
+    )
+    email_address = forms.EmailField(
+        max_length=75,
+        label='Email:',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter your email address.'}
+    )
+    username = formfields.UsernameField(
+        max_length=30,
+        label='Alias:',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={
+            'required': 'Please enter a username.',
+            'invalid_length': 'Please enter at least 4 characters.',
+            'invalid_characters': 'Only letters, numbers and underscores.',
+            'existing': 'Sorry, that username already exists.',
+        }
+    )
+    password = formfields.PasswordField(
+        max_length=30,
+        label='Password:',
+        widget=forms.PasswordInput(attrs={'class':'text'}),
+        error_messages={
+            'required': 'Please enter a username.',
+            'invalid_length': 'Please enter at least 8 characters.',
+            'invalid_characters': 'Only letters, numbers and underscores.',
+        }
+    )
+    password_confirm = formfields.PasswordField(
+        label='Confirm Password:',
+        widget=forms.PasswordInput(attrs={'class':'text'}),
+        error_messages={
+            'required': 'Please confirm your new password.',
+            'invalid_length': 'Please enter at least 4 characters.',
+            'invalid_characters': 'Only letters, numbers and underscores.',
+        },
+        required=False,
+    )
+    email_subscribe = forms.BooleanField(
+        required=False,
+        label='',
+        help_text='Send Me Email Alerts',
+    )
+    sms_subscribe = forms.BooleanField(
+        required=False,
+        label='',
+        help_text='Send Me SMS Alerts',
+    )
+    accept_terms = forms.BooleanField(
+        label='',
+        help_text='I agree to the website <a href="/terms/">terms of use</a>',
+        error_messages={'required': 'Please accept our terms &amp; conditions to complete registration.'}
+    )
+
+    def is_valid(self):
+        # Base validate
+        valid = super(MobileRegistrationForm, self).is_valid()
+
+        # Validate image size
+        if not self._errors.has_key('password_confirm'):
+            try:
+                password_confirm = self.fields['password_confirm'].widget.value_from_datadict(self.data, self.files, self.add_prefix('password_confirm'))
+            except KeyError:
+                password_confirm = None
+            try:
+                password = self.fields['password'].widget.value_from_datadict(self.data, self.files, self.add_prefix('password'))
+            except KeyError:
+                password = None
+            if password and password_confirm:
+                if password != password_confirm:
+                    self._errors['password_confirm'] = ['Passwords do not match.',]
+                    valid = False
+
+        return valid
 
 class ProfileForm(forms.Form):
     username = formfields.UsernameField(
@@ -179,6 +286,93 @@ class ProfileForm(forms.Form):
     def is_valid(self):
         # Base validate
         valid = super(ProfileForm, self).is_valid()
+
+        # Validate image size
+        if not self._errors.has_key('password_confirm'):
+            try:
+                password_confirm = self.fields['password_confirm'].widget.value_from_datadict(self.data, self.files, self.add_prefix('password_confirm'))
+            except KeyError:
+                password_confirm = None
+            try:
+                password = self.fields['password'].widget.value_from_datadict(self.data, self.files, self.add_prefix('password'))
+            except KeyError:
+                password = None
+            if password and password_confirm:
+                if password != password_confirm:
+                    self._errors['password_confirm'] = ['Passwords do not match.',]
+                    valid = False
+
+        return valid
+    
+class MobileProfileForm(forms.Form):
+    first_name = forms.CharField(
+        max_length=30,
+        label='Name:',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter your name.'}
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        label='Surname:',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter your surname.'}
+    )
+    mobile_number = forms.CharField(
+        max_length=20,
+        label='Mobile (Int. Format: +2782 123 4567):',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter your mobile number.'}
+    )
+    email_address = forms.EmailField(
+        max_length=75,
+        label='Email:',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={'required': 'Please enter your email address.'}
+    )
+    username = formfields.UsernameField(
+        max_length=30,
+        label='Alias:',
+        widget=forms.TextInput(attrs={'class':'text'}),
+        error_messages={
+            'required': 'Please enter a username.',
+            'invalid_length': 'Please enter at least 4 characters.',
+            'invalid_characters': 'Only letters, numbers and underscores.',
+            'existing': 'Sorry, that username already exists.',
+        }
+    )
+    password = formfields.PasswordField(
+        max_length=30,
+        label='Password:',
+        widget=forms.PasswordInput(attrs={'class':'text'}),
+        error_messages={
+            'required': 'Please enter a username.',
+            'invalid_length': 'Please enter at least 8 characters.',
+            'invalid_characters': 'Only letters, numbers and underscores.',
+        }
+    )
+    password_confirm = formfields.PasswordField(
+        label='Confirm Password:',
+        widget=forms.PasswordInput(attrs={'class':'text'}),
+        error_messages={
+            'required': 'Please confirm your new password.',
+            'invalid_length': 'Please enter at least 4 characters.',
+            'invalid_characters': 'Only letters, numbers and underscores.',
+        },
+        required=False,
+    )
+    email_subscribe = forms.BooleanField(
+        required=False,
+        label='',
+        help_text='Send Me Email Alerts',
+    )
+    sms_subscribe = forms.BooleanField(
+        required=False,
+        label='',
+        help_text='Send Me SMS Alerts',
+    )
+    def is_valid(self):
+        # Base validate
+        valid = super(MobileProfileForm, self).is_valid()
 
         # Validate image size
         if not self._errors.has_key('password_confirm'):
