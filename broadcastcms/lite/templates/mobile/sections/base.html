@@ -16,7 +16,7 @@
 	<div id="header">
 		<div id="logo"><a href="/"><img src="/media/bcms/mobile/pics/header/logo.png" alt="Broadcast CMS" /></a></div>
 		{% if request.user.is_authenticated %}
-        <div id="header-tools"><a href="/account/sign-out/">Sign Out</a> &nbsp; | &nbsp; Hello {{ request.user.username|title }}</div>
+        <div id="header-tools">Hello <a href="/account/profile/">{{ request.user.username|title }}</a> &nbsp; | &nbsp;<a href="/account/sign-out/">Sign Out</a></div>
         {% else %}
         <div id="header-tools"><a href="/account/sign-in/">Sign In</a> &nbsp; | &nbsp; <a href="/account/sign-up/">Sign Up</a></div>
         {% endif %}
