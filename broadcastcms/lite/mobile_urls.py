@@ -54,6 +54,9 @@ urlpatterns = patterns('',
     # Accounts
     (r'account/sign-in/$', account_login),
     (r'account/sign-out/$', account_logout),
+    (r'account/sign-up/(?P<result>[\w-]+)/$', account_confirm),
+    (r'account/sign-up/$', account_register),
+    (r'account/profile/$', account_profile),
     
     # Competition
     (r'competition/$', object_list, competition_list_params),
