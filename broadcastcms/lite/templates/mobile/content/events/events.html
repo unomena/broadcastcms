@@ -7,6 +7,7 @@
     {% for obj in object_list %}
         {% ifchanged %}<h2>{{ obj.start|naturalday|title }}</h2>{% endifchanged %}
         <div class="section">
+            {% ifchanged obj.start|naturalday|title %}{% else %}<hr/>{% endifchanged %}
             <div class="abstract">
                 <a href="{{ obj.content.get_absolute_url }}"><img src="{% scaled_image_url obj.content 55 55 %}" class="thumb" /></a>
                 <div class="tag">
@@ -19,9 +20,12 @@
                 </div>
                 <h3><a href="{{ obj.content.get_absolute_url }}">{{ obj.content.description }}</a></h3>
             </div>
-            {% if not forloop.last %}<hr />{% endif %}
         </div>
     {% endfor %}
+    {% else %}
+        <div class="section">
+            There are no Upcoming Events.
+        </div>
     {% endif %}
     {% if is_paginated %}
     <div class="filter">

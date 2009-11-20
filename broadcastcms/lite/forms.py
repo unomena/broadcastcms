@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django import forms
 from django.contrib.sites.models import Site
+from django.contrib.comments.forms import CommentForm
 from django.core.mail import EmailMessage, mail_managers
 
 from broadcastcms.competition.models import CompetitionEntry
@@ -136,6 +137,7 @@ class MobileRegistrationForm(forms.Form):
     password = formfields.PasswordField(
         max_length=30,
         label='Password:',
+        initial = '',
         widget=forms.PasswordInput(attrs={'class':'text'}),
         error_messages={
             'required': 'Please enter a username.',
@@ -145,6 +147,7 @@ class MobileRegistrationForm(forms.Form):
     )
     password_confirm = formfields.PasswordField(
         label='Confirm Password:',
+        initial = '',
         widget=forms.PasswordInput(attrs={'class':'text'}),
         error_messages={
             'required': 'Please confirm your new password.',
@@ -168,7 +171,6 @@ class MobileRegistrationForm(forms.Form):
         help_text='I agree to the website <a href="/terms/">terms of use</a>',
         error_messages={'required': 'Please accept our terms &amp; conditions to complete registration.'}
     )
-
     def is_valid(self):
         # Base validate
         valid = super(MobileRegistrationForm, self).is_valid()
@@ -357,8 +359,7 @@ class MobileProfileForm(forms.Form):
             'required': 'Please confirm your new password.',
             'invalid_length': 'Please enter at least 4 characters.',
             'invalid_characters': 'Only letters, numbers and underscores.',
-        },
-        required=False,
+        }
     )
     email_subscribe = forms.BooleanField(
         required=False,
@@ -513,6 +514,43 @@ class _BaseContactForm(forms.Form):
         mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
         mail.send(fail_silently=False)
 
+class _BaseMobileContactForm(forms.Form):
+    
+    from_name = ''
+    from_email = ''
+    
+    def get_recipients(self):
+        current_site = Site.objects.get_current()
+        site_name = current_site.name
+        recipients = []
+        
+        settings = Settings.objects.all()
+        if settings:
+            contact_email_recipients = settings[0].contact_email_recipients
+            if contact_email_recipients:
+                split_recipients = [recipient.replace('\r', '') for recipient in contact_email_recipients.split('\n')]
+                for recipient in split_recipients:
+                    if recipient:
+                        recipients.append(recipient)
+
+        if not recipients:
+            mail_managers('Error: No email address specified', 'Users are trying to contact %s for which no contact email recipients are specified.' % site_name, fail_silently=False)
+        return recipients
+    
+    def send_message(self):
+        current_site = Site.objects.get_current()
+        site_name = current_site.name
+        
+        name = self.from_name
+        email = self.from_email
+        subject = "Contact message from %s: %s" % (site_name, self.cleaned_data['subject'])
+        message = self.cleaned_data['message']
+        recipients = self.get_recipients()
+        from_address = "%s <%s>" % (name, email)
+        
+        mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
+        mail.send(fail_silently=False)
+
 def make_contact_form(request):
     user = request.user
     if request.user.is_authenticated():
@@ -551,7 +589,56 @@ def make_contact_form(request):
                     if not ReCaptcha().verify(request):
                         self._errors['recaptcha_response_field'] = ['Incorrect, please try again.',]
                         valid = False
-
                 return valid
 
         return AnonymousContactForm
+    
+def make_mobile_contact_form(request):
+    user = request.user
+    if request.user.is_authenticated():
+        class AuthenticatedMobileContactForm(_BaseMobileContactForm):
+            subject = forms.CharField(
+                max_length=150,
+                widget=forms.HiddenInput(),
+                required = False
+            )
+            message = forms.CharField(
+                max_length=10000,
+                label='Message',
+                widget=forms.Textarea(),
+                error_messages={'required':'Please enter a message.'}
+            )
+
+        return AuthenticatedMobileContactForm
+    else:
+        class AnonymousMobileContactForm(_BaseMobileContactForm):
+            name = forms.CharField(
+                max_length=100,
+                label='Your Name',
+                widget=forms.TextInput(attrs={'class':'text'}),
+            )
+            email = forms.EmailField(
+                max_length=100,
+                label='Your Email',
+                widget=forms.TextInput(attrs={'class':'text'}),
+                error_messages={'required':'Please enter your email address.'}
+            )
+            mobile_number = forms.CharField(
+                max_length=20,
+                label='Your Mobile (Int. Format: +2782 123 4567):',
+                widget=forms.TextInput(attrs={'class':'text'}),
+            )
+            subject = forms.CharField(
+                max_length=150,
+                widget=forms.HiddenInput(),
+                required = False
+            )
+            message = forms.CharField(
+                max_length=10000,
+                label='Message',
+                widget=forms.Textarea(),
+                error_messages={'required':'Please enter a message.'}
+            )
+
+        return AnonymousMobileContactForm
+

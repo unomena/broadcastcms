@@ -7,7 +7,7 @@
         {% with comment.user as user %}
         <div class="section">
             <div class="comment">
-                <div class="tag">{{ comment.id }}. {{ user.username|default:"Anonymous" }} - {% get_time_difference comment %} Ago</div>
+                <div class="tag">{{ user.username|default:"Anonymous" }} - {% get_time_difference comment %} Ago</div>
                 <p>{{ comment.comment|linebreaksbr }}</p>
             </div>
             {% if not forloop.last %}<hr />{% endif %}
@@ -15,11 +15,11 @@
         {% endwith %}
     {% endfor %}
     {% else %}
-    <div class="section"><p>There are no comments. Be the first person to add a comment.</p></div>
+        <div class="section"><p>There are no comments. Be the first person to add a comment.</p></div>
     {% endif %}
     <div class="filter">
         <ul>
-            <li><a href="{{ instance.get_absolute_url }}comment/">Add your comment <span class="red">&raquo;</span></a></li>
+            <li><a href="/comment/{{ instance.slug }}/">Add your comment <span class="red">&raquo;</span></a></li>
         </ul>
     </div>
-</div>
+</span>

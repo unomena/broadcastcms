@@ -3,6 +3,7 @@
 
 {% block content_body %}
     <h2>Galleries</h2>
+    {% if object_list %}
      <div class="section">
         {% for obj in object_list %}
          <div class="abstract">
@@ -13,6 +14,11 @@
          {% if not forloop.last %}<hr />{% endif %}
          {% endfor %}
      </div>
+    {% else %}
+    <div class="section">
+        There are no Galleries.
+    </div>
+    {% endif %}
      {% if is_paginated %}
      <div class="filter">
          <ul>

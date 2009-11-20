@@ -61,7 +61,10 @@ class HumanizeTimeDifference(template.Node):
         self.obj_name = obj_name
 
     def render(self, context):
-        time_difference = datetime.datetime.now() - context[self.obj_name].created
+        if self.obj_name == 'comment':
+            time_difference = datetime.datetime.now() - context['comment'].submit_date
+        else:
+            time_difference = datetime.datetime.now() - context[self.obj_name].created
         days = time_difference.days
         hours = time_difference.seconds / 3600
         minutes = time_difference.seconds % 3600 / 60

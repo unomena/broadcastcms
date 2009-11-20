@@ -3,9 +3,8 @@
 
 {% get_comment_count for obj as comment_count %}
 {% score_for_object obj.contentbase as score %}
- 
+
 {% block content_body %}
-    {% if obj %}
     <h2>{% if comment_add %}Add Your Comment{% else %}News Updates{% endif %}</h2>
     <div class="section">
         <div class="abstract">
@@ -28,6 +27,5 @@
 	</div>
     {% endif %}
     {% if comment_add %}{% comments_add_form obj %}{% else %}{% comments obj %}{% endif %}
-    {% endif %}
 {% endblock %}
 {% block news_active %}class="active_lnk"{% endblock %}

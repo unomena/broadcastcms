@@ -3,6 +3,7 @@ import calendar
 from django import template
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.comments.forms import CommentForm
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.template.defaultfilters import pluralize
@@ -174,7 +175,7 @@ def comments(parser, token):
 class CommentsAddFormNode(template.Node):
     def __init__(self, instance):
         self.instance = template.Variable(instance)
-    
+        
     def render(self, context):
         instance = self.instance.resolve(context)
         context.update({
