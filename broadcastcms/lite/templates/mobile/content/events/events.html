@@ -7,7 +7,7 @@
     {% for obj in object_list %}
         {% ifchanged %}<h2>{{ obj.start|naturalday|title }}</h2>{% endifchanged %}
         <div class="section">
-            {% if not forloop.first %}{% ifchanged obj.start|naturalday %}{% else %}<hr />{% endifchanged %}{% endif %}
+            {% ifchanged obj.start|naturalday|title %}{% else %}<hr/>{% endifchanged %}
             <div class="abstract">
                 <a href="{{ obj.content.get_absolute_url }}"><img src="{% scaled_image_url obj.content 55 55 %}" class="thumb" /></a>
                 <div class="tag">
