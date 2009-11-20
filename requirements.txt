@@ -14,4 +14,4 @@ python-memcached==1.44
 simplejson==2.0.9
 python-twitter==0.6
 -e git://github.com/alex/django-friends.git@origin/friends-refactor#egg=friends
--e git+ssh://git@git.eldarion.com:1382/user_messages.git#egg=user_messages
+http://pypi.eldarion.com/find-links/user_messages-0.1-dev1.tar.gz
