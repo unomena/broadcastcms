@@ -1,0 +1,17 @@
+{% extends "mobile/sections/base.html" %}
+{% load mobile_inclusion_tags %}
+
+{% block content_body %}
+    <h2>Sign In</h2>
+    <div class="section">
+        <div class="clear">&nbsp;</div>
+        <div id="article">
+            {% if result %}
+            <p>Thanks - you've signed up, and have been automatically logged in!</p>
+            {% else %}
+            <p>Failed - something has gone wrong! Please <a href="/account/sign-up/">Go Back</a> and try again.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block account_active %}class="active_lnk"{% endblock %}

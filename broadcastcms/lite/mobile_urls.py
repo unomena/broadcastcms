@@ -54,38 +54,43 @@ urlpatterns = patterns('',
     # Accounts
     (r'account/sign-in/$', account_login),
     (r'account/sign-out/$', account_logout),
+    (r'account/sign-up/(?P<result>[\w-]+)/$', account_confirm),
+    (r'account/sign-up/$', account_register),
+    (r'account/profile/$', account_profile),
+    
+    # Comment
+    (r'comment-add/$', comment_add),
+    (r'comment/(?P<slug>[\w-]+)/$', custom_object_detail, {'comment_add': True}),
+    (r'comment/(?P<slug>[\w-]+)/(?P<result>[\w-]+)/$', custom_object_detail, {'comment_add': True}),
     
     # Competition
     (r'competition/$', object_list, competition_list_params),
     (r'competition/rules/$', direct_to_template, {'template':'mobile/content/competitions/competition-rules.html'}),
     (r'competition/(?P<page>[0-9]+)/$', object_list, competition_list_params),
     (r'competition/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Competition'}),
-    (r'competition/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Competition', 'comment_add': True}),
     
     # Event
     (r'event/$', object_list, event_list_params),
     (r'event/(?P<page>[0-9]+)/$', object_list, event_list_params),
     (r'event/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Event'}),
-    (r'event/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Event', 'comment_add': True}),
     
     # Gallery
     (r'gallery/$', object_list, gallery_list_params),
     (r'gallery/(?P<page>[0-9]+)/$', object_list, gallery_list_params),
     (r'gallery/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Gallery'}),
-    (r'gallery/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Post', 'comment_add': True}),
     
     # News
     (r'news/$', object_list, news_list_params),
     (r'news/(?P<page>[0-9]+)/$', object_list, news_list_params),
     (r'news/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Post'}),
-    (r'news/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'classname': 'Post', 'comment_add': True}),
     
     # Shows and DJ pages
     #(r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', content_details, {'mode':'djcontent'}),
     (r'show/$', shows_line_up),
     (r'show/(?P<dj_slug>[\w-]+)/$', shows_dj_blog),
+    (r'show/line-up/(?P<weekday>[\w-]+)/$', shows_line_up),
     (r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', custom_object_detail),
-    (r'show/lineup/(?P<weekday>[\w-]+)/$', shows_line_up),
+    (r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'comment_add': True}),
     
     # Contact
     (r'contact/(?P<dj_slug>[\w-]+)/$', contact),
@@ -102,7 +107,7 @@ urlpatterns = patterns('',
     (r'contact/$', direct_to_template, {'template':'mobile/content/contact.html'}),
     
     # Voting / Likes
-    (r'voting/(?P<slug>[\w-]+)/$', httprequest_vote_on_object, {'model': ContentBase, 'slug_field': 'slug', 'direction': 'up'}),
+    (r'voting/(?P<slug>[\w-]+)/$', vote_on_object, {'model': ContentBase, 'slug_field': 'slug', 'direction': 'up'}),
 )
 
 

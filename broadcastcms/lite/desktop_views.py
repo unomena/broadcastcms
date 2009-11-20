@@ -525,8 +525,7 @@ def contact(request):
         for key, item in form_class().fields.items():
             data.update({key: item.label})
         form = form_class(initial=data)
-    
-
+        
     context.update({
         'form': form,
         'sent': sent,

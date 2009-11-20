@@ -1,0 +1,21 @@
+{% extends "mobile/sections/base.html" %}
+{% load mobile_inclusion_tags %}
+
+{% block content_body %}
+    <h2>Sign Up</h2>
+    <div class="section">
+        <div class="clear">&nbsp;</div>
+        <div id="article">
+            <form method="post" name="signin-form">
+                <ul>
+                    {{ form.as_p }}
+                </ul>
+                <p><input type="submit" value="Sign Up" /></p>
+            </form>
+        </div>
+        <div id="article">
+            <p><strong>Tip:</strong> If you've signed up already on our website, you can <a href="/account/sign-in/">Sign In</a> without signing-up.</p>
+        </div>
+    </div>
+{% endblock %}
+{% block account_active %}class="active_lnk"{% endblock %}

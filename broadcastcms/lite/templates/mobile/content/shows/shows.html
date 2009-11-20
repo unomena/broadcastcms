@@ -2,35 +2,35 @@
 {% load scaled_image_tags %}
 
 {% block content_body %}
-        {% if obj_list %}
-        <h2>Show Lineup - {% if is_today %}Today{% else %}{{ weekday|title }}{% endif %}</h2>
-        <div class="section">
-            {% for obj in obj_list %}
-                {% if obj.content.show %}
-                <div class="abstract">
-                    <a href="{{ obj.content.show.primary_castmembers.permitted.0.get_absolute_url }}"><img src="{% scaled_image_url obj.content.show 55 55 %}" class="thumb" /></a>
-                    <div class="tag">{{ obj.start|date:"H:i" }}-{{ obj.end|date:"H:i" }}</div>
-                    <h3>
-                        {{ obj.content.show.title }}
-                        {% if obj.content.show.primary_castmembers.permitted %}with 
-                            {% for castmember in obj.content.show.primary_castmembers.permitted %}
-                                <a href="{{ castmember.get_absolute_url }}">{{ castmember.title }}</a>
-                                {% if not forloop.last  %} &amp; {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </h3>
-                </div>
-                {% if not forloop.last  %}<hr />{% endif %}
+    {% if obj_list %}
+    <h2>Show Lineup - {% if is_today %}Today{% else %}{{ weekday|title }}{% endif %}</h2>
+    <div class="section">
+        {% for obj in obj_list %}
+            {% if obj.content.show %}
+            <div class="abstract">
+                <a href="{{ obj.content.show.primary_castmembers.permitted.0.get_absolute_url }}"><img src="{% scaled_image_url obj.content.show 55 55 %}" class="thumb" /></a>
+                <div class="tag">{{ obj.start|date:"H:i" }}-{{ obj.end|date:"H:i" }}</div>
+                <h3>
+                {{ obj.content.show.title }}
+                {% if obj.content.show.primary_castmembers.permitted %}with 
+                    {% for castmember in obj.content.show.primary_castmembers.permitted %}
+                        <a href="{{ castmember.get_absolute_url }}">{{ castmember.title }}</a>
+                        {% if not forloop.last  %} &amp; {% endif %}
+                    {% endfor %}
                 {% endif %}
+                </h3>
+            </div>
+            {% if not forloop.last  %}<hr />{% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="filter">
+        <ul>
+            {% for day in weekdays %}
+            <li{% ifequal day weekday %} class="active"{% endifequal %}><a href="/show/line-up/{{ day }}/">{{ day|title }}</a></li>
             {% endfor %}
-        </div>
-        <div class="filter">
-			<ul>
-                {% for day in weekdays %}
-				<li{% ifequal day weekday %} class="active"{% endifequal %}><a href="/show/lineup/{{ day }}/">{{ day|title }}</a></li>
-                {% endfor %}
-			</ul>
-        </div>
-        {% endif %}
+        </ul>
+    </div>
+    {% endif %}
 {% endblock %}
 {% block shows_active %}class="active_lnk"{% endblock %}
