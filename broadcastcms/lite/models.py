@@ -230,13 +230,15 @@ class UserProfile(models.Model):
     )
     email_subscribe = models.BooleanField(default=False)
     sms_subscribe = models.BooleanField(default=False)
-    facebook_url = models.URLField(
+    facebook_username = models.CharField(
         blank=True,
         null=True,
+        max_length=256,
     )
-    twitter_url = models.URLField(
+    twitter_username = models.CharField(
         blank=True,
         null=True,
+        max_length=256,
     )
     image = ScaledImageField()
     mobile_number = models.CharField(max_length=64)
@@ -247,6 +249,13 @@ class UserProfile(models.Model):
         null=True,
     )
     birth_date= models.DateField(blank=True, null=True)
+    
+    bio = RichTextField(
+        null=True, 
+        blank=True, 
+        verbose_name='Bio',
+        help_text="Content used for user's Bio page.",
+    )
 
     def __unicode__(self):
         return self.user.username
