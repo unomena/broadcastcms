@@ -22,7 +22,7 @@ setup(
         'simplejson==2.0.9',
         'windmill==1.3',
         'whoosh==0.3.4',
-        'django-haystack==1.0.0'
+        'django-haystack'
     ],
     include_package_data=True,
 )
