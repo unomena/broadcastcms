@@ -87,6 +87,7 @@ AUTH_PROFILE_MODULE = "lite.UserProfile"
 HAYSTACK_SITECONF = 'broadcastcms.lite.haystack_index'
 HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = '%s/broadcastcms_index' % SCRIPT_PATH
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 
 
 INSTALLED_APPS = (
