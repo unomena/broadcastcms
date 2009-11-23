@@ -83,6 +83,12 @@ TEMPLATE_DIRS = (
 
 AUTH_PROFILE_MODULE = "lite.UserProfile"
 
+# Haystack globals
+HAYSTACK_SITECONF = 'broadcastcms.lite.haystack_index'
+HAYSTACK_SEARCH_ENGINE = 'whoosh'
+HAYSTACK_WHOOSH_PATH = '%s/broadcastcms_index' % SCRIPT_PATH
+
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -93,6 +99,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
 
     'voting',
+    'haystack',
 
     'broadcastcms.banner',
     'broadcastcms.base',
