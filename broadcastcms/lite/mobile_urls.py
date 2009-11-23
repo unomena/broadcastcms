@@ -11,8 +11,10 @@ from broadcastcms.competition.models import Competition
 from broadcastcms.event.models import Event
 from broadcastcms.gallery.models import Gallery
 from broadcastcms.post.models import Post
+
 from mobile_views import *
 from voting.views import xmlhttprequest_vote_on_object
+from haystack.views import basic_search
 
 
 # Custom direct to template
@@ -99,6 +101,10 @@ urlpatterns = patterns('',
     # Foooter links
     (r'privacy/$', direct_to_template, {'template':'mobile/content/footer/privacy.html'}),
     (r'terms/$', direct_to_template, {'template':'mobile/content/footer/terms.html'}),
+    
+    # Search
+    #(r'search/', include('haystack.urls'), {'template': 'mobile/search/search.html'}),
+    (r'search/$', basic_search, {'template': 'mobile/search/search.html'}),
     
     # Static urls
     (r'^$', direct_to_template, {'template':'mobile/content/home.html'}),
