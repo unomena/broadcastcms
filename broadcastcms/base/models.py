@@ -131,10 +131,7 @@ class ModelBase(PermissionBase):
         super(ModelBase, self).delete(*args, **kwargs)
 
     def __unicode__(self):
-        if self.__class__ == ModelBase:
-            return self.as_leaf_class().__unicode__()
-        else: 
-            return self.slug
+        return self.slug
 
 class ContentBase(ModelBase):
     objects = ModelBaseManager()
