@@ -7,8 +7,8 @@
             <p>You searched for: <span class="highlighted">{{ request.GET.q }}</span>. {{ paginator.count|default:"No" }} results found</p>
             {% for result in page.object_list %}
                 <p>
-                    <a href="{{ result.object.get_absolute_url }}">{% highlight result.object.title with request.GET.q max_length 40 %}</a><br />
-                    {% highlight result.object.description with request.GET.q max_length 40 %}
+                    <a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a><br />
+                    {% if result.content %}{% highlight result.content with request.GET.q max_length 55 %}{% endif %}
                 </p>
             {% endfor %}
             <div id="paginate">{% pagination_nav_qs page '/search/' request.GET %}</div>
