@@ -4,6 +4,7 @@ from django import template
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.comments.forms import CommentForm
+from django.core.paginator import EmptyPage, InvalidPage, Paginator
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.template.defaultfilters import pluralize
@@ -112,15 +113,30 @@ class EntryUpdatesNode(template.Node):
         
         # return list of instance leaves
         return [instance.as_leaf_class() for instance in instances]
+    
+    def paginate_updates(self, context, instances):
+        page = int(context.get('page', 1))
+        paginator = Paginator(instances, self.count)
+        try:
+            return paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            return paginator.page(paginator.num_pages)
 
     def render(self, context):
         """
         Renders the latest update entries as filterd by cast member or type.
         """
-        instances = self.get_instances(context, context['settings'])[:self.count]
-        context.update({
-            'instances': instances,
-        })
+        instances = self.get_instances(context, context['settings'])
+        if self.castmember:
+            paginator = self.paginate_updates(context, instances)
+            context.update({
+                'instances': paginator.object_list,
+                'paginator': paginator,
+            })
+        else:
+            context.update({
+                'instances': instances[:self.count],
+            })
         return render_to_string("mobile/inclusion_tags/misc/updates.html", context)
 
 @register.tag
@@ -191,18 +207,22 @@ def comments_add_form(parser, token):
 
 class DJHeaderNode(template.Node):
     def render(self, context):
-        obj = context['obj']
-        shows = obj.show_set.permitted()
-        show_times = []
-        for show in shows:
-            show_times += show.show_times()
-            if len(show_times) > 2:
-                break
-        show_times = show_times[:2]
-        
-        context.update({
-            'show_times': show_times,
-        })
+        try:
+            castmember = context['castmember']
+        except KeyError:
+            castmember = context['obj']
+        if castmember:
+            show_times = []
+            shows = castmember.show_set.all()
+            for show in shows:
+                show_times += show.show_times()
+                if len(show_times) > 2:
+                    break
+            show_times = show_times[:2]
+            context.update({
+                'show_times': show_times,
+                'castmember': castmember,
+            })
         return render_to_string('mobile/inclusion_tags/shows/dj_header.html', context)
     
 @register.tag
@@ -218,7 +238,7 @@ class CompetitionEnterNode(template.Node):
         if request.POST:
             form = form_class(request.POST)
             if form.is_valid():
-                form.create_entry(self, request.user)
+                form.create_entry(obj, request.user)
         else:
             form = form_class()
 
