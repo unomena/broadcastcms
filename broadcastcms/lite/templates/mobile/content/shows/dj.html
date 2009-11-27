@@ -3,12 +3,7 @@
 {% load mobile_inclusion_tags %}
 
 {% block content_body %}
-        {% dj_header %}
-        {% dj_updates obj %}
-		<div class="filter">
-			<ul>
-				<li><a href="#">See More <span class="red">&raquo;</span></a></li>
-			</ul>
-		</div>
+    {% dj_header %}
+    {% dj_updates obj %}
 {% endblock %}
 {% block shows_active %}class="active_lnk"{% endblock %}
