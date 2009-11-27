@@ -15,3 +15,14 @@
     {% endfor %}
 </div>
 {% endif %}
+{% if paginator %}
+<div class="filter">
+    <ul>
+        <li>
+            {% if paginator.has_previous %}<a href="/show/{{ dj_slug }}/{{ paginator.previous_page_number }}/"><span class="red">&laquo;</span> Go Back</a>{% endif %}
+            {% if paginator.has_next and paginator.has_previous %} &nbsp; | &nbsp; {% endif %}
+            {% if paginator.has_next %}<a href="/show/{{ dj_slug }}/{{ paginator.next_page_number }}/">See More <span class="red">&raquo;</span></a>{% endif %}
+        </li>
+    </ul>
+</div>
+{% endif %}
