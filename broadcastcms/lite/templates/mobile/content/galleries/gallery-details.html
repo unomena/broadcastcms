@@ -5,6 +5,7 @@
 {% score_for_object obj.contentbase as score %}
  
 {% block content_body %}
+    {% if castmember %}{% dj_header %}{% endif %}
     <h2>{% if comment_add %}Add Your Comment{% else %}Galleries{% endif %}</h2>
     <div class="section">
         <div class="abstract">
