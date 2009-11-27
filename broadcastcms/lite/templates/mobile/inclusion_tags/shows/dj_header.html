@@ -1,9 +1,9 @@
 {% load scaled_image_tags %}
 
-<h2>{{ obj.title }}</h2>
+<h2>{{ castmember.title }}</h2>
 <div class="section">
     <div class="abstract">
-        <a href="{{ obj.get_absolue_url }}"><img src="{% scaled_image_url obj 55 55 %}" class="thumb" /></a>
+        <a href="{{ castmember.get_absolue_url }}"><img src="{% scaled_image_url castmember 55 55 %}" class="thumb" /></a>
         <h3>
             {% for show_time in show_times %}
                 {{ show_time.days|join:","|title|slice:"3" }} {{ show_time.start_time|time:"H:i" }}-{{ show_time.end_time|time:"H:i" }}{% if forloop.last %}{% else %}, {% endif %}
