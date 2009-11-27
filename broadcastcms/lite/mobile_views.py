@@ -49,7 +49,7 @@ def account_login(request):
             else:
                 error = 'Either your username or password is incorrect. Please try again'
     else:
-        request.session['return_path'] = request.META['HTTP_REFERER']
+        request.session['return_path'] = request.META.get('HTTP_REFERER', '/')
             
     return render_to_response('mobile/content/accounts/sign-in.html', {'form': form, 'errors': error})
 
@@ -245,6 +245,9 @@ def comment_add(request):
     Post a comment. Taken from django.contrib.comments.views.comments and
     adjusted to use authenticated user details.
     """
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/account/sign-in/')
+    
     post_data = request.POST.copy()
     if request.user.is_authenticated():
         post_data['name'] = request.user.username
@@ -317,6 +320,10 @@ def comment_add(request):
 
 # Generic
 def custom_object_detail(request, slug, dj_slug=None, classname=None, comment_add=False, result=None):
+    # Redirect the user to login if they want to add a comment
+    if comment_add and not request.user.is_authenticated():
+        return HttpResponseRedirect('/account/sign-in/')
+            
     context = RequestContext(request, {})
     template_dict = {
         'Competition': 'mobile/content/competitions/competition-details.html',
@@ -334,10 +341,15 @@ def custom_object_detail(request, slug, dj_slug=None, classname=None, comment_ad
         
     if not obj: raise Http404
     
+    castmember = CastMember.objects.filter(owner=obj.owner)
+    if castmember:
+        castmember = castmember[0]
+    
     if classname == 'Event':
         obj = obj.entries.all()[0]
     context.update({
         'obj': obj,
+        'castmember': castmember,
         'comment_add': comment_add,
         'result': result,
     })
@@ -360,9 +372,9 @@ def shows_line_up(request, weekday=None):
     else:
         weekday = weekdays[day_offset]
         day_offset = 0
-        
+    
     is_today = day_offset == 0
-        
+    
     obj_list = Entry.objects.permitted().day(day_offset).by_content_type(Show).order_by('start')
     context.update({
         'weekdays': weekdays,
@@ -373,12 +385,14 @@ def shows_line_up(request, weekday=None):
     
     return render_to_response('mobile/content/shows/shows.html', context)
 
-def shows_dj_blog(request, dj_slug):
+def shows_dj_blog(request, dj_slug, page=1):
     context = RequestContext(request, {})
     obj = get_object_or_404(CastMember, slug=dj_slug)
     context.update({
         'is_castmember': True,
         'obj': obj,
+        'page': page,
+        'dj_slug': dj_slug,
     })
     
     return render_to_response('mobile/content/shows/dj.html', context)
