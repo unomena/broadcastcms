@@ -87,9 +87,9 @@ urlpatterns = patterns('',
     (r'news/(?P<slug>[\w-]+)/$', custom_object_detail, {'classname': 'Post'}),
     
     # Shows and DJ pages
-    #(r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', content_details, {'mode':'djcontent'}),
     (r'show/$', shows_line_up),
     (r'show/(?P<dj_slug>[\w-]+)/$', shows_dj_blog),
+    (r'show/(?P<dj_slug>[\w-]+)/(?P<page>[0-9]+)/$', shows_dj_blog),
     (r'show/line-up/(?P<weekday>[\w-]+)/$', shows_line_up),
     (r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/$', custom_object_detail),
     (r'show/(?P<dj_slug>[\w-]+)/(?P<slug>[\w-]+)/comment/$', custom_object_detail, {'comment_add': True}),
