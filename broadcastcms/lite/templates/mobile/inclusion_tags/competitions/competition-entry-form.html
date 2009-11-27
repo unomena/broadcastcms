@@ -17,20 +17,19 @@
                             {% endif %}
                         </p>
                         {% if field.help_text %}
-                            <p class="note">
+                            <p>
                                 {{ field.help_text }}
                             </p>
                         {% endif %}
                     </div>
                 {% endwith %}
                 <div>
-                    <p>&nbsp;</p>
                     <p><input type="submit" value="Submit Entry" name="competition-submit" /></p>
                 </div>
             </form>
         {% else %}
             <strong>Enter Now!</strong>
-            <p class="blurb"><a href="/account/sign-in/">Sign in</a> to enter this competition. Not yet a member? <a href="/account/sign-up/" class="thickbox">Sign up</a> now!</p>
+            <p><a href="/account/sign-in/">Sign in</a> to enter this competition. Not yet a member? <a href="/account/sign-up/">Sign up</a> now!</p>
         {% endif %}
     {% endif %}
 {% endif %}
