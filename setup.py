@@ -22,8 +22,10 @@ setup(
         'simplejson==2.0.9',
         'windmill==1.3',
         'whoosh==0.3.5',
-        'django-haystack'
+        'django-haystack',
         'python-twitter==0.6',
+        'django-friends==0.2alpha',
+        'user-messages==0.1-dev1',
     ],
     include_package_data=True,
 )
