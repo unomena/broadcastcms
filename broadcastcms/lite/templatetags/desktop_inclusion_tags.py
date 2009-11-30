@@ -48,7 +48,7 @@ def masthead(parser, token):
     return MastheadNode()
 
 class MastheadNode(template.Node):
-    @cache_view_function(10*60, respect_path=True, respect_user=True)
+    #@cache_view_function(10*60, respect_path=True, respect_user=True)
     def render(self, context):
         """
         Renders the sitewide masthead, including site logo, site section links, search and account links.
@@ -56,12 +56,14 @@ class MastheadNode(template.Node):
         """
         section = context['section']
         items = [
-            {'title': 'Shows &amp; DJs', 'url': reverse('shows_line_up'), 'current': section == 'shows'},
+            {'title': 'Home', 'url': reverse('home'), 'current': section == 'home'},
+            {'title': 'Shows', 'url': reverse('shows_line_up'), 'current': section == 'shows'},
             {'title': 'Chart', 'url': reverse('chart'), 'current': section == 'chart'},
             {'title': 'Win', 'url': reverse('competitions'), 'current': section == 'competitions'},
             {'title': 'News', 'url': reverse('news'), 'current': section == 'news'},
             {'title': 'Events', 'url': reverse('events'), 'current': section == 'events'},
             {'title': 'Galleries', 'url': reverse('galleries'), 'current': section == 'galleries'},
+            {'title': 'Reviews', 'url': reverse('reviews'), 'current': section == 'reviews'},
         ]
         
         context.update({
