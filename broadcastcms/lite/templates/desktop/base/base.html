@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% load desktop_inclusion_tags %}
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"{% block extra_html %}{% endblock %}>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>{{ site_name }}{% if page_title %} | {{ page_title|safe }} {% endif %}</title>
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+	<link rel="stylesheet" type="text/css" href="/media/bcms/includes/reset.css" />
+	<link rel="stylesheet" type="text/css" href="/media/bcms/includes/style-positions.css" />
+	<link rel="stylesheet" type="text/css" href="/media/bcms/includes/styles.css" />
+	<!--Lib-->
+	<script type="text/javascript" src="/media/bcms/includes/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" src="/media/bcms/includes/jquery.easing.1.3.js"></script>
+	<script type="text/javascript" src="/media/bcms/includes/jquery.color.js"></script>
+	<script type="text/javascript" src="/media/bcms/includes/jquery.form.js"></script>
+	<!--PNG Fix-->
+	<script type="text/javascript" src="/media/bcms/includes/jquery.pngFix.js"></script>
+	<!--Thickbox-->
+	<script type="text/javascript" src="/media/bcms/includes/thickbox.js"></script>
+	<link rel="stylesheet" type="text/css" href="/media/bcms/includes/thickbox.css" />
+	<link rel="stylesheet" type="text/css" href="/media/bcms/includes/modal.css" />
+	<!--Validation-->
+	<script type="text/javascript" src="/media/bcms/includes/jquery.validate.js"></script>
+	<script type="text/javascript" src="/media/bcms/includes/cmxforms.js"></script>
+	<!--Gallery-->
+	<script type="text/javascript" src="/media/bcms/includes/jquery.galleriffic.js"></script>
+	<script type="text/javascript" src="/media/bcms/includes/jcarousellite.js"></script>
+	<!--General-->
+	<script type="text/javascript" src="/media/bcms/includes/routines.js"></script>
+	<script type="text/javascript" src="/media/bcms/includes/modal-routines.js"></script>
+    <!--Recaptcha-->
+    <script type="text/javascript" src="http://api.recaptcha.net/js/recaptcha_ajax.js"></script>
+    {% if FACEBOOK_API_KEY %}
+    <!--Facebook-->
+    <script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php" type="text/javascript"></script>
+    <script type="text/javascript" src="/media/bcms/includes/facebook.js"></script>
+    {% endif %}
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+    {% block body %}
+
+        <div class="main"><a id="top"></a>
+            <div class="wrapper">
+
+                {% masthead %}
+
+            	<div class="mast_body">
+
+                    {% block content_body %}{% endblock %}
+        	    
+                </div><!--/MAST_BODY-->
+            </div><!--/MAIN-->
+        </div><!--/WRAPPER-->
+        <div class="mast_foot">
+
+            {% mastfoot %}
+
+        </div><!--/MAST_FOOT-->
+
+    {% endblock %}
+
+    {% metrics %}
+    
+    {% if request.fb_authenticated %}
+        <script type="text/javascript">
+            FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
+        </script>
+    {% endif %}
+
+</body>
+</html>
