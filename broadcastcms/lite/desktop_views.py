@@ -864,6 +864,37 @@ def studio_cam(request):
 
     return render_to_response('desktop/popups/studio_cam.html', context)
 
+# Reviews
+def reviews(request, template_name='desktop/generic/object_listing_block.html'):
+    queryset=Gallery.permitted.all()
+    header = utils.GalleriesHeader(request)
+    queryset_modifiers = [header.page_menu.queryset_modifier,]
+    for queryset_modifier in queryset_modifiers:
+        queryset = queryset_modifier.updateQuery(queryset)
+
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        paginate_by=15,
+        extra_context={
+            'header': header,
+        },
+    )
+
+def reviews_content(request, slug, template_name='desktop/generic/object_detail.html'):
+    queryset = Gallery.permitted
+    header = utils.GalleryHeader()
+
+    return list_detail.object_detail(
+        request=request,
+        queryset=queryset,
+        slug=slug,
+        template_name=template_name,
+        extra_context={
+            'header': header,
+        },
+    )
 # Shows
 class ShowsLineUp(object):
     def __call__(self, request, template_name='desktop/generic/object_listing_block.html'):
@@ -1013,6 +1044,9 @@ class ContentBaseViews(object):
         
         def handle_news(self):
             return reverse('news_content', kwargs={'slug': self.slug})
+        
+        def handle_reviews(self):
+            return reverse('reviews_content', kwargs={'slug': self.slug})
 
         section_handlers = [
             ('home', handle_home),
@@ -1022,6 +1056,7 @@ class ContentBaseViews(object):
             ('events', handle_events),
             ('chart', handle_chart),
             ('news', handle_news),
+            ('reviews', handle_reviews),
         ]
 
         section = context['section']
