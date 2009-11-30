@@ -167,7 +167,7 @@ IMAGE_SCALES = {
     'lite': {
         'UserProfile': {
             'image': (
-                (33, 33), 
+                (35, 35), 
                 (41, 41),
                 (50, 50),
             )
