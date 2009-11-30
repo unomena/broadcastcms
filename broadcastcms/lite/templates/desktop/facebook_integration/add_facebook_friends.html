@@ -1,0 +1,29 @@
+{% extends "desktop/sections/base_section.html" %}
+
+{% load desktop_inclusion_tags %}
+{% load friends_tags %}
+
+{% block left %}
+    {% account_menu %}
+    {% account_thanks %}
+    
+    <div class="page_form">
+        {% if users %}
+            {% for user in users %}
+                <div>
+                    <p>{{ user.username }}</p>
+                    <form action="{% url account_friends_add %}" method="post">
+                        <input type="hidden" name="user_id" value="{{ user.id }}" />
+                        <input type="submit" value="make friends" />
+                    </form>
+                    {% friendship_status request.user user as status %}
+                    {% ifequal status "Sent" %}
+                        <p>Friendship request sent</p>
+                    {% endifequal %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>You have no facebook friends on this site.</p>
+        {% endif %}
+    </div>
+{% endblock %}

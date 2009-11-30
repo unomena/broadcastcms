@@ -23,6 +23,7 @@ setup(
         'windmill==1.3',
         'whoosh==0.3.5',
         'django-haystack'
+        'python-twitter==0.6',
     ],
     include_package_data=True,
 )

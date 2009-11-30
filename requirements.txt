@@ -1,0 +1,17 @@
+--find-links=http://pypi2.pinaxproject.com/releases/0.7/
+
+
+# pip install --no-deps -e . (in broadcastcms clone)
+
+
+http://code.djangoproject.com/svn/django/branches/releases/1.1.X/
+MySQL-python==1.2.3c1
+http://dist.repoze.org/PIL-1.1.6.tar.gz
+django-debug-toolbar==0.8.0
+django-voting==0.1-pre
+pexpect==2.4
+python-memcached==1.44
+simplejson==2.0.9
+python-twitter==0.6
+-e git://github.com/alex/django-friends.git@origin/friends-refactor#egg=friends
+http://pypi.eldarion.com/find-links/user_messages-0.1-dev1.tar.gz

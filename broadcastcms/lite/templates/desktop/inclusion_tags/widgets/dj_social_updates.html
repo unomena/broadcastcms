@@ -1,0 +1,10 @@
+<div class="box dark">
+    <h1>Social Updates</h1>
+    <ul>
+        {% for update in updates %}
+            <li>{{ update.timestamp }} {{ update.text }}</li>
+        {% empty %}
+            <li>No updates</li>
+        {% endfor %}
+    </ul>
+</div><!--/box-->

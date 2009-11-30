@@ -40,6 +40,7 @@ GALLERY_IMAGE_COUNT = 200
 EVENT_COUNT = 10
 EVENT_ENTRY_COUNT = 20
 LOCATION_COUNT = 5
+FRIENDSHIP_COUNT = 4
 
 def clear_and_sync():
     ADMIN_USER = 'admin'
@@ -47,11 +48,17 @@ def clear_and_sync():
     ADMIN_EMAIL = 'admin@admin.com'
 
     db_name = settings.DATABASE_NAME
+    db_host = settings.DATABASE_HOST
     db_user = settings.DATABASE_USER
     db_pass = settings.DATABASE_PASSWORD
     
+    flags = ['-u%s' % db_user]
+    if db_host:
+        flags.append('-h %s' % db_host)
+    flags.append('-p')
+    
     # Clear db
-    child = pexpect.spawn('mysql -u%s -p' % db_user)
+    child = pexpect.spawn('mysql %s' % ' '.join(flags))
     child.expect('Enter password:')
     child.sendline(db_pass)
     child.expect('mysql> ')
@@ -238,7 +245,29 @@ def create_profiles():
             }
         })
     return profiles
-    
+
+def create_friendships():
+    friendships = []
+    for i in range(1, FRIENDSHIP_COUNT+1):
+        friendships.append({
+            "model": "friends.friendship",
+            "fields": {
+                "to_user": {
+                    "model": "auth.user",
+                    "fields": {
+                        "username": "castmember%s" % i,
+                    }
+                },
+                "from_user": {
+                    "model": "auth.user",
+                    "fields": {
+                        "username": "castmember%s" % (i + 2)
+                    }
+                }
+            }
+        })
+    return friendships
+
 def create_shows():
     shows = []
     for i in range(1, SHOW_COUNT + 1):
@@ -585,6 +614,7 @@ def generate():
     objects += create_banners()
     objects += create_castmembers()
     objects += create_profiles()
+    objects += create_friendships()
     objects += create_posts()
     objects += create_shows()
     objects += create_show_credits()

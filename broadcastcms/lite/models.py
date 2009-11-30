@@ -234,6 +234,11 @@ class UserProfile(models.Model):
         blank=True,
         null=True,
     )
+    facebook_id = models.IntegerField(blank=True, null=True)
+    publish_facebook_comments = models.BooleanField(default=False)
+    publish_facebook_status = models.BooleanField(default=False)
+    publish_facebook_likes = models.BooleanField(default=False)
+    use_facebook_picture = models.BooleanField(default=False)
     twitter_url = models.URLField(
         blank=True,
         null=True,
@@ -266,6 +271,13 @@ class UserProfile(models.Model):
                     pmailer.unsubscribe()
 
         super(UserProfile, self).save(*args, **kwargs)
+    
+    def tweets(self):
+        from broadcastcms.status.models import StatusUpdate
+        return StatusUpdate.objects.filter(
+            user = self.user,
+            source = StatusUpdate.TWITTER_SOURCE
+        )
 
 # Create User profile property which gets or creates an empty profile for the given user
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
