@@ -230,7 +230,7 @@ class OnAirNode(template.Node):
         credits = show.credits.all().filter(castmember__is_public=True).order_by('role')
         return credits[0].castmember if credits else None
     
-    @cache_view_function(2*60)
+    #@cache_view_function(2*60)
     def render(self, context):
         """
         Renders the homepage On Air box containing details on the
