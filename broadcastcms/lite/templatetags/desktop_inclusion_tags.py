@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from user_messages.models import Thread
 
 from broadcastcms.calendar.models import Entry
+from broadcastcms.label.models import Label
 from broadcastcms.show.models import Credit, Show
 from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.radio.models import Song
@@ -262,6 +263,50 @@ class OnAirNode(template.Node):
             'artist': artist,
         })
         return render_to_string('desktop/inclusion_tags/home/on_air.html', context)
+
+@register.tag
+def home_news(parser, token):
+    news_labels = Label.objects.filter(title__iexact="news", is_visible=False)
+    queryset = ContentBase.permitted.filter(labels__in=news_labels).order_by("-created")[:18]
+    more_url = reverse('news')
+    return UpdatesNode(queryset, panels=3, node_class="updates pink", heading="Latest News", more_url=more_url)
+
+class UpdatesNode(template.Node):
+    def __init__(self, queryset, panels, node_class, heading, more_url):
+        self.queryset = queryset
+        self.panels = panels
+        self.node_class = node_class
+        self.heading = heading
+        self.more_url = more_url
+    
+    def build_panels(self):
+        """
+        Returns panels containing objects. Pannels are build according
+        to the number of panels requested and the number of objects in the queryset.
+        """
+        object_list = list(self.queryset)
+        object_list_count = len(object_list)
+        panel_object_count = object_list_count / self.panels
+        panel_object_count = 1 if panel_object_count == 0 else panel_object_count
+        
+        panels = []
+        if object_list_count > 0:
+            # generate instance slice offsets from which to populate panels
+            slices = range(0, object_list_count, panel_object_count)
+            # populate panels based on instance slices
+            for slice_start in slices:
+                panels.append(object_list[slice_start: slice_start + panel_object_count])
+
+        return panels
+
+    def render(self, context):
+        panels = self.build_panels()
+        context.update({
+            'panels': panels,
+            'render_controls': (len(panels) > 1),
+            'node': self,
+        })
+        return render_to_string('desktop/inclusion_tags/misc/updates.html', context)
 
 class SlidingUpdatesNode(template.Node):
     def __init__(self, tray_length=3, panel_rows=2, count=18):
@@ -545,6 +590,7 @@ class NowPlayingNode(OnAirNode):
         })
         return render_to_string('desktop/inclusion_tags/widgets/now_playing.html', context)
 
+"""
 @register.tag
 def updates(parser, token):
     return UpdatesNode()
@@ -558,6 +604,7 @@ class UpdatesNode(SlidingUpdatesNode):
             'instances': instances,
         })
         return render_to_string('desktop/inclusion_tags/widgets/updates.html', context)
+"""
 
 # Shows
 
