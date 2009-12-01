@@ -972,10 +972,10 @@ class ImageBannerViews(object):
 
 class ContentBaseViews(object):
     def render_updates(self, context):
-        context = {
+        context.update({
             'object': self,
             'url': self.url(context),
-        }
+        })
         return render_to_string('desktop/content/contentbase/updates.html', context)
     
     def render_updates_featured(self, context):
