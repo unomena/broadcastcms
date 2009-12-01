@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from user_messages.models import Thread
 
 from broadcastcms.calendar.models import Entry
+from broadcastcms.competition.models import Competition
 from broadcastcms.label.models import Label
 from broadcastcms.show.models import Credit, Show
 from broadcastcms.base.models import ContentBase, ModelBase
@@ -271,13 +272,21 @@ def home_news(parser, token):
     more_url = reverse('news')
     return UpdatesNode(queryset, panels=3, node_class="updates pink", heading="Latest News", more_url=more_url)
 
+@register.tag
+def home_competitions(parser, token):
+    news_labels = Label.objects.filter(title__iexact="news", is_visible=False)
+    queryset = Competition.permitted.order_by("-created")[:3]
+    more_url = reverse('competitions')
+    return UpdatesNode(queryset, panels=1, node_class="updates align-right events yellow", heading="Competitions", more_url=more_url, show_images=False)
+
 class UpdatesNode(template.Node):
-    def __init__(self, queryset, panels, node_class, heading, more_url):
+    def __init__(self, queryset, panels, node_class, heading, more_url, show_images=True):
         self.queryset = queryset
         self.panels = panels
         self.node_class = node_class
         self.heading = heading
         self.more_url = more_url
+        self.show_images = show_images
     
     def build_panels(self):
         """
