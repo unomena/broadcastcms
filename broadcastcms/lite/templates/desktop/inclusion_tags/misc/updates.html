@@ -1,33 +1,34 @@
 {% load public_tags %}
+
 {% if panels %}
-    <div class="updates">
+    <div class="{{ node.node_class }}">
         <div id="slider">    
-	        <h1>Updates</h1>
-    		<p class="updates_more"><a href="{% url news %}">View all Updates &raquo;</a></p>
+	        <h1>{{ node.heading }}</h1>
 	    	{% if render_controls %}
-            <div class="scroll_nav">
-	            <ul class="navigation">
-                    {% for panel in panels %}
-    	                <li><a href="#panel{{ forloop.counter }}"></a></li>
-                    {% endfor %}
-	            </ul>
-		    </div>
+                <div class="scroll_nav">
+	                <ul class="navigation">
+                        {% for panel in panels %}
+    	                    <li><a href="#panel{{ forloop.counter }}"></a></li>
+                        {% endfor %}
+	                </ul>
+		        </div>
             {% endif %}
 	        <div class="scroll">
 	            <div class="scroll_container">
                     {% for panel in panels %}        
     		            <div class="panel" id="panel{{ forloop.counter }}">
-                            {% for tray in panel %}
-        				        <div class="chunk_tray">
-                                    {% for instance in tray %}
-                                        {% call_view instance render_home_updates %}
-                                    {% endfor %}
-	    						</div><!--/tray-->
+                            {% for object in panel %}
+                                {% if forloop.first %}
+                                    {% call_view object render_updates_featured %}
+                                {% else %}
+                                    {% call_view object render_updates %}
+                                {% endif %}
                             {% endfor %}
-			    		</div>
+	    				</div><!--/tray-->
                     {% endfor %}
     	        </div>
             </div>
      	</div><!--/slider-->
+		<p class="updates_more"><a href="{{ node.more_url }}">View all {{ node.heading }}</a></p>
     </div><!--/Updates-->
 {% endif %}
