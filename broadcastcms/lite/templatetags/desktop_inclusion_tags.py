@@ -9,6 +9,7 @@ from user_messages.models import Thread
 
 from broadcastcms.calendar.models import Entry
 from broadcastcms.competition.models import Competition
+from broadcastcms.event.models import Event
 from broadcastcms.label.models import Label
 from broadcastcms.show.models import Credit, Show
 from broadcastcms.base.models import ContentBase, ModelBase
@@ -274,10 +275,23 @@ def home_news(parser, token):
 
 @register.tag
 def home_competitions(parser, token):
-    news_labels = Label.objects.filter(title__iexact="news", is_visible=False)
     queryset = Competition.permitted.order_by("-created")[:3]
     more_url = reverse('competitions')
     return UpdatesNode(queryset, panels=1, node_class="updates align-right events yellow", heading="Competitions", more_url=more_url, show_images=False)
+
+@register.tag
+def home_events(parser, token):
+    queryset = []
+    entries = Entry.objects.permitted().upcoming().by_content_type(Event).order_by('start')
+    if entries:
+        for entry in entries:
+            content = entry.content
+            if content not in queryset:
+                queryset.append(content)
+
+    queryset = queryset[:3]
+    more_url = reverse('events')
+    return UpdatesNode(queryset, panels=1, node_class="updates align-right events blue", heading="Events", more_url=more_url, show_images=False)
 
 class UpdatesNode(template.Node):
     def __init__(self, queryset, panels, node_class, heading, more_url, show_images=True):
