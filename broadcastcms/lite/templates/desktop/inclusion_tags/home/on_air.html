@@ -8,7 +8,7 @@
     <p class="banner_info">
         {% if show %}
     	    <span class="onair">{% if on_air %}On Air{% else %}Coming Up{% endif %}: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</span><br />
-	    	<span class="showtitle">{{ show.title }}</span><br />
+	    	<span class="showtitle">{{ show.title }}{% with show.primary_castmembers as primary_castmembers %}{% if primary_castmembers %} with {{primary_castmembers|join:" & "|truncatewords:"5" }} {% endif %}{% endwith %}</span><br />
         {% endif %}
     	{% if song %}
             <span class="nowplaying"><strong>Now Playing:</strong>{% if artist %} {{ artist.title }} -{% endif %} {{ song.title }}</span>
