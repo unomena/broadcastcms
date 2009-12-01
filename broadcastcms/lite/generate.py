@@ -85,7 +85,8 @@ def create_labels():
     restricted_to_choices = ["post-labels", "event-labels", "competition-labels", "show-labels", "gallery-labels", "chart-labels", "imagebanner-labels"]
 
     labels = []
-    for i in range (1, LABEL_COUNT + 1):
+    # minus 1 for the news label
+    for i in range (1, LABEL_COUNT + 1 - 1):
         labels.append({
             "model": "label.label", 
             "fields": {
@@ -94,6 +95,16 @@ def create_labels():
                 "restricted_to": random.sample(restricted_to_choices, random.randint(0, len(restricted_to_choices))),
             }
         })
+
+    # add news label
+    labels.append({
+        "model": "label.label", 
+        "fields": {
+            "title": "News", 
+            "is_visible": False,
+            "restricted_to": restricted_to_choices,
+        }
+    })
     return labels
 
 def create_posts():
