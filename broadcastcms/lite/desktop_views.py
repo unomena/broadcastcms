@@ -971,12 +971,19 @@ class ImageBannerViews(object):
         return render_to_string('desktop/content/banners/image_banner.html', {"self": self})
 
 class ContentBaseViews(object):
-    def render_home_updates(self, context):
+    def render_updates(self, context):
         context = {
-            'self': self,
+            'object': self,
             'url': self.url(context),
         }
-        return render_to_string('desktop/content/contentbase/home_updates.html', context)
+        return render_to_string('desktop/content/contentbase/updates.html', context)
+    
+    def render_updates_featured(self, context):
+        context = {
+            'object': self,
+            'url': self.url(context),
+        }
+        return render_to_string('desktop/content/contentbase/updates_featured.html', context)
    
     def render_updates_widget(self, context):
         labels = self.labels.visible()
