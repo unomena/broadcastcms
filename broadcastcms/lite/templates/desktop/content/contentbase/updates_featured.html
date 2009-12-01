@@ -1,0 +1,9 @@
+{% load scaled_image_tags %}
+
+<div class="chunk_item">
+    <div class="chunk_body_first">
+	    <p class="upd_pic"><a href="{{ url }}"><img src="{% scaled_image_url object 150 84 %}" width="150" height="84" alt="" /></a></p>
+		<p class="upd_cat"><span class="upd_catname">{{ object.labels.visible.0.title }}</a></span></p>
+		<h2><a href="{{ url }}">{{ object.title }}</a></h2>
+	</div>
+</div>

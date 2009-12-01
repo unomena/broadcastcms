@@ -1,0 +1,11 @@
+{% load scaled_image_tags comments voting_tags public_tags %}
+
+{% get_comment_count for object as comment_count %}
+{% score_for_object object.contentbase as score %}
+<div class="chunk_item">
+    <div class="chunk_body">
+	    <p class="upd_pic"><a href="{{ url }}"><img src="{% scaled_image_url object 107 60 %}" width="107" height="60" alt="" /></a></p>
+    	<p class="upd_cat"><span class="upd_catname">{{ object.labels.visible.0.title }}</span><span class="upd_meta">{{ score.score }} Likes | <a href="{{ url }}#comments">{{ comment_count }} Comments</a> | <a href="{% url modals_content object.slug %}?height=600&amp;width=720" class="thickbox">Peek &raquo;</a></span></p>
+	    <h2><a href="{{ url }}">{{ object.title }}</a></h2>
+    </div>
+</div>
