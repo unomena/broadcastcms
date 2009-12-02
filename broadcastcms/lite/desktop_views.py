@@ -7,6 +7,7 @@ from django.contrib import comments
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.comments import signals
+from django.contrib.comments.models import Comment
 from django.contrib.comments.views.comments import CommentPostBadRequest
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
@@ -18,10 +19,12 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.loader import render_to_string
+from django.utils import simplejson
 from django.utils.http import urlencode
 from django.views.generic import list_detail
 
 from friends.models import FriendshipInvitation, Friendship
+from voting.models import Vote
 
 from broadcastcms import public
 from broadcastcms.banner.models import CodeBanner, ImageBanner
@@ -37,6 +40,7 @@ from broadcastcms.radio.models import Song
 from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.scaledimage.fields import get_image_scales
 from broadcastcms.show.models import Show, CastMember
+from broadcastcms.status.models import StatusUpdate
 from broadcastcms.utils import mail_user
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
@@ -44,6 +48,61 @@ from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode
 import utils
 
 # Account
+def gen_inv_response(user):
+    return { 
+        '2': {
+            "action_text": "Awaiting Confirmation", 
+            "action_href": "", 
+            "action_class": "user_add",
+            "user_pk": user.pk
+        },
+        '5': {
+            "action_text": "Unfriend", 
+            "action_href": "", 
+            "action_class": "user_delete",
+            "user_pk": user.pk
+        },
+        'None': {
+            "action_text": "Add Friend", 
+            "action_href": reverse('account_friends_add', kwargs={'user_pk': user.pk}),
+            "action_class": "user_add",
+            "user_pk": user.pk
+        }
+    }
+
+def account_login(request):
+    context = RequestContext(request, {})
+    next = request.GET.get('next', None)
+    if not next:
+        next = request.POST.get('next', None)
+        
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = auth.authenticate(
+                username=username, 
+                password=password
+            )
+            if user:
+                auth.login(request, user)
+                if not next:
+                    next = request.META["HTTP_REFERER"]
+                    if reverse('account_login') in next:
+                        next = reverse("home")
+                return HttpResponseRedirect(next)
+            else:
+                form._errors['username'] = ['Incorrect username or password.',]
+    else:
+        form = LoginForm()
+
+    context.update({
+        'form': form,
+        'next': next
+    })
+    return render_to_response('desktop/content/account/login.html', context)
 
 def account_picture(request):
     if not request.user.is_authenticated():
@@ -215,36 +274,45 @@ def account_subscriptions(request):
 
 @login_required
 def account_friends_find(request):
-    if request.GET.get('q'):
-        q = request.GET['q']
+    if request.GET.get('find'):
+        q = request.GET['find']
         users = User.objects.filter(
             Q(first_name__icontains=q) |
             Q(last_name__icontains=q) |
             Q(username__icontains=q)
-        )
+        ).exclude(pk=request.user.pk)
     else:
-        users = None
+        users = []
+
+    # create pager
+    page_obj = utils.paging(users, 'page', request, 5)
+    users = page_obj.object_list
+
     return render_to_response('desktop/content/account/find_friends.html', {
         'users': users,
+        'page_obj': page_obj,
     }, context_instance=RequestContext(request))
 
 @login_required
-def account_friends_add(request):
-    if request.method == 'POST' and request.POST.get('user_id'):
-        user = get_object_or_404(User, pk=request.POST['user_id'])
-        inv = FriendshipInvitation.objects.create_friendship_request(request.user,
-            user)
-        ctx = {
-            "to_user": user,
-            "from_user": request.user,
-            "invitation": inv,
-            "site": Site.objects.get_current(),
-        }
-        subject = render_to_string("desktop/mailers/account/friend_request_subject.txt", ctx).strip()
-        body = render_to_string("desktop/mailers/account/friend_request_body.html", ctx)
-        send_mail(subject, body, settings.SERVER_EMAIL, [user.email])
-    return HttpResponseRedirect(request.META["HTTP_REFERER"])
+def account_friends_add(request, user_pk):
+    if not request.is_ajax():
+        raise Http404
+        
+    user = get_object_or_404(User, pk=user_pk)
+    inv = FriendshipInvitation.objects.create_friendship_request(request.user, user)
+    ctx = {
+        "to_user": user,
+        "from_user": request.user,
+        "invitation": inv,
+        "site": Site.objects.get_current(),
+    }
 
+    inv_response = gen_inv_response(user=user) 
+    subject = render_to_string("desktop/mailers/account/friend_request_subject.txt", ctx).strip()
+    body = render_to_string("desktop/mailers/account/friend_request_body.html", ctx)
+    send_mail(subject, body, settings.SERVER_EMAIL, [user.email])
+    
+    return HttpResponse(simplejson.dumps(inv_response[str(inv.status)]))
 
 @login_required
 def account_friends(request):
@@ -1233,6 +1301,33 @@ class UserViews(object):
     def url(self):
         castmembers = self.contentbase_set.permitted().filter(classname__exact="castmember")
         return castmembers[0].as_leaf_class().url() if castmembers else ''
+
+    def render_listing(self, context):
+        request = context['request']
+        
+        #are_friends = Friendship.objects.are_friends(self, request.user)
+        #if are_friends:
+        #    status = 
+        status = str(FriendshipInvitation.objects.invitation_status(self, request.user))
+        #    import pdb; pdb.set_trace()
+  
+        inv_response = gen_inv_response(user = self)
+
+
+        update_count = StatusUpdate.objects.filter(user=self).count()
+        like_count = Vote.objects.filter(user=self).count()
+        comment_count = Comment.objects.filter(user=self).count()
+        context = {
+            'user': self,
+            'profile': self.profile,
+            'update_count': update_count,
+            'like_count': like_count,
+            'comment_count': comment_count,
+        }
+
+        context.update(inv_response[status])
+
+        return render_to_string('desktop/content/user/listing.html', context)
 
 class SongViews(object):
     def render_modals_content(self, context):
