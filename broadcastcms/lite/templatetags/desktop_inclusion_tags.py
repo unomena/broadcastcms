@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 
 from user_messages.models import Thread
+from friends.models import Friendship
 
 from broadcastcms.calendar.models import Entry
 from broadcastcms.competition.models import Competition
@@ -163,6 +164,25 @@ class HomeAdvertNode(template.Node):
         settings = context['settings']
         banners = settings.get_section_banners(section)
         return banners[0].render() if banners else ""
+
+@register.tag
+def home_friends(parser, token):
+    return HomeFriendsNode()
+
+class HomeFriendsNode(template.Node):
+    def render(self, context):
+        friends = []
+        request = context['request']
+        
+        user = request.user
+       
+        if user.is_authenticated():
+            friends = Friendship.objects.friends_for_user(user)
+
+        context.update({
+            'friends': friends
+        })
+        return render_to_string('desktop/inclusion_tags/home/friends.html', context)
 
 @register.tag
 def features(parser, token):
@@ -450,6 +470,26 @@ class PagingNode(template.Node):
             })
             return render_to_string('desktop/inclusion_tags/misc/paging.html', context)
         return ''
+
+@register.tag
+def social_paging(parser, token):
+    token = token.split_contents()
+    if not len(token) == 2:
+        raise template.TemplateSytaxError, '%r tag requires exactly 1 argument.' % token[0]
+    return SocialPagingNode(token[1])
+
+
+class SocialPagingNode(template.Node):
+    def __init__(self, page_obj):
+        self.page_obj = template.Variable(page_obj)
+
+    def render(self, context):
+        page_obj = self.page_obj.resolve(context)
+        context = {
+            'request': context['request'],
+            'page_obj': page_obj
+        }
+        return render_to_string('desktop/inclusion_tags/misc/social_paging.html', context)
 
 @register.tag
 def comments(parser, token):
