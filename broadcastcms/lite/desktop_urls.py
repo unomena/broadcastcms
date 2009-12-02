@@ -46,7 +46,7 @@ urlpatterns = patterns('',
     url(r'^account/subscriptions/$', account_subscriptions, name='account_subscriptions'),
     url(r'^account/friends/$', account_friends, name='account_friends'),
     url(r'^account/friends/find/$', account_friends_find, name='account_friends_find'),
-    url(r'^account/friends/add/$', account_friends_add, name='account_friends_add'),
+    url(r'^account/friends/add/(?P<user_pk>[\w-]+)/$$', account_friends_add, name='account_friends_add'),
     url(r'^account/friends/response/(\d+)/$',
         'friends.views.respond_to_friendship_invitation',
         {'redirect_to_view': 'account_friends'},
@@ -60,6 +60,8 @@ urlpatterns = patterns('',
     url(r'^account/messages/', include(messages_urls)),
     url(r'^account/activity/', include("broadcastcms.activity.urls")),
     url(r'^account/status/', include('broadcastcms.status.urls')),
+    
+    url(r'^account/login/', account_login, name='account_login'),
     
     url(r'chart/$', ChartView(), name='chart'),
     
