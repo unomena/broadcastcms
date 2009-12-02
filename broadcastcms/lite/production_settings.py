@@ -62,6 +62,8 @@ MIDDLEWARE_CLASSES = (
     'broadcastcms.lite.middleware.URLSwitchMiddleware',
 )
 
+LOGIN_URL = '/account/login'
+
 ROOT_URLCONF = 'broadcastcms.lite.desktop_urls'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
