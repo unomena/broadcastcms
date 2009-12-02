@@ -7,15 +7,24 @@ from django.template.loader import render_to_string
     
 from voting.models import Vote
 
-def paging(list, request_key, request, size=10):
-    paginator = Paginator(list, size)
-    page = int(request.REQUEST.get(request_key, '1'))
+def paging(queryset, request_key, request, size=10):
+    paginator = Paginator(queryset, size)
+    page = request.GET.get(request_key, '1')
     try:
-        page = paginator.page(page)
+        page_number = int(page)
+    except ValueError:
+        if page == 'last':
+            page_number = paginator.num_pages
+        else:
+            # Page is not 'last', nor can it be converted to an int.
+            raise Http404
+    try:
+        page_obj = paginator.page(page_number)
     except (EmptyPage, InvalidPage):
-        page = paginator.page(1)
-    page.key = request_key
-    return page
+        page_obj = paginator.page(1)
+    
+    page_obj.key = request_key
+    return page_obj
 
 def order_by_created(items):
     return items.order_by("-created")
