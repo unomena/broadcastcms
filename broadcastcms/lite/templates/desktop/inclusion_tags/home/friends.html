@@ -1,0 +1,19 @@
+<div class="updates friends purple">
+{% if user.is_authenticated %}
+    {% if friends %}
+        <h1>Your Friends <span>(254)</span></h1>
+    	<ul>
+            {% for friend in friends %}
+    	        <li><a href="user-friends-profile.html"><img src="media/goodhopefm/images/examples/avatar_friends.jpg" width="50" height="50" alt="" /></a></li>
+            {% endfor %}
+	    </ul>
+	    <p class="updates_more"><a href="friends.html">View all Friends</a><a href="friends-find.html">Find more Friends</a></p>
+    {% else %}
+        <h1>Your Friends</h1>
+	    <p class="updates_more" style="width: 100%;"><a href="{% url account_friends_find %}" style="width: 100%;">You don't have any friends. Go find some now.</a></p>
+    {% endif %}
+{% else %}
+    <h1>Your Friends</h1>
+	<p class="updates_more" style="width: 100%;"><a href="{% url modals_login %}?height=370&amp;width=540" class="thickbox" style="width: 100%;">Sign in to view Your Friends</a></p>
+{% endif %}
+</div><!--/Updates-->
