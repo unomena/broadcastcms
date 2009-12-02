@@ -5,7 +5,7 @@
 	    <h1>Sign In &nbsp;<img src="media/goodhopefm/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
 	</div><!--/head-->
 	<div class="page_form">
-	    <h2 class="smaller">Not Registered? <a href="register.html">Create your free profile now</a>.</h2>
+	    <h2 class="smaller">Not Registered? <a href="{% url modals_register %}?height=630&amp;width=515" class="thickbox">Create your free profile now</a>.</h2>
 		<form id="frmLoginFallback" action="{% url account_login %}" method="post" class="cmxform">
             {% for field in form %}
 			    <div class="page_form_row">
