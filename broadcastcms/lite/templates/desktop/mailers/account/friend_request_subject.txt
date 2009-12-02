@@ -1,1 +1,1 @@
-{{ from_user }} wants to be your friend.
+{{ from_user }} wants to be your friend on {{ site.name }}.
