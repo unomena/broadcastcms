@@ -171,17 +171,19 @@ def home_friends(parser, token):
 
 class HomeFriendsNode(template.Node):
     def render(self, context):
-        friends = []
         request = context['request']
-        
         user = request.user
        
         if user.is_authenticated():
             friends = Friendship.objects.friends_for_user(user)
+            friends_count = len(friends)
+            friends = [friend['friend'] for friend in friends][:10]
+    
+            context.update({
+                'friends': friends,
+                'friends_count': friends_count
+            })
 
-        context.update({
-            'friends': friends
-        })
         return render_to_string('desktop/inclusion_tags/home/friends.html', context)
 
 @register.tag
