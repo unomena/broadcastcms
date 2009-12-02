@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='broadcastcms',
-    #version='dev',
-    version='1.1.1_trufm',
+    version='dev',
+    #version='1.1.1_trufm',
     description='Broadcast CMS Django Applications',
     author='Praekelt Consulting',
     author_email='sysadmin@praekeltconsulting.com',
