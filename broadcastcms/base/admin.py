@@ -119,7 +119,7 @@ class ContentBaseAdmin(ModelBaseAdmin):
 
     list_display = ('title', 'owner', 'created', 'modified',) + ModelBaseAdmin.list_display
     list_filter = ('created', 'modified',) + ModelBaseAdmin.list_filter
-    search_fields = ('title', 'description', 'content')
+    search_fields = ('title', 'description')
     
     fieldsets = deepcopy(ModelBaseAdmin.fieldsets)
     for fieldset in fieldsets:
