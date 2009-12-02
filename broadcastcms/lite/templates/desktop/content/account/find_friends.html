@@ -2,40 +2,74 @@
 
 {% load desktop_inclusion_tags %}
 {% load friends_tags %}
+{% load public_tags %}
 
 {% block left %}
     {% account_menu %}
     {% account_thanks %}
     
-    <div class="page_form">
-        <form action="{% url account_friends_find %}" method="get">
-            <div class="page_form_row">
-                <label for="q">Who are you looking for?</label>
-                <p class="text_input shift">
-                    <input type="text" name="q" value="{{ request.GET.q }}" />
-                </p>
-                <p class="note">
-                    You can search for nicknames, first names, or surnames.
-                </p>
-                <p class="btn">
-                    <input type="submit" value="Search" />
-                </p>
-            </div>
-        </form>
-        {% if users %}
-            {% for user in users %}
-                <div>
-                    <p>{{ user.username }}</p>
-                    <form action="{% url account_friends_add %}" method="post">
-                        <input type="hidden" name="user_id" value="{{ user.id }}" />
-                        <input type="submit" value="make friends" />
-                    </form>
-                    {% friendship_status request.user user as status %}
-                    {% ifequal status "Sent" %}
-                        <p>Friendship request sent</p>
-                    {% endifequal %}
-                </div>
-            {% endfor %}
-        {% endif %}
-    </div>
+    <div class="social">
+	    <ul class="social_nav">
+		    <li><a href="javascript: void(0);" rel="#find_people_you_know">Find People You Know</a></li>
+			<li><a href="javascript: void(0);" rel="#invite_facebook_friends">Invite Facebook Friends</a></li>
+			<li><a href="javascript: void(0);" rel="#invite_more_people">Invite More People</a></li>
+		</ul>
+		<div class="social_body" id="find_people_you_know">
+		    <div class="page_form">
+			    <h2 class="smaller no-bg">Who are you looking for?</h2>
+				<form id="frmFindFriends" action="{% url account_friends_find %}" method="get" onsubmit="this.submit();return false;">
+				    <div class="page_form_row">
+					    <label for="find">Look for:</label>
+						<p class="text_input shift">
+                            <input type="text" name="find" id="find" value="{{ request.GET.find }}" class="required" />
+                        </p>
+						<p class="note">
+                            (You can search for nicknames, first names or surnames)
+                            <br />
+                        </p>
+					</div>
+					<p class="clearfix"></p>
+					<div class="page_form_row no-pad">
+					    <p class="label">&nbsp;</p>
+						<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-search.jpg" name="submit" /></p>
+					</div>
+				</form>
+				<p class="clearfix"></p>
+			</div><!--/form-->
+					
+            {% if users %}
+                
+                {% social_paging page_obj %}
+                
+                {% for user in users %}
+                    {% call_view user render_listing %}
+                {% endfor %}
+
+            {% endif %}
+            {% if not users and request.GET.find %}
+			<h2 class="smaller no-bg">No users found matching '{{ request.GET.find }}'. Please try again.</h2>
+            {% endif %}
+		</div>
+				<div class="social_body" id="invite_facebook_friends">
+					facebook
+				</div>
+				<div class="social_body" id="invite_more_people">
+					<div class="page_form">
+						<h2 class="smaller no-bg">Invite more of your friends!</h2>
+						<form id="frmInviteFriends" action="#" method="post">
+						<div class="page_form_row">
+							<label for="emails">Email Addresses:</label>
+							<p class="text_area_short shift_half"><textarea name="emails" id="emails" class="required"></textarea></p>
+							<p class="note">(You can send to more than one email address. Separate email addresses with commas.)</p>
+						</div>
+						<p class="clearfix"></p>
+						<div class="page_form_row no-pad">
+							<p class="label">&nbsp;</p>
+							<p class="btn"><input type="image" src="media/goodhopefm/images/forms/btn-invite.jpg" name="submit" /></p>
+						</div>
+						</form>
+						<p class="clearfix"></p>
+					</div><!--/form-->
+				</div>
+			</div><!--/social-->
 {% endblock %}
