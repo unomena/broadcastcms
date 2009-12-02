@@ -1,13 +1,17 @@
+{% load scaled_image_tags %}
+
 <div class="updates friends purple">
 {% if user.is_authenticated %}
     {% if friends %}
-        <h1>Your Friends <span>(254)</span></h1>
+        <h1>Your Friends <span>({{ friends_count }})</span></h1>
     	<ul>
             {% for friend in friends %}
-    	        <li><a href="user-friends-profile.html"><img src="media/goodhopefm/images/examples/avatar_friends.jpg" width="50" height="50" alt="" /></a></li>
+                {% with friend.profile as profile %}
+        	        <li><a href="user-friends-profile.html"><img title="{{ friend.username }}" src="{% if profile.image %}{% scaled_image_url profile 50 50 %}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="50" height="50" alt="" /></a></li>
+                {% endwith %}
             {% endfor %}
 	    </ul>
-	    <p class="updates_more"><a href="friends.html">View all Friends</a><a href="friends-find.html">Find more Friends</a></p>
+	    <p class="updates_more"><a href="friends.html">View all Friends</a><a href="{% url account_friends_find %}">Find more Friends</a></p>
     {% else %}
         <h1>Your Friends</h1>
 	    <p class="updates_more" style="width: 100%;"><a href="{% url account_friends_find %}" style="width: 100%;">You don't have any friends. Go find some now.</a></p>
