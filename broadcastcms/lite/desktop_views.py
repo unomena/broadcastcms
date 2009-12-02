@@ -58,7 +58,25 @@ def gen_inv_response(user):
         },
         '5': {
             "action_text": "Unfriend", 
+            "action_href": reverse('account_friends_remove', kwargs={'user_pk': user.pk}), 
+            "action_class": "user_delete",
+            "user_pk": user.pk
+        },
+        '6': {
+            "action_text": "Friendship Declined", 
             "action_href": "", 
+            "action_class": "user_delete",
+            "user_pk": user.pk
+        },
+        '7': {
+            "action_text": "Add Friend", 
+            "action_href": reverse('account_friends_add', kwargs={'user_pk': user.pk}),
+            "action_class": "user_add",
+            "user_pk": user.pk
+        },
+        'friends': {
+            "action_text": "Unfriend", 
+            "action_href": reverse('account_friends_remove', kwargs={'user_pk': user.pk}), 
             "action_class": "user_delete",
             "user_pk": user.pk
         },
@@ -297,22 +315,29 @@ def account_friends_find(request):
 def account_friends_add(request, user_pk):
     if not request.is_ajax():
         raise Http404
-        
+    
+    # get user and create invitation
     user = get_object_or_404(User, pk=user_pk)
     inv = FriendshipInvitation.objects.create_friendship_request(request.user, user)
-    ctx = {
-        "to_user": user,
-        "from_user": request.user,
-        "invitation": inv,
-        "site": Site.objects.get_current(),
-    }
+    inv_response = gen_inv_response(user=user) 
+            
+    # send confirmation request mail
+    message, subject = mailer_friend_request(request=request, from_user=request.user, to_user=user, invitation=inv)
+    mail_user(subject, message, user, content_subtype="html", fail_silently=False)
+   
+    # return json response
+    return HttpResponse(simplejson.dumps(inv_response[str(inv.status)]))
+
+@login_required
+def account_friends_remove(request, user_pk):
+    if not request.is_ajax():
+        raise Http404
+        
+    user = get_object_or_404(User, pk=user_pk)
+    Friendship.objects.remove(request.user, user)
 
     inv_response = gen_inv_response(user=user) 
-    subject = render_to_string("desktop/mailers/account/friend_request_subject.txt", ctx).strip()
-    body = render_to_string("desktop/mailers/account/friend_request_body.html", ctx)
-    send_mail(subject, body, settings.SERVER_EMAIL, [user.email])
-    
-    return HttpResponse(simplejson.dumps(inv_response[str(inv.status)]))
+    return HttpResponse(simplejson.dumps(inv_response[str(None)]))
 
 @login_required
 def account_friends(request):
@@ -772,6 +797,21 @@ def mailer_new_user(request, username, password):
         'host': host,
         'site_name': site_name,
         'site_domain': site_domain,
+    }), subject)
+
+def mailer_friend_request(request, from_user, to_user, invitation):
+    site = Site.objects.get_current()
+    host = "http://%s" % request.META['HTTP_HOST']
+    subject = render_to_string("desktop/mailers/account/friend_request_subject.txt", { 'from_user': from_user, 'site': site}).strip()
+    
+    return (render_to_string('desktop/mailers/account/friend_request_body.html', {
+        'host': host,
+        'invitation': invitation,
+        'site': site,
+        'host': "http://%s" % request.META['HTTP_HOST'],
+        'mailer_title': 'Friendship Request',
+        'from_user': from_user,
+        'to_user': to_user
     }), subject)
 
 
@@ -1305,14 +1345,13 @@ class UserViews(object):
     def render_listing(self, context):
         request = context['request']
         
-        #are_friends = Friendship.objects.are_friends(self, request.user)
-        #if are_friends:
-        #    status = 
-        status = str(FriendshipInvitation.objects.invitation_status(self, request.user))
-        #    import pdb; pdb.set_trace()
+        are_friends = Friendship.objects.are_friends(self, request.user)
+        if are_friends:
+            status = 'friends'
+        else:
+            status = str(FriendshipInvitation.objects.invitation_status(self, request.user))
   
         inv_response = gen_inv_response(user = self)
-
 
         update_count = StatusUpdate.objects.filter(user=self).count()
         like_count = Vote.objects.filter(user=self).count()
