@@ -16,13 +16,13 @@ from models import Settings
 class LoginForm(forms.Form):
     username = forms.CharField(
         max_length=100,
-        label='Username',
+        label='Username: ',
         widget=forms.TextInput(attrs={'class':'required'}),
         error_messages={'required': 'Please enter a username.'}
     )
     password = forms.CharField(
         max_length=100, 
-        label='Password',
+        label='Password: ',
         widget=forms.PasswordInput(attrs={'class':'required'}),
         error_messages={'required': 'Please enter a password.'}
     )
