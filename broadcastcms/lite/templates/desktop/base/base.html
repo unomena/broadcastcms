@@ -32,10 +32,11 @@
     <!--Recaptcha-->
     <script type="text/javascript" src="http://api.recaptcha.net/js/recaptcha_ajax.js"></script>
     {% if FACEBOOK_API_KEY %}
-    <!--Facebook-->
-    <script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php" type="text/javascript"></script>
-    <script type="text/javascript" src="/media/bcms/includes/facebook.js"></script>
+        <!--Facebook-->
+        <script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php" type="text/javascript"></script>
+        <script type="text/javascript" src="/media/bcms/includes/facebook.js"></script>
     {% endif %}
+
     {% block head %}{% endblock %}
 </head>
 
@@ -62,13 +63,12 @@
 
     {% endblock %}
 
-    {% metrics %}
-    
     {% if request.fb_authenticated %}
         <script type="text/javascript">
             FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
         </script>
     {% endif %}
-
+    
+    {% metrics %}
 </body>
 </html>
