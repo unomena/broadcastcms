@@ -83,3 +83,25 @@ def permissions(request):
     return direct_to_template(request,"desktop/facebook_integration/permissions.html", {
         "form": form,
     })
+
+def existing_user(request):
+    """
+    Checks wether a user exists for the given facebook info
+    Used to check for page reload requirement on facebook modal login.
+    """
+    from broadcastcms.lite.models import UserProfile
+    response = "false"
+    params = {
+        "uids": request.COOKIES[API_KEY + "_user"],
+        "fields": "profile_url,first_name,last_name",
+    }
+    result = facebook_api_request("users.getInfo", **params)
+    user_info = result[0]
+    try:
+        queryset = UserProfile.objects.select_related("user").filter(facebook_url = user_info["profile_url"])
+        profile = queryset.get()
+        response = "true"
+    except UserProfile.DoesNotExist:
+        respone = "false"
+        
+    return HttpResponse(response)
