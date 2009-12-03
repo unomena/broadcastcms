@@ -198,3 +198,7 @@ IMAGE_SCALES = {
         },
     },
 }
+
+FACEBOOK_API_KEY = '76f92b0c84d3d371ee18175e2be1c3bc'
+
+FACEBOOK_API_SECRET = 'd3ac4c835b56590bc5aef8dfa04717e8'
