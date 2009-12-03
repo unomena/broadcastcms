@@ -234,7 +234,11 @@ class UserProfile(models.Model):
         blank=True,
         null=True,
     )
-    facebook_id = models.IntegerField(blank=True, null=True)
+    facebook_id = models.CharField(
+        max_length=100,
+        blank=True, 
+        null=True
+    )
     publish_facebook_comments = models.BooleanField(default=False)
     publish_facebook_status = models.BooleanField(default=False)
     publish_facebook_likes = models.BooleanField(default=False)
