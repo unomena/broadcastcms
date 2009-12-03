@@ -1,5 +1,16 @@
 {% extends "desktop/base/section.html" %}
 
+{% block head %}	
+    <script type="text/javascript">
+	    $().ready(function() {
+	        bindForm();
+    	});
+    	function fb_onlogin() {
+    	    window.location.reload();
+    	}
+	</script>
+{% endblock %}
+
 {% block left %}
     <div class="page_head">
 	    <h1>Sign In &nbsp;<img src="media/goodhopefm/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
@@ -26,7 +37,13 @@
 				<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-sign_in.jpg" name="submit" /></p>
 			</div>
 			<p class="clearfix"></p>
-			<div class="facebook_connect_bar">Are you a Facebook user? Sign in using Facebook: <fb:login-button v="2" size="medium">Connect</fb:login-button></div>
+			<div class="facebook_connect_bar">Are you a Facebook user? Sign in using Facebook: <fb:login-button v="2" size="medium" onlogin="fb_onlogin();">Connect</fb:login-button></div>
 		</form>
-	</div><!--/form-->	
+	</div><!--/form-->
+
+	{% if FACEBOOK_API_KEY %}
+	    <script type="text/javascript">
+            FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
+        </script>
+    {% endif %}
 {% endblock %}
