@@ -9,6 +9,7 @@ from django.contrib import auth
 
 from broadcastcms.facebook_integration.utils import (facebook_signature,
     facebook_api_request, API_KEY)
+from broadcastcms.lite.desktop_views import account_links
 from broadcastcms.lite.models import UserProfile
 
 
@@ -18,12 +19,17 @@ class FacebookConnectMiddleware(object):
         request.delete_facebook_cookies = False
         request.fb_authenticated = False
         
+        if request.path.startswith(reverse("facebook_existing_user")):
+            # allow this request to pass through
+            return None
+        
         if request.GET.get("fbc", False):
             request.delete_facebook_cookies = True
         
         if request.session.get("fb_signup_info"):
             # allow this request to pass through
             return None
+
         
         if not request.user.is_authenticated():
             if API_KEY in request.COOKIES:
@@ -54,6 +60,10 @@ class FacebookConnectMiddleware(object):
                             user = profile.user
                             user.backend = "django.contrib.auth.backends.ModelBackend"
                             auth.login(request, user)
+                            # if the request is for the account_links view
+                            # return its response instead of redirecting to home
+                            if request.path == reverse('account_links'):
+                                return account_links(request)
                             return HttpResponseRedirect(reverse("home"))
                     else:
                         request.delete_facebook_cookies = True
