@@ -63,11 +63,9 @@
 
     {% endblock %}
 
-    {% if request.fb_authenticated %}
-        <script type="text/javascript">
-            FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
-        </script>
-    {% endif %}
+    <script type="text/javascript">
+        FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
+    </script>
     
     {% metrics %}
 </body>
