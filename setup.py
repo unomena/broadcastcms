@@ -7,7 +7,7 @@ setup(
     description='Broadcast CMS Django Applications',
     author='Praekelt Consulting',
     author_email='sysadmin@praekeltconsulting.com',
-    url='http://projects.praekelt.com/broadcastcms',
+    url='http://www.broadcastcms.com',
     packages = find_packages(),
     dependency_links = [
         'http://dist.repoze.org/',
@@ -26,6 +26,7 @@ setup(
         'python-twitter==0.6',
         'django-friends==0.2alpha',
         'user-messages==0.1-dev1',
+        'python-dateutil==1.4.1',
     ],
     include_package_data=True,
 )
