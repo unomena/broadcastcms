@@ -2,7 +2,13 @@
 
 <div class="social_item">
     <p class="user_actions"><a {% if action_href %}href="{{ action_href }}"{% endif %} id="user_{{ user.pk }}" class="{{ action_class }}">{{ action_text }}</a></p>
-	<p class="user_avatar"><a href="user-friends-profile.html"><img src="{% if profile.image %}{% scaled_image_url profile 50 50 %}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="50" height="50" alt="" /></a></p>
+	<p class="user_avatar"><a href="user-friends-profile.html">
+    {% if profile.facebook_id and profile.use_facebook_picture %}
+        <fb:profile-pic linked="false" uid="{{ profile.facebook_id }}" width="50" height="50" />
+    {% else %}
+        <img src="{% if profile.image %}{% scaled_image_url profile 50 50 %}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="50" height="50" alt="" />
+    {% endif %}
+    </a></p>
 	<p class="user_date">Last Seen {{ user.last_login|date:"j F Y" }}</p>
 	<p class="user_name">{{ user.username }}{% if user.first_name and user.last_name %} ({{ user.first_name|capfirst }} {{ user.last_name|capfirst }}){% endif %}</p>
 	<p class="user_meta">{{ update_count }} Status Updates  |  {{ like_count }} Likes  |  {{ comment_count }} Comments</p>
