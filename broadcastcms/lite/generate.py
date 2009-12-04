@@ -245,7 +245,7 @@ def create_profiles():
             "model": "lite.userprofile", 
             "fields": {
                 "facebook_url": "http://www.facebook.com/kabelom?_fb_noscript=1",
-                "twitter_url": "http://twitter.com/gustavp",
+                "twitter_username": "gustavp",
                 "image": random.sample(IMAGES, 1)[0],
                 "user": {
                     "model": "auth.user",
