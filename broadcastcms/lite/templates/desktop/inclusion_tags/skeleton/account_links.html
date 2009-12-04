@@ -4,7 +4,7 @@
     <p class="logged_avatar">
         <a href="{% url account_picture %}">
             {% if profile.facebook_id and profile.use_facebook_picture %}
-                <fb:profile-pic uid="{{ profile.facebook_id }}" width="35" height="35" />
+                <fb:profile-pic linked="false" uid="{{ profile.facebook_id }}" width="35" height="35" />
             {% else %}
                 <img src="{% if profile.image %}{% scaled_image_url profile 35 35%}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="35" height="35" alt="" />
             {% endif %}
