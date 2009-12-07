@@ -1,7 +1,7 @@
 {% load template_tags %}
 
 {% with page_obj.paginator as paginator %}
-    <p class="align-left social_pagi">{{ page_obj.start_index }} - {{ page_obj.end_index }} of {{ paginator.count }} Friends</p>
+    <p class="align-left social_pagi">{{ page_obj.start_index }} - {{ page_obj.end_index }} of {{ paginator.count }}</p>
     {% if page_obj.has_other_pages %}
         <p class="align-right social_pagi social_pagi_contain">{% if page_obj.has_previous %}<a href="{% smart_query_string page_obj.key page_obj.previous_page_number %}" class="social_pagi_prev">Prev</a> &nbsp;{% endif %}{% if page_obj.has_previous and page_obj.has_next %}|&nbsp; {% endif %}{% if page_obj.has_next %}<a href="{% smart_query_string page_obj.key page_obj.next_page_number %}" class="social_pagi_next">Next</a>{% endif %}</p>
     {% endif %}
