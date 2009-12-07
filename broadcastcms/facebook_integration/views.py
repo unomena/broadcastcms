@@ -98,7 +98,7 @@ def existing_user(request):
     result = facebook_api_request("users.getInfo", **params)
     user_info = result[0]
     try:
-        queryset = UserProfile.objects.select_related("user").filter(facebook_url = user_info["profile_url"])
+        queryset = UserProfile.objects.select_related("user").filter(facebook_id = user_info["uid"])
         profile = queryset.get()
         response = "true"
     except UserProfile.DoesNotExist:
