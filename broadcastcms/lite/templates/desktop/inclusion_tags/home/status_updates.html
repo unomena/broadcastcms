@@ -1,0 +1,60 @@
+{% load public_tags %}
+
+<div class="updates global green">
+    <h1>Update Stream</h1>
+	<ul class="global_updates_nav">
+	    <li class="dj_updates"><a href="javascript: void();" rel="#dj_updates">DJ's</a></li>
+		<li class="friend_updates"><a href="javascript: void();" rel="#friend_updates">Your Friends</a></li>
+	</ul>
+	<div class="global_updates" id="dj_updates">
+        {% for update in castmember_status_updates %}
+            {% call_view update render_updates %}
+        {% endfor %}
+	</div>
+				<div class="global_updates" id="friend_updates">
+					<div class="update">
+						<p class="update_avatar"><a href="#"><img src="media/goodhopefm/images/examples/avatar_friends.jpg" width="50" height="50" alt="" /></a></p>
+						<p class="update_content">
+							<a href="user-friends-profile.html">Michael Cera</a> 
+							<span class="update_text">looking fwd to seeing France vs Brazil at Green Point Stadium.</span>
+							<span class="update_meta">3 Hours Ago via Twitter | <a href="#" class="update_meta_like">5</a> | <a href="#" class="update_meta_comments">2</a></span>
+							<span class="update_btns">
+								<a href="#" class="update_btn_like">I Like</a>
+								<a href="#" class="update_btn_retweet">Retweet</a>
+								<a href="#" class="update_btn_reply">Reply</a>
+								<a href="#" class="update_btn_dm">Direct Message</a>
+							</span>
+						</p>
+					</div>
+					<div class="update">
+						<p class="update_avatar"><a href="#"><img src="media/goodhopefm/images/examples/avatar_friends.jpg" width="50" height="50" alt="" /></a></p>
+						<p class="update_content">
+							<a href="user-friends-profile.html">Michael Cera</a> 
+							<span class="update_text">looking fwd to seeing France vs Brazil at Green Point Stadium.</span>
+							<span class="update_meta">3 Hours Ago via Twitter | <a href="#" class="update_meta_like">5</a> | <a href="#" class="update_meta_comments">2</a></span>
+							<span class="update_btns">
+								<a href="#" class="update_btn_like">I Like</a>
+								<a href="#" class="update_btn_retweet">Retweet</a>
+								<a href="#" class="update_btn_reply">Reply</a>
+								<a href="#" class="update_btn_dm">Direct Message</a>
+							</span>
+						</p>
+					</div>
+					<div class="update">
+						<p class="update_avatar"><a href="#"><img src="media/goodhopefm/images/examples/avatar_friends.jpg" width="50" height="50" alt="" /></a></p>
+						<p class="update_content">
+							<a href="user-friends-profile.html">Michael Cera</a> 
+							<span class="update_text">looking fwd to seeing France vs Brazil at Green Point Stadium.</span>
+							<span class="update_meta">3 Hours Ago via Twitter | <a href="#" class="update_meta_like">5</a> | <a href="#" class="update_meta_comments">2</a></span>
+							<span class="update_btns">
+								<a href="#" class="update_btn_like">I Like</a>
+								<a href="#" class="update_btn_retweet">Retweet</a>
+								<a href="#" class="update_btn_reply">Reply</a>
+								<a href="#" class="update_btn_dm">Direct Message</a>
+							</span>
+						</p>
+					</div>
+				</div>
+				<p class="updates_more"><a href="news.html" class="newer">Prev</a><a href="news.html" class="older">Next</a></p>
+				<p class="clearfix"></p>
+			</div><!--/Updates-->
