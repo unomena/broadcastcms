@@ -4,12 +4,14 @@
     <div class="logo"><a href="{% url home %}"></a></div>	
 		
     <div class="logged">
-	    <div class="logged_status">
-		    <form id="frmStatusUpdate" action="#" method="post">
-			    <p class="status_update"><input type="text" name="status_update" value="Update your status here..." onfocus="if (this.value == 'Update your status here...') {this.value = '';}" onblur="if (this.value == '') {this.value = 'Update your status here...';}" /></p>
-				<p class="status_update_btn"><input type="submit" name="submit" value="Update" /></p>
-			</form>
-		</div>
+        {% if request.user.is_authenticated %}
+    	    <div class="logged_status">
+	    	    <form id="frmStatusUpdate" action="{% url status_update %}" method="post">
+					<p class="status_update"><input type="text" name="status_update" value="Update your status here..." /></p>
+					<p class="status_update_btn"><input type="submit" name="submit" value="Update" /></p>
+    			</form>
+	    	</div>
+        {% endif %}
 
         <div id="account_links">
             {% account_links %}
