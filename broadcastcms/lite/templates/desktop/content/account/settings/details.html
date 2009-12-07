@@ -1,0 +1,166 @@
+{% extends "desktop/base/account.html" %}
+{% load desktop_inclusion_tags %}
+
+{% block left %}
+	<script type="text/javascript">
+	    $().ready(function() {
+	        bindForm();
+            validateProfile();
+    	});
+	</script>
+    
+    {% account_menu %}
+    {% account_thanks %}
+	
+    <div class="page_form">
+	    <h2 class="smaller">Update your details using the form below.</h2>
+		<form id="frmProfile" action="{% url account_settings_details %}" method="post">
+            {% with form.username as field %}
+			    <div class="page_form_row">
+                    {{ field.label_tag }}
+					<p class="text_input shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+			    	{% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+				</div>
+            {% endwith %}
+            {% with form.first_name as field %}
+				<div class="page_form_row">
+                    {{ field.label_tag }}
+    	    		<p class="text_input_short shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+				    <p class="text_input_short no-marg shift">
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <label class="error" for="{{ form.last_name.name }}" generated="true" style="display: inline;">{{ form.last_name.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+			    	{% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+    	    	</div>
+            {% endwith %}
+            {% with form.email_address as field %}
+			    <div class="page_form_row">
+                    {{ field.label_tag }}
+					<p class="text_input shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+			    	{% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+				</div>
+            {% endwith %}
+            {% with form.mobile_number as field %}
+			    <div class="page_form_row">
+                    {{ field.label_tag }}
+					<p class="text_input shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+			    	{% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+				</div>
+            {% endwith %}
+            {% with form.password as field %}
+			    <div class="page_form_row">
+                    {{ field.label_tag }}
+					<p class="text_input shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+			    	{% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+				</div>
+            {% endwith %}
+            {% with form.password_confirm as field %}
+			    <div class="page_form_row">
+                    {{ field.label_tag }}
+					<p class="text_input shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+			    	{% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+				</div>
+            {% endwith %}
+            {% with form.city as field %}
+			    <div class="page_form_row">
+                    {{ field.label_tag }}
+					<p class="text_input shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+			    	{% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+				</div>
+            {% endwith %}
+            {% with form.province as field %}
+			    <div class="page_form_row">
+                    {{ field.label_tag }}
+					<p class="text_input no-bg">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+			    	{% if field.help_text %}
+                        <p class="note">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+				</div>
+            {% endwith %}
+			<div class="page_form_row">
+			    <label for="birth_date">Birth Date:</label>
+                {% with form.birth_date_day as field %}
+				    <p class="text_input no-bg">
+                        {{ form.birth_date_day }} &nbsp; {{ form.birth_date_month }}&nbsp; {{ form.birth_date_year }}
+                    </p>
+                {% endwith %}
+			</div>
+			<div class="page_form_row no-pad">
+			    <p class="label">&nbsp;</p>
+				<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-submit.jpg" name="submit" /></p>
+			</div>
+		</form>
+	</div><!--/form-->
+{% endblock %}
