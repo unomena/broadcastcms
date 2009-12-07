@@ -1,0 +1,23 @@
+{% load scaled_image_tags %}
+
+<div class="update">
+    <p class="update_avatar">
+        <a href="#">
+            {% if profile.facebook_id and profile.use_facebook_picture %}
+                <fb:profile-pic linked="false" uid="{{ profile.facebook_id }}" width="50" height="50" />
+            {% else %}
+                <img src="{% if profile.image %}{% scaled_image_url profile 50 50%}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="50" height="50" alt="" />
+            {% endif %}
+        </a>
+    </p>
+	<p class="update_content">
+        <a href="user-friends-profile.html">{{ user.username }}</a> 
+	    <span class="update_text">{{ object.text }}</span>
+		<span class="update_meta">{{ object.timestamp|timesince }} Ago {% ifequal object.source 1 %} via Twitter {% endifequal %}| <a href="#" class="update_meta_like">5</a></span>
+		<span class="update_btns">
+    	    <a href="#" class="update_btn_like">I Like</a>
+			<a href="#" class="update_btn_dm">Direct Message</a>
+			<a href="#" class="update_btn_retweet">Retweet</a>
+		</span>
+	</p>
+</div>
