@@ -1,0 +1,17 @@
+{% extends "desktop/base/base.html" %}
+{% load desktop_inclusion_tags %}
+
+{% block content_body %} 
+
+    <div class="mast_left">
+        {% block left %}{% endblock %}
+	</div><!--/Mast_Left-->
+
+    <div class="mast_right">
+        {% account_side_nav %}
+        {% now_playing %}
+        {% advert %}
+        {{ updates }}
+	</div><!--/Mast_Right-->
+
+{% endblock %}
