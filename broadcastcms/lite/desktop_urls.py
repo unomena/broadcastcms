@@ -4,6 +4,7 @@ from django.contrib import admin
 
 from broadcastcms.base.models import ContentBase
 import broadcastcms.lite.management
+from broadcastcms.lite.forms import NewMessageFormMultipleFriends
 
 from desktop_views import *
 from voting.views import xmlhttprequest_vote_on_object
@@ -14,11 +15,13 @@ handler404 = 'broadcastcms.lite.desktop_views.handler404'
 handler500 = 'broadcastcms.lite.desktop_views.handler500'
 
 messages_urls = patterns('user_messages.views',
-    url(r'^inbox/$', 'inbox',
-        {'template_name': 'desktop/content/account/messages/inbox.html'},
-        name='messages_inbox'),
+    #url(r'^inbox/$', 'inbox',
+    #   {'template_name': 'desktop/content/account/messages/inbox.html'},
+    #    name='messages_inbox'),
+    url(r'^inbox/$', account_messages_inbox, name='messages_inbox'),
+    url(r'^sent/$', account_messages_sent, name='account_messages_sent'),
     url(r'^create/$', 'message_create',
-        {'template_name': 'desktop/content/account/messages/create.html', 'multiple': True},
+        {'template_name': 'desktop/content/account/messages/create.html', 'form_class': NewMessageFormMultipleFriends, 'multiple': True},
         name='message_create'),
     url(r'^create/(?P<user_id>\d+)/$', 'message_create',
         {'template_name': 'desktop/content/account/messages/create.html', 'multiple': True},
@@ -41,10 +44,11 @@ urlpatterns = patterns('',
     
     url(r'^admin/(.*)', admin.site.root),
     
-    url(r'^account/picture/$', account_picture, name='account_picture'),
-    url(r'^account/profile/$', account_profile, name='account_profile'),
-    url(r'^account/subscriptions/$', account_subscriptions, name='account_subscriptions'),
-    url(r'^account/friends/$', account_friends, name='account_friends'),
+    url(r'^account/settings/image/$', account_settings_image, name='account_settings_image'),
+    url(r'^account/settings/details/$', account_settings_details, name='account_settings_details'),
+    url(r'^account/settings/subscriptions/$', account_settings_subscriptions, name='account_settings_subscriptions'),
+    url(r'^account/friends/my/$', account_friends_my, name='account_friends_my'),
+    url(r'^account/friends/activity/$', account_friends_activity, name='account_friends_activity'),
     url(r'^account/friends/find/$', account_friends_find, name='account_friends_find'),
     url(r'^account/friends/add/(?P<user_pk>[\w-]+)/$$', account_friends_add, name='account_friends_add'),
     url(r'^account/friends/remove/(?P<user_pk>[\w-]+)/$$', account_friends_remove, name='account_friends_remove'),
@@ -58,8 +62,8 @@ urlpatterns = patterns('',
     url(r'^account/friends/facebook/add/$',
         'broadcastcms.facebook_integration.views.add_facebook_friends',
         name='account_friends_facebook_add'),
+    url(r'^account/history/$', account_history, name='account_history'),
     url(r'^account/messages/', include(messages_urls)),
-    url(r'^account/activity/', include("broadcastcms.activity.urls")),
     url(r'^account/status/', include('broadcastcms.status.urls')),
     
     url(r'^account/login/', account_login, name='account_login'),
