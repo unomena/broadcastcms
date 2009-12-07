@@ -1,0 +1,5 @@
+<ul class="social_nav">
+    {% for item in items %}
+        <li {% if item.class %}class="{{ item.class }}"{% endif %}><a href="{{ item.url }}" {% ifequal section item.section %}class="selected"{% endifequal %}>{{ item.title }}</a></li>
+    {% endfor %}
+</ul>
