@@ -85,8 +85,8 @@ def create_labels():
     restricted_to_choices = ["post-labels", "event-labels", "competition-labels", "show-labels", "gallery-labels", "chart-labels", "imagebanner-labels"]
 
     labels = []
-    # minus 1 for the news label
-    for i in range (1, LABEL_COUNT + 1 - 1):
+    # minus 1 for the news and reviews labels
+    for i in range (1, LABEL_COUNT + 1 - 2):
         labels.append({
             "model": "label.label", 
             "fields": {
@@ -97,14 +97,23 @@ def create_labels():
         })
 
     # add news label
-    labels.append({
+    labels += [{
         "model": "label.label", 
         "fields": {
             "title": "News", 
             "is_visible": False,
             "restricted_to": restricted_to_choices,
+            }
+        },
+        {
+        "model": "label.label", 
+        "fields": {
+            "title": "Reviews", 
+            "is_visible": False,
+            "restricted_to": restricted_to_choices,
+            }
         }
-    })
+    ]
     return labels
 
 def create_posts():
