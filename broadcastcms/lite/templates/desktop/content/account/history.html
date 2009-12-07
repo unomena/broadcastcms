@@ -1,0 +1,21 @@
+{% extends "desktop/base/section.html" %}
+
+{% load desktop_inclusion_tags %}
+{% load friends_tags %}
+
+{% block left %}
+    {% account_menu %}
+    {% account_thanks %}
+    
+    <div class="page_form">
+        {% if events %}
+            <ul>
+                {% for event in events %}
+                    <li>At {{ event.timestamp }} you had an event of type {{ event.get_event_type_display }} with {{ event.content_object }}.</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No events.</p>
+        {% endif %}
+    </div>
+{% endblock %}
