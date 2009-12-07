@@ -3,17 +3,84 @@
 {% load desktop_inclusion_tags %}
 {% load friends_tags %}
 
+{% block head %}	
+    <script type="text/javascript">
+	    $().ready(function() {
+	        bindForm();
+            validateMessageCreate();
+    	});
+	</script>
+{% endblock %}
+
 {% block left %}
     {% account_menu %}
     {% account_thanks %}
-    
-    <div class="page_form">
-        <h2>Compose Message</h2>
-        <form action="{% url message_create %}" method="post">
-            <table>
-                {{ form }}
-            </table>
-            <input type="submit" value="Send message" />
-        </form>
-    </div>
+			
+    <div class="social">
+        {% account_messages_menu %}
+		<div class="social_body" id="new">
+		    <div class="page_form">
+			    <h2 class="smaller no-bg">Compose a new message using the form below.</h2>
+				<p class="thanks">Your message has been sent.</p>
+				<form id="frmMessage" action="#" method="post"u>
+                    {% with form.to_user as field %}
+        			    <div class="page_form_row">
+                            {{ field.label_tag }}
+				    	    <p class="text_input no-bg">
+                                {{ field }}
+                                {% if field.errors %}
+                                    <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                                {% endif %}
+                            </p>
+		        	    	{% if field.help_text %}
+                                <p class="note">
+                                    {{ field.help_text }}
+                                </p>
+                            {% endif %}
+			        	</div>
+					    <p class="clearfix"></p>
+                    {% endwith %}
+                    {% with form.subject as field %}
+        			    <div class="page_form_row">
+                            {{ field.label_tag }}
+		    				<p class="text_input">
+                                {{ field }}
+                                {% if field.errors %}
+                                    <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                                {% endif %}
+                            </p>
+		        	    	{% if field.help_text %}
+                                <p class="note">
+                                    {{ field.help_text }}
+                                </p>
+                            {% endif %}
+			        	</div>
+					    <p class="clearfix"></p>
+                    {% endwith %}
+                    {% with form.content as field %}
+        			    <div class="page_form_row">
+                            {{ field.label_tag }}
+		    				<p class="text_area_short">
+                                {{ field }}
+                                {% if field.errors %}
+                                    <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                                {% endif %}
+                            </p>
+		        	    	{% if field.help_text %}
+                                <p class="note">
+                                    {{ field.help_text }}
+                                </p>
+                            {% endif %}
+			        	</div>
+					    <p class="clearfix"></p>
+                    {% endwith %}
+					<div class="page_form_row no-pad">
+					    <p class="label">&nbsp;</p>
+						<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-send_message.jpg" name="submit" /></p>
+					</div>
+				</form>
+				<p class="clearfix"></p>
+			</div><!--/form-->
+		</div>
+	</div><!--/social-->
 {% endblock %}
