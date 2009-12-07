@@ -40,6 +40,13 @@
         </span>
         <span>&nbsp; | &nbsp;</span>
         <span><a href="#comments" class="pm_comments">Comments</a></span>
+        {% if instance.rating %}
+            <div class="pb_star_rater">
+		        <ul class="star-rating">
+			        <li class="current-rating" style="width: {% widthratio instance.rating 5 100 %}%"></li>
+    		    </ul>
+	    	</div>
+        {% endif %}
     </p>
     <h3>{{ instance.title }}</h3>
 </div>
