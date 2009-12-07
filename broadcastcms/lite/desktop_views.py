@@ -44,6 +44,7 @@ from broadcastcms.scaledimage.fields import get_image_scales
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.status.models import StatusUpdate
 from broadcastcms.utils import mail_user
+from broadcastcms.label.models import Label
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode
@@ -973,7 +974,8 @@ def modals_password_reset(request):
 
 # News
 def news(request, template_name='desktop/generic/object_listing_wide.html'):
-    queryset=Post.permitted.all()
+    news_label = Label.objects.get(title__iexact='news')
+    queryset=Post.permitted.filter(labels=news_label)
     header = utils.NewsHeader(request)
     queryset_modifiers = [header.page_menu.queryset_modifier,]
     for queryset_modifier in queryset_modifiers:
@@ -1024,9 +1026,10 @@ def studio_cam(request):
     return render_to_response('desktop/popups/studio_cam.html', context)
 
 # Reviews
-def reviews(request, template_name='desktop/generic/object_listing_block.html'):
-    queryset=Gallery.permitted.all()
-    header = utils.GalleriesHeader(request)
+def reviews(request, template_name='desktop/generic/object_listing_wide.html'):
+    reviews_label = Label.objects.get(title__iexact='reviews')
+    queryset=Post.permitted.filter(labels=reviews_label)
+    header = utils.ReviewsHeader(request, reviews_label)
     queryset_modifiers = [header.page_menu.queryset_modifier,]
     for queryset_modifier in queryset_modifiers:
         queryset = queryset_modifier.updateQuery(queryset)
@@ -1035,15 +1038,15 @@ def reviews(request, template_name='desktop/generic/object_listing_block.html'):
         request=request,
         queryset=queryset,
         template_name=template_name,
-        paginate_by=15,
+        paginate_by=10,
         extra_context={
             'header': header,
         },
     )
 
 def reviews_content(request, slug, template_name='desktop/generic/object_detail.html'):
-    queryset = Gallery.permitted
-    header = utils.GalleryHeader()
+    queryset = ContentBase.permitted
+    header = utils.ReviewsArticleHeader()
 
     return list_detail.object_detail(
         request=request,
@@ -1054,6 +1057,7 @@ def reviews_content(request, slug, template_name='desktop/generic/object_detail.
             'header': header,
         },
     )
+
 # Shows
 class ShowsLineUp(object):
     def __call__(self, request, template_name='desktop/generic/object_listing_block.html'):
