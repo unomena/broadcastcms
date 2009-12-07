@@ -1,0 +1,8 @@
+<div class="box">
+    <h1>{{ title }} &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+	<ul class="user_nav">
+        {% for item in items %}
+	        <li class="{{ item.class }}"><a href="{{ item.url }}" {% ifequal item.section active_section %}class="on"{% endifequal %}>{{ item.title }}</a></li>
+        {% endfor %}
+	</ul>				
+</div><!--/box-->
