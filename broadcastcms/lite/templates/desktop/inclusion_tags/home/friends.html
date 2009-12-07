@@ -17,7 +17,7 @@
                 {% endwith %}
             {% endfor %}
 	    </ul>
-	    <p class="updates_more"><a href="friends.html">View all Friends</a><a href="{% url account_friends_find %}">Find more Friends</a></p>
+	    <p class="updates_more"><a href="{% url account_friends_my %}">View all Friends</a><a href="{% url account_friends_find %}">Find more Friends</a></p>
     {% else %}
         <h1>Your Friends</h1>
 	    <p class="updates_more" style="width: 100%;"><a href="{% url account_friends_find %}" style="width: 100%;">You don't have any friends. Go find some now.</a></p>
