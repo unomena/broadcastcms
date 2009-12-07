@@ -1,0 +1,22 @@
+{% load scaled_image_tags %}
+
+<div class="social_item">
+    <p class="user_actions">
+        <a href="{% url messages_thread_detail thread.pk %}#reply" class="user_reply">Reply</a>
+        {% comment %}
+        <a href="#" class="user_delete">Delete</a>
+        {% endcomment %}
+    </p>
+	<p class="user_avatar"><a href="user-friends-profile.html">
+        {% if profile.facebook_id and profile.use_facebook_picture %}
+            <fb:profile-pic linked="false" uid="{{ profile.facebook_id }}" width="50" height="50" />
+        {% else %}
+            <img src="{% if profile.image %}{% scaled_image_url profile 50 50%}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="50" height="50" alt="" />
+        {% endif %}
+    </a></p>
+	<p class="user_name_time">
+	    <span class="user_message_name">{{ sender.username }}</span>
+		<span class="user_message_time">{{ object.sent_at|timesince }} ago</span>
+	</p>
+	<p class="user_message_subject"><a>{{ object.content|linebreaksbr }}</a></p>
+</div>
