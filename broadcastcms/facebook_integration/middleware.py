@@ -45,12 +45,12 @@ class FacebookConnectMiddleware(object):
                         }
                         result = facebook_api_request("users.getInfo", **params)
                         user_info = result[0]
-                        
+                       
                         try:
                             queryset = UserProfile.objects.select_related(
                                 "user"
                             ).filter(
-                                facebook_url = user_info["profile_url"],
+                                facebook_id = user_info["uid"],
                             )
                             profile = queryset.get()
                         except UserProfile.DoesNotExist:
