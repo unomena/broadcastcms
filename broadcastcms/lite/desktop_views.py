@@ -24,9 +24,11 @@ from django.utils.http import urlencode
 from django.views.generic import list_detail
 
 from friends.models import FriendshipInvitation, Friendship
+from user_messages.models import Message
 from voting.models import Vote
 
 from broadcastcms import public
+from broadcastcms.activity.models import ActivityEvent
 from broadcastcms.banner.models import CodeBanner, ImageBanner
 from broadcastcms.base.models import ContentBase
 from broadcastcms.calendar.models import Entry
@@ -122,7 +124,7 @@ def account_login(request):
     })
     return render_to_response('desktop/content/account/login.html', context)
 
-def account_picture(request):
+def account_settings_image(request):
     if not request.user.is_authenticated():
        raise Http404
         
@@ -144,9 +146,9 @@ def account_picture(request):
         'profile': profile,
         'form': form,
     })
-    return render_to_response('desktop/content/account/picture.html', context)
+    return render_to_response('desktop/content/account/settings/image.html', context)
 
-def account_profile(request):
+def account_settings_details(request):
     """
     TODO: This view seems very flimsy, refactor.
     """
@@ -262,9 +264,9 @@ def account_profile(request):
     context.update({
         'form': form,
     })
-    return render_to_response('desktop/content/account/profile.html', context)
+    return render_to_response('desktop/content/account/settings/details.html', context)
 
-def account_subscriptions(request):
+def account_settings_subscriptions(request):
     if not request.user.is_authenticated():
        raise Http404
     
@@ -288,7 +290,7 @@ def account_subscriptions(request):
     context.update({
         'form': form,
     })
-    return render_to_response('desktop/content/account/subscriptions.html', context)
+    return render_to_response('desktop/content/account/settings/subscriptions.html', context)
 
 @login_required
 def account_friends_find(request):
@@ -306,7 +308,7 @@ def account_friends_find(request):
     page_obj = utils.paging(users, 'page', request, 5)
     users = page_obj.object_list
 
-    return render_to_response('desktop/content/account/find_friends.html', {
+    return render_to_response('desktop/content/account/friends/find.html', {
         'users': users,
         'page_obj': page_obj,
     }, context_instance=RequestContext(request))
@@ -340,14 +342,63 @@ def account_friends_remove(request, user_pk):
     return HttpResponse(simplejson.dumps(inv_response[str(None)]))
 
 @login_required
-def account_friends(request):
+def account_friends_my(request):
     friends = Friendship.objects.friends_for_user(request.user)
     invitations = FriendshipInvitation.objects.invitations(request.user)
-    return render_to_response('desktop/content/account/friends.html', {
+    return render_to_response('desktop/content/account/friends/my.html', {
         'friends': [o['friend'] for o in friends],
         'invitations': invitations,
     }, context_instance=RequestContext(request))
 
+@login_required
+def account_friends_activity(request):
+    friends = Friendship.objects.friends_for_user(request.user)
+    friends = [o["friend"] for o in friends]
+    events = ActivityEvent.objects.filter(user__in=friends)
+    return render_to_response("desktop/content/account/friends/activity.html", {
+        "events": events,
+    }, context_instance=RequestContext(request))
+
+@login_required
+def account_history(request):
+    events = ActivityEvent.objects.filter(user=request.user)
+    return render_to_response("desktop/content/account/history.html", {
+        "events": events,
+    }, context_instance=RequestContext(request))
+
+@login_required
+def account_messages_sent(request):
+    user = request.user
+    object_list = Message.objects.filter(sender=user).order_by('-sent_at')
+    context = RequestContext(request, {})
+    
+    # create pager
+    page_obj = utils.paging(object_list, 'page', request, 5)
+    object_list = page_obj.object_list
+    
+    context.update({
+        'object_list': object_list,
+        'view': 'render_listing_sent',
+        'page_obj': page_obj,
+    })
+    return render_to_response("desktop/content/account/messages/listing.html", context)
+
+@login_required
+def account_messages_inbox(request):
+    user = request.user
+    object_list = Message.objects.filter(thread__users=request.user).exclude(sender=user).order_by('-sent_at')
+    context = RequestContext(request, {})
+    
+    # create pager
+    page_obj = utils.paging(object_list, 'page', request, 5)
+    object_list = page_obj.object_list
+    
+    context.update({
+        'object_list': object_list,
+        'view': 'render_listing_inbox',
+        'page_obj': page_obj,
+    })
+    return render_to_response("desktop/content/account/messages/listing.html", context)
 
 # Chart
 
@@ -1080,10 +1131,11 @@ class ImageBannerViews(object):
 
 class ContentBaseViews(object):
     def render_updates(self, context):
-        context.update({
+        context = {
             'object': self,
             'url': self.url(context),
-        })
+            'node': context['node'],
+        }
         return render_to_string('desktop/content/contentbase/updates.html', context)
     
     def render_updates_featured(self, context):
@@ -1375,6 +1427,55 @@ class SongViews(object):
             'artist': self.get_primary_artist(),
         })
         return render_to_response('desktop/content/charts/modals_content.html', context)
+   
+class StatusUpdateViews(object):
+    def render_updates(self, context):
+        user = self.user
+        context = {
+            'object': self,
+            'user': user,
+            'profile': user.profile,
+        }
+        return render_to_string('desktop/content/status_update/update.html', context)
+        
+class MessageViews(object):
+    
+    def render_listing_sent(self, context):
+        thread = self.thread
+        users = thread.users.exclude(pk=self.sender.pk).order_by('username')
+        profile = users[0].profile
+        context = {
+            'object': self,
+            'thread': thread,
+            'users': users,
+            'profile': profile,
+        }
+        return render_to_string('desktop/content/message/listing_sent.html', context)
+    
+    def render_listing_inbox(self, context):
+        thread = self.thread
+        sender = self.sender
+        profile = sender.profile
+        context = {
+            'object': self,
+            'thread': thread,
+            'sender': sender,
+            'profile': profile,
+        }
+        return render_to_string('desktop/content/message/listing_inbox.html', context)
+    
+    def render_listing_thread(self, context):
+        thread = self.thread
+        sender = self.sender
+        profile = sender.profile
+        context = {
+            'object': self,
+            'thread': thread,
+            'sender': sender,
+            'profile': profile,
+        }
+        return render_to_string('desktop/content/message/listing_thread.html', context)
+        
     
 public.site.register(CastMember, CastMemberViews)
 public.site.register(ChartEntry, ChartEntryViews)
@@ -1388,3 +1489,5 @@ public.site.register(ImageBanner, ImageBannerViews)
 public.site.register(Post, PostViews)
 public.site.register(User, UserViews)
 public.site.register(Song, SongViews)
+public.site.register(StatusUpdate, StatusUpdateViews)
+public.site.register(Message, MessageViews)
