@@ -1,9 +1,13 @@
 from datetime import datetime
 
 from django import forms
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.comments.forms import CommentForm
 from django.core.mail import EmailMessage, mail_managers
+
+from friends.models import Friendship
+from user_messages.forms import NewMessageFormMultiple
 
 from broadcastcms.competition.models import CompetitionEntry
 from broadcastcms.event.models import Province
@@ -11,7 +15,6 @@ from broadcastcms.fields import formfields
 from broadcastcms.integration.captchas import ReCaptcha
 
 from models import Settings
-
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -642,3 +645,22 @@ def make_mobile_contact_form(request):
 
         return AnonymousMobileContactForm
 
+class NewMessageFormMultipleFriends(NewMessageFormMultiple):
+    to_user = forms.ModelMultipleChoiceField(Friendship.objects)
+
+    def __init__(self, *args, **kwargs):
+        super(NewMessageFormMultipleFriends, self).__init__(*args, **kwargs)
+    
+        # give form fields nice labels
+        self.fields['subject'].label = 'Subject'
+        self.fields['to_user'].label = 'Recipient/s'
+        self.fields['content'].label = 'Message'
+        
+        # set field classes
+        self.fields['to_user'].widget = forms.SelectMultiple(attrs={'class':'province'})
+
+        # limit user options to friends
+        if self.initial.get('to_user') is None:
+            friend_pks = [object['friend'].pk for object in self.fields['to_user'].queryset.friends_for_user(kwargs['user'])]
+            qs = User.objects.filter(pk__in=friend_pks).order_by('username')
+            self.fields['to_user'].queryset = qs
