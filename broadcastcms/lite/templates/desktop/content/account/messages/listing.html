@@ -1,0 +1,22 @@
+{% extends "desktop/base/section.html" %}
+
+{% load desktop_inclusion_tags %}
+{% load public_tags %}
+
+{% block left %}
+    {% account_menu %}
+    <div class="social">
+        {% account_messages_menu %}
+		<div class="social_body" id="sent">
+            {% if object_list %}
+                {% social_paging page_obj %}
+            
+                {% for object in object_list %}
+                    {% call_view object view %}
+                {% endfor %}        
+            {% else %}
+	    		<h2 class="smaller no-bg">No messages found. Please check back later or <a href="{% url message_create %}">send a new message.</a></h2>
+            {% endif %}
+		</div>
+	</div><!--/social-->
+{% endblock %}
