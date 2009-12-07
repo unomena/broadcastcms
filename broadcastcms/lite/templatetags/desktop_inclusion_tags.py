@@ -39,11 +39,15 @@ class AccountLinksNode(template.Node):
         if user:
             if not user.is_anonymous():
                 profile = user.profile
+        
+            # get unread message count
+            messages = Thread.objects.unread(user).count()
 
         context.update({
             'user': user,
             'profile': profile,
             'fb_authenticated': request.fb_authenticated,
+            'messages': messages,
         })
         return render_to_string('desktop/inclusion_tags/skeleton/account_links.html', context)
 
@@ -69,9 +73,9 @@ class MastheadNode(template.Node):
             {'title': 'Galleries', 'url': reverse('galleries'), 'current': section == 'galleries'},
             {'title': 'Reviews', 'url': reverse('reviews'), 'current': section == 'reviews'},
         ]
-        
+   
         context.update({
-            'items': items
+            'items': items,
         })
 
         return render_to_string('desktop/inclusion_tags/skeleton/masthead.html', context)
@@ -185,6 +189,39 @@ class HomeFriendsNode(template.Node):
             })
 
         return render_to_string('desktop/inclusion_tags/home/friends.html', context)
+
+@register.tag
+def home_status_updates(parser, token):
+    return HomeStatusUpdatesNode()
+
+class HomeStatusUpdatesNode(template.Node):
+    def render(self, context):
+        request = context['request']
+        user = request.user
+      
+        credits = Credit.objects.all()
+        credits = Credit.objects.filter(role='1', show__in=Show.permitted.all).select_related('castmember')
+        castmember_owners = [credit.castmember.owner for credit in credits]
+
+        from broadcastcms.status.models import StatusUpdate
+        castmember_status_updates = StatusUpdate.objects.filter(user__in=castmember_owners).select_related('user').order_by('-timestamp')[:4]
+        """
+        if user.is_authenticated():
+            friends = Friendship.objects.friends_for_user(user)
+            friends_count = len(friends)
+            friends = [friend['friend'] for friend in friends][:10]
+    
+            context.update({
+                'friends': friends,
+                'friends_count': friends_count
+            })
+        """
+
+        context.update({
+            'castmember_status_updates': castmember_status_updates,
+        })
+
+        return render_to_string('desktop/inclusion_tags/home/status_updates.html', context)
 
 @register.tag
 def features(parser, token):
@@ -346,11 +383,12 @@ class UpdatesNode(template.Node):
 
     def render(self, context):
         panels = self.build_panels()
-        context.update({
+        context = {
             'panels': panels,
             'render_controls': (len(panels) > 1),
             'node': self,
-        })
+            'section': context['section'],
+        }
         return render_to_string('desktop/inclusion_tags/misc/updates.html', context)
 
 class SlidingUpdatesNode(template.Node):
@@ -529,6 +567,74 @@ class SortingNode(template.Node):
         return render_to_string('desktop/inclusion_tags/misc/sorting.html', context)
 
 @register.tag
+def account_side_nav(parser, token):
+    return AccountSideNavNode()
+
+class AccountSideNavNode(template.Node):
+    def render(self, context):
+        request = context['request']
+        account_section = request.path.split('/')[2]
+        account_sub_section = request.path.split('/')[3]
+        
+        items = {'settings': 
+            [{
+                'title': 'My Details',
+                'section': 'details',
+                'class': 'my_details',
+                'url': reverse('account_settings_details'),
+            },
+            {
+                'title': 'Profile Image',
+                'section': 'image',
+                'class': 'profile_image',
+                'url': reverse('account_settings_image'),
+            },
+            {
+                'title': 'Subscription Settings',
+                'section': 'subscriptions',
+                'class': 'sub_settings',
+                'url': reverse('account_settings_subscriptions'),
+            },
+            # XXX: Facebook Connect
+            #{
+            #    'title': 'Facebook Connect',
+            #    'section': 'facebook',
+            #    'class': 'facebook_connect',
+            #},
+        ],
+        'friends': [{
+                'title': 'My Friends',
+                'section': 'my',
+                'class': 'see_my_friends',
+                'url': reverse('account_friends_my'),
+            },
+            {
+                'title': "See My Friends' Recent Activity",
+                'section': 'activity',
+                'class': 'friends_activity',
+                'url': reverse('account_friends_activity'),
+            },
+            {
+                'title': "Find More Friends",
+                'section': 'find',
+                'class': 'more_friends',
+                'url': reverse('account_friends_find'),
+            },
+        ]}
+
+        titles = {
+            'settings': 'Update Your Settings',
+            'friends': 'Follow Your Friends',
+        }
+        
+        context = {
+            'items': items[account_section],
+            'active_section': account_sub_section,
+            'title': titles[account_section],
+        }
+        return render_to_string('desktop/inclusion_tags/account/side_nav.html', context)
+
+@register.tag
 def account_menu(parser, token):
     return AccountMenuNode()
 
@@ -541,33 +647,30 @@ class AccountMenuNode(template.Node):
         if messages:
             msg += " (%s)" % messages
 
-        menu_items = [{
-                'title': 'Profile',
-                'section': 'profile',
-                'url': reverse('account_profile'),
-            },
-            {
-                'title': 'Picture',
-                'section': 'picture',
-                'url': reverse('account_picture'),
-            },
-            {
-                'title': 'Subscriptions',
-                'section': 'subscriptions',
-                'url': reverse('account_subscriptions'),
-            },
-            {
-                'title': 'Find Friends',
-                'section': 'friends',
-                'url': reverse('account_friends_find'),
-            },
+        menu_items = [
             {
                 'title': msg,
                 'section': 'messages',
                 'url': reverse('messages_inbox'),
             },
+            #XXX: History
+            #{
+            #    'title': 'History',
+            #    'section': 'history',
+            #    'url': reverse('account_history'),
+            #},
+            {
+                'title': 'Friends',
+                'section': 'friends',
+                'url': reverse('account_friends_my'),
+            },
+            {
+                'title': 'Settings',
+                'section': 'settings',
+                'url': reverse('account_settings_details'),
+            },
         ]
-        account_section = request.path.split('/')[-2]
+        account_section = request.path.split('/')[2]
        
         profile = request.user.profile
 
@@ -577,6 +680,40 @@ class AccountMenuNode(template.Node):
             'profile': profile,
         })
         return render_to_string('desktop/inclusion_tags/account/menu.html', context)
+
+@register.tag
+def account_messages_menu(parser, token):
+    return AccountMessagesMenuNode()
+
+class AccountMessagesMenuNode(template.Node):
+    def render(self, context):
+        request = context['request']
+        
+        items = [
+            {
+                'title': 'Inbox',
+                'section': 'inbox',
+                'url': reverse('messages_inbox'),
+            },
+            {
+                'title': 'Sent',
+                'section': 'sent',
+                'url': reverse('account_messages_sent'),
+            },
+            {
+                'title': 'New Message',
+                'section': 'create',
+                'class': 'compose',
+                'url': reverse('message_create'),
+            },
+        ]
+        section = request.path.split('/')[3]
+
+        context = {
+            'items': items,
+            'section': section,
+        }
+        return render_to_string('desktop/inclusion_tags/account/messages_menu.html', context)
 
 @register.tag
 def account_thanks(parser, token):
