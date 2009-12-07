@@ -6,6 +6,8 @@ from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
     
 from voting.models import Vote
+            
+from broadcastcms.label.models import Label
 
 def paging(queryset, request_key, request, size=10):
     paginator = Paginator(queryset, size)
@@ -130,6 +132,14 @@ class MostLikedQuerysetModifier(QuerysetModifier):
 class MostRecentQuerysetModifier(QuerysetModifier):
     def updateQuery(self, queryset):
         return queryset.order_by("-created")
+
+class LabeledQuerysetModifier(QuerysetModifier):
+    def __init__(self, get_value, label):
+        self.label = label
+        super(LabeledQuerysetModifier, self).__init__(get_value)
+
+    def updateQuery(self, queryset):
+        return queryset.filter(labels=self.label)
 
 
 class PageMenu(object):
@@ -315,6 +325,44 @@ class OrderPageMenu(PageMenu):
         }
     ]
 
+class LabelPageMenu(PageMenu):
+    request_key = 'label'
+    
+    def __init__(self, request, common_label):
+        common_labeled_content = common_label.modelbase_set.permitted().select_related('labels')
+        labels = set()
+        for content in common_labeled_content:
+            labels.update(content.labels.visible())
+
+        labels = list(labels)
+        labels.sort(reverse=False, key=lambda x: x.title)
+
+
+        self.items = []
+        for label in labels:
+            self.items.append({
+                'title': label.title,
+                'get_value': label.title,
+                'queryset_modifier': LabeledQuerysetModifier,
+            })
+        
+        self.items = [{
+                'title': 'All',
+                'get_value': 'Reviews',
+                'queryset_modifier': LabeledQuerysetModifier,
+            }] + self.items
+        
+        super(LabelPageMenu, self).__init__(request)
+    
+    @property
+    def queryset_modifier(self):
+        active_item = self.active_item
+        if active_item:
+            filter_label = Label.objects.filter(title__exact=active_item['get_value'])
+            return active_item['queryset_modifier'](active_item['get_value'], filter_label)
+        else:
+            return None
+            
 
 class Header(object):
     @property
@@ -409,6 +457,14 @@ class NewsArticleHeader(NewsHeader):
     def __init__(self):
         self.page_menu = None
 
+class ReviewsArticleHeader(Header):
+    page_title = 'Reviews'
+
+class ReviewsHeader(Header):
+    page_title = 'Reviews'
+    
+    def __init__(self, request, common_label):
+        self.page_menu = LabelPageMenu(request, common_label=common_label)
 
 class ShowsHeader(Header):
     page_title = 'Shows &amp; DJs'
