@@ -19,22 +19,22 @@ class Command(NoArgsCommand):
         api = twitter.Api()
         
         profiles = UserProfile.objects.exclude(
-            Q(twitter_url=None) | Q(twitter_url="")
+            Q(twitter_username=None) | Q(twitter_username="")
         ).select_related("user")
         
         usernames = collections.defaultdict(list)
         
         # group twitter usernames with profiles (in any case they overlap)
         for profile in profiles:
-            # @@@ how does twitter_url get set?
-            username = profile.twitter_url.split("/")[-1]
+            # @@@ how does twitter_username get set?
+            username = profile.twitter_username
             usernames[username].append(profile)
         
         for username, profiles in usernames.iteritems():
             if verbosity > 1:
                 print "[%s] fetching timeline" % username
             tweets = api.GetUserTimeline(username)
-            
+           
             for tweet in tweets:
                 # mysql does not support timezone-aware datetime objects
                 created_at = parse_date(tweet.created_at).replace(tzinfo=None)
@@ -54,7 +54,7 @@ class Command(NoArgsCommand):
                         status.text = tweet.text
                         status.source = StatusUpdate.TWITTER_SOURCE
                         status.raw_extra_data = str(tweet)
-                        #status.save()
+                        status.save()
                     else:
                         if verbosity > 1:
                             print "[%s] kipping %s for %s" % (username, tweet.id, profile.user)
