@@ -35,8 +35,10 @@ class FacebookRegistrationForm(forms.Form):
             password = password,
             email = self.cleaned_data["email"],
         )
-        user.first_name = self.user_info["first_name"] if self.user_info["first_name"] else ' '
-        user.last_name = self.user_info["last_name"] if self.user_info["last_name"] else ' '
+        if self.user_info["first_name"]: 
+            user.first_name = self.user_info["first_name"]
+        if self.user_info["last_name"]:
+            user.last_name = self.user_info["last_name"]
         user.save()
         
         FacebookFriendInvite.objects.create_friendships(user,
