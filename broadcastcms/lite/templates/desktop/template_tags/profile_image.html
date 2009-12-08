@@ -1,0 +1,7 @@
+{% load scaled_image_tags %}
+
+{% if profile.facebook_id and profile.use_facebook_picture %}
+    <fb:profile-pic linked="false" uid="{{ profile.facebook_id }}" width="{{ width }}" height="{{ height }}" />
+{% else %}
+    <img src="{% if profile.image %}{% scaled_image_url profile width height %}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="{{ width }}" height="{{ height }}" alt="" />
+{% endif %}
