@@ -9,11 +9,13 @@
     {% account_thanks %}
     
     <div class="social">
+        {% comment %}
 	    <ul class="social_nav">
 		    <li><a href="javascript: void(0);" rel="#find_people_you_know">Find People You Know</a></li>
 			<li><a href="javascript: void(0);" rel="#invite_facebook_friends">Invite Facebook Friends</a></li>
 			<li><a href="javascript: void(0);" rel="#invite_more_people">Invite More People</a></li>
 		</ul>
+        {% endcomment %}
 		<div class="social_body" id="find_people_you_know">
 		    <div class="page_form">
 			    <h2 class="smaller no-bg">Who are you looking for?</h2>
@@ -50,6 +52,7 @@
 			<h2 class="smaller no-bg">No users found matching '{{ request.GET.find }}'. Please try again.</h2>
             {% endif %}
 		</div>
+        {% comment %}
 				<div class="social_body" id="invite_facebook_friends">
 					facebook
 				</div>
@@ -71,5 +74,6 @@
 						<p class="clearfix"></p>
 					</div><!--/form-->
 				</div>
+        {% endcomment %}
 			</div><!--/social-->
 {% endblock %}
