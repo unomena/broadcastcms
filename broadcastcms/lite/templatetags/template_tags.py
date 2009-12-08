@@ -1,8 +1,35 @@
 import datetime
 
 from django import template
+from django.template.loader import render_to_string
 
 register = template.Library()
+
+@register.tag
+def profile_image(parser, token):
+    try:
+        tag_name, obj_name, width, height = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError, "%s requires exactly 3 arguments" % token.contents
+    
+    obj = template.Variable(obj_name)
+    return ProfileImageNode(obj, width, height)
+
+class ProfileImageNode(template.Node):
+    def __init__(self, obj, width, height):
+        self.obj = obj
+        self.width = width
+        self.height = height
+    
+    def render(self, context):
+        profile = self.obj.resolve(context)
+        context = {
+            'profile': profile,
+            'width': self.width,
+            'height': self.height,
+        }
+        return render_to_string('desktop/template_tags/profile_image.html', context)
+
 
 @register.tag
 def smart_query_string(parser, token):
