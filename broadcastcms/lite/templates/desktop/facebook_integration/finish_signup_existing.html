@@ -1,0 +1,30 @@
+{% extends "desktop/base/section.html" %}
+
+{% block left %}
+    <div class="page_head">
+        <h1>Hello {{ first_name }} <img width="9" height="8" alt="" src="/media/bcms/images/arrow-title_light.gif"/></h1>
+    </div>
+	<div class="page_form">
+        <h2 class="smaller">You're almost done. Sign in with your {{ site_name }} credentials using the form below.</h2>
+		<form id="frmLoginFallback" action="{% url facebook_finish_signup_existing %}" method="post" class="cmxform">
+            {% for field in form %}
+			    <div class="page_form_row">
+                    {{ field.label_tag }}
+    				<p class="text_input shift">
+                        {{ field }}
+                        {% if field.errors %}
+                            <label class="error" for="id_{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                        {% endif %}
+                    </p>
+	    		</div>
+            {% endfor %}
+            {% if next %}
+                <input type="hidden" value="{{ next }}" name="next" />
+            {% endif %}
+			<div class="page_form_row no-pad">
+			    <p class="label">&nbsp;</p>
+				<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-sign_in.jpg" name="submit" /></p>
+			</div>
+		</form>
+	</div><!--/form-->
+{% endblock %}
