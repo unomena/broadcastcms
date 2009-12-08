@@ -9,7 +9,7 @@ from django.contrib import auth
 
 from broadcastcms.facebook_integration.utils import (facebook_signature,
     facebook_api_request, API_KEY)
-from broadcastcms.lite.desktop_views import account_links
+from broadcastcms.lite.desktop_views import ajax_account_links
 from broadcastcms.lite.models import UserProfile
 
 
@@ -45,7 +45,7 @@ class FacebookConnectMiddleware(object):
                         }
                         result = facebook_api_request("users.getInfo", **params)
                         user_info = result[0]
-                       
+                      
                         try:
                             queryset = UserProfile.objects.select_related(
                                 "user"
@@ -55,15 +55,17 @@ class FacebookConnectMiddleware(object):
                             profile = queryset.get()
                         except UserProfile.DoesNotExist:
                             request.session["fb_signup_info"] = user_info
-                            return HttpResponseRedirect(reverse("facebook_finish_signup"))
+                            return HttpResponseRedirect(reverse("facebook_finish_signup_choice"))
                         else:
                             user = profile.user
                             user.backend = "django.contrib.auth.backends.ModelBackend"
                             auth.login(request, user)
-                            # if the request is for the account_links view
-                            # return its response instead of redirecting to home
-                            if request.path == reverse('account_links'):
-                                return account_links(request)
+                            # allow requests for ajax views
+                            if request.path.startswith('/ajax'):
+                                if API_KEY in request.COOKIES:
+                                    # @@@ may need more checks before assuming this is true
+                                    request.fb_authenticated = True
+                                return None
                             return HttpResponseRedirect(reverse("home"))
                     else:
                         request.delete_facebook_cookies = True
@@ -78,7 +80,7 @@ class FacebookConnectMiddleware(object):
             if API_KEY in request.COOKIES:
                 # @@@ may need more checks before assuming this is true
                 request.fb_authenticated = True
-    
+
     def process_response(self, request, response):
         if hasattr(request, "delete_facebook_cookies") and request.delete_facebook_cookies:
             response.delete_cookie(API_KEY + "_user")
