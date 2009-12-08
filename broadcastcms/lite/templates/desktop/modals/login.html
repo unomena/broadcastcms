@@ -30,7 +30,11 @@
 				<li><input id="login_submit" type="image" src="/media/bcms/images/forms/btn-sign_in.jpg" name="submit" /></li>
 				{% comment %}<li class="mb_link"><a href="{% url modals_password_reset %}?height=230&amp;width=499" class="thickbox">Forgot your Password?</a></li>{% endcomment %}
 			</ul>
-			<div class="facebook_connect_short">Facebook user? Sign in using Facebook: <fb:login-button v="2" size="medium" onlogin="fb_on_modal_login();">Connect</fb:login-button></div>
+			<div class="modal_busy">
+                Signing in, please wait...<br />
+                <img src="/media/bcms/images/loadingAnimation.gif" />
+            </div>
+			<div class="facebook_connect_short">Facebook user? Sign in using Facebook: <fb:login-button v="2" size="medium" onlogin="facebookModalLogin();">Connect</fb:login-button></div>
 		</form>
 		
 		{% if FACEBOOK_API_KEY %}
