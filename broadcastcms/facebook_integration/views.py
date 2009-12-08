@@ -12,9 +12,60 @@ from broadcastcms.facebook_integration.forms import (FacebookRegistrationForm,
     FacebookPermissionsForm)
 from broadcastcms.facebook_integration.models import FacebookFriendInvite
 from broadcastcms.facebook_integration.utils import facebook_api_request, API_KEY
+from broadcastcms.lite.forms import LoginForm
 
-def finish_signup(request):
-    template_name = "desktop/facebook_integration/finish_signup.html"
+def finish_signup_choice(request):
+    user_info = request.session.get("fb_signup_info")
+
+    context = {
+        "first_name": user_info["first_name"] if user_info["first_name"] else '',
+    }
+    return direct_to_template(request, "desktop/facebook_integration/finish_signup_choice.html", context)
+
+def finish_signup_existing(request):
+    template_name = "desktop/facebook_integration/finish_signup_existing.html"
+    
+    user_info = request.session.get("fb_signup_info")
+    if not user_info:
+        return HttpResponse("no signup data available, not good")
+    
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = auth.authenticate(
+                username=username, 
+                password=password
+            )
+            if user:
+                FacebookFriendInvite.objects.create_friendships(user, user_info["uid"])
+        
+                # Update profile
+                profile = user.profile
+                profile.facebook_url = user_info["profile_url"]
+                profile.facebook_id = user_info["uid"]
+                profile.save()
+                auth.login(request, user)
+            
+                del request.session["fb_signup_info"]
+            
+                return HttpResponseRedirect(reverse("home"))
+
+            else:
+                form._errors['username'] = ['Incorrect username or password.',]
+    else:
+        form = LoginForm()
+
+    return direct_to_template(request, template_name, {
+        "form": form,
+        "first_name": user_info["first_name"] if user_info["first_name"] else '',
+    })
+
+    
+def finish_signup_new(request):
+    template_name = "desktop/facebook_integration/finish_signup_new.html"
     
     user_info = request.session.get("fb_signup_info")
     if not user_info:
@@ -37,10 +88,10 @@ def finish_signup(request):
             return HttpResponseRedirect(reverse("home"))
     else:
         form = FacebookRegistrationForm()
-    
+
     return direct_to_template(request, template_name, {
         "form": form,
-        "first_name": user_info["first_name"],
+        "first_name": user_info["first_name"] if user_info["first_name"] else '',
     })
 
 
