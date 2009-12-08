@@ -2,37 +2,28 @@
 
 {% load desktop_inclusion_tags %}
 {% load friends_tags %}
+{% load public_tags %}
 
 {% block left %}
     {% account_menu %}
-    {% account_thanks %}
-    
-    <div class="page_form">
-        {% if friends %}
-            <p>You have {{ friends|length }} friends.</p>
-            <ul>
-                {% for user in friends %}
-                    <li>{{ user }}</li>
+			
+    <div class="social">
+	    <div class="social_body">
+            {% if friends %}
+                {% social_paging page_obj %}
+                
+                {% for friend in friends %}
+                    {% if forloop.counter0|divisibleby:"2" or forloop.first %}
+					    <div class="friend_tray">
+                    {% endif %}
+                            {% call_view friend render_block %}
+                    {% if forloop.counter|divisibleby:"2" or forloop.last %}
+                        </div>
+                    {% endif %}
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p>You have no friends</p>
-        {% endif %}
-        {% if invitations %}
-            <p>You have {{ invitations|length }} invitations.</p>
-            <ul>
-                {% for inv in invitations %}
-                    <li>
-                        {% ifequal inv.from_user user %}
-                            You invited {{ inv.to_user }} to be friends.
-                        {% else %}
-                            {{ inv.from_user }} invited you to be friends.
-                        {% endifequal %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You have no invitations.</p>
-        {% endif %}
-    </div>
+            {% else %}
+    			<h2 class="smaller no-bg">You don't have any friends. <a href="{% url account_friends_find %}">Click here to go find some now.</a></h2>
+            {% endif %}
+		</div>
+	</div><!--/social-->
 {% endblock %}
