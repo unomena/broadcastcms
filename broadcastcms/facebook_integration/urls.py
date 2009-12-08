@@ -13,7 +13,9 @@ urlpatterns = patterns("",
 )
 
 urlpatterns += patterns("broadcastcms.facebook_integration.views",
-    url(r'^finish_signup/$', "finish_signup", name="facebook_finish_signup"),
+    url(r'^finish-signup-choice/$', "finish_signup_choice", name="facebook_finish_signup_choice"),
+    url(r'^finish-signup-new/$', "finish_signup_new", name="facebook_finish_signup_new"),
+    url(r'^finish-signup-existing/$', "finish_signup_existing", name="facebook_finish_signup_existing"),
     url(r'^permissions/$', "permissions", name="facebook_permissions"),
     url(r'^existing_user/$', "existing_user", name="facebook_existing_user"),
 )
