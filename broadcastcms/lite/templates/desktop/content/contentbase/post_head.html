@@ -1,33 +1,8 @@
-{% load voting_tags %}
-
-{% score_for_object instance.contentbase as score %}
+{% load desktop_inclusion_tags %}
 <div class="post_head">
-    <p class="post_stamp">
-        <span class="ps_likes_num">{{ score.score }}</span>
-        <span class="ps_likes">Likes</span>
-        {% if user.is_authenticated %}
-            <span class="ps_like"><a id="like_link" href="{{ vote_url }}">I Like</a></span>
-            <script type="text/javascript">
-                $(function() {
-                    submit_facebook_vote = function() {
-                        {% if user.profile.facebook_id and user.profile.publish_facebook_likes %}
-                            Facebook.publish_stream({
-                                auto_publish: true,
-                                user_message: "liked something on {{ site_name }}",
-                                attachment: {
-                                    name: $('.post_head h3').text(),
-                                    href: window.location.toString(),
-                                    description: "{{ user }} liked this."
-                                }
-                            });
-                        {% endif %}
-                    };
-                });
-            </script>
-        {% else %}
-            <span class="ps_like"><a class="thickbox" href="{% url modals_login %}?height=300&width=540">Log in</a></span>
-        {% endif %}
-    </p>
+    <span class="auth_reload" src="{% url ajax_likes_stamp instance.slug %}">
+        {% likes_stamp instance %}
+    </span>
     <p class="post_meta">
         <span>{% if owner %}By <a href="{{ owner.url }}">{{ owner.username }}</a> on {% endif %}{{ instance.created|date:"j F Y" }}</span>
         <span>&nbsp; | &nbsp;</span>
