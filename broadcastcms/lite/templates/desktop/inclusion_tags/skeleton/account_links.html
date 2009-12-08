@@ -1,18 +1,14 @@
-{% load scaled_image_tags %}
+{% load template_tags %}
 
 {% if user.is_authenticated %}
     <p class="logged_avatar">
         <a href="{% url account_settings_image %}">
-            {% if profile.facebook_id and profile.use_facebook_picture %}
-                <fb:profile-pic linked="false" uid="{{ profile.facebook_id }}" width="35" height="35" />
-            {% else %}
-                <img src="{% if profile.image %}{% scaled_image_url profile 35 35%}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="35" height="35" alt="" />
-            {% endif %}
+            {% profile_image profile 35 35 %}
         </a>
     </p>
     <p class="logged_info">
         <span class="logged_name">Hello {{ user.username }}</span><br />
-    	<span class="logged_links"><a href="{% url messages_inbox %}">Messages {% if messages %}({{ messages }}){% endif %}</a> | {% if fb_authenticated %}<a id="fb_sign_out" href="#">Sign out</a>{% else %}<a id="sign_out" href="#">Sign out</a>{% endif %}</span>
+    	<span class="logged_links"><a href="{% url messages_inbox %}">Messages {% if messages %}({{ messages }}){% endif %}</a> | {% if fb_authenticated %}<a id="fb_sign_out" href="{% url ajax_sign_out %}">Sign out</a>{% else %}<a id="sign_out" href="{% url ajax_sign_out %}">Sign out</a>{% endif %}</span>
     </p>
 {% else %}
     <p class="logged_avatar">
