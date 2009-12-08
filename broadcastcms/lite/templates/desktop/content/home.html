@@ -33,7 +33,9 @@
 		
 	<div class="mast_right">
 	    {% home_advert %}
-        {% home_friends %}
+        <span class="auth_reload" src="{% url ajax_home_friends %}">
+            {% home_friends %}
+        </span>
         {% home_status_updates %}
 	</div><!--/MAST_RIGHT-->
 	
