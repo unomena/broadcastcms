@@ -1,0 +1,10 @@
+{% extends "desktop/base/section.html" %}
+
+{% block left %}
+    <div class="page_head">
+        <h1>Hello {{ first_name }} <img width="9" height="8" alt="" src="/media/bcms/images/arrow-title_light.gif"/></h1>
+    </div>
+    <div class="page_form">
+        <h2 class="smaller">You're almost done. Before you proceed we need to finalize your {{ site_name }} account. <br /><br />You've got one of two options:<br /><a href="{% url facebook_finish_signup_existing %}">Connect your Facebook account with an existing {{ site_name }} account.</a><br /><a href="{% url facebook_finish_signup_new %}">Connect your Facebook account with a new {{ site_name }} account.</a></h2>
+    </div>
+{% endblock %}
