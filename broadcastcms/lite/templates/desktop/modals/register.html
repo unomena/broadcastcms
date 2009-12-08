@@ -11,15 +11,11 @@
 	        bindForm();
             validateRegistration();
     	});
-    	function fb_onlogin() {
-    	    window.location.reload();
-    	}
 	</script>
 	<div class="modal">
 	
 		<div class="modal_title">
 			<h1>Create your Free Profile</h1>
-			<fb:login-button onlogin="fb_onlogin();"></fb:login-button>
 			<p><a href="javascript: void(0);" onclick="tb_remove()" id="TB_closeWindowButton" class="close">Close</a></p>
 			<p class="modal_intro">Sign up using the form below.</p>
 		</div>
@@ -54,7 +50,7 @@
             {% with form.recaptcha_response_field as field %}
                 <div class="modal_row">
                     {{ field.label_tag }}
-                    <div id="recaptcha_image" style="width: 300px; height: 57px;"></div>
+                    <div id="recaptcha_image" ></div>
 	    			<label> &nbsp; </label>
     	        	<p class="text_input shift">
                         {{ field }}
@@ -64,7 +60,12 @@
                         Recaptcha.create(
                             "6LdcYgcAAAAAAEq2mn0KoUfM18BsgjSkuyLu-Pzk",
                             "", 
-                            { theme: "custom" }
+                            { theme: "custom",
+                              callback: function() {
+                                $("#recaptcha_image").css("height", "63px");
+                                $("#recaptcha_image").css("width", "306px");
+                              }
+                            }
                         );
                     </script>
                 </div>
@@ -84,23 +85,22 @@
             {% endwith %}
 			<ul id="register_buttons" class="modal_buttons">
 				<li><input id="register_submit" type="image" src="/media/bcms/images/forms/btn-sign_up.jpg" name="submit" /></li>
-				<li><a href="javascript: document.getElementById('frmRegister').reset();"><img src="/media/bcms/images/forms/btn-clear.jpg" width="76" height="27" alt="" /></a></li>
+				<li><a href="javascript: document.getElementById('frmRegister').reset();"><img src="/media/bcms/images/forms/btn-clear.jpg" alt="" /></a></li>
                 {% with settings.terms_post as terms_post %}
 				    {% if terms_post.is_public %}
                         <li class="mb_link"><a href="{{ terms_post.url }}">{{ terms_post.title }}</a></li>
                     {% endif %}
                 {% endwith %}
 			</ul>
-			<ul id="register_progress" class="modal_buttons" style="display: none">
-                Creating your profile, please wait...
-				<li>
-                    <img src="/media/bcms/images/loading.gif" />
-                </li>
-            </ul>
+			<div class="modal_busy">
+                Signing up, please wait...<br />
+                <img src="/media/bcms/images/loadingAnimation.gif" />
+            </div>
+			<div class="facebook_connect_short">You can sign up using your Facebook info: <fb:login-button v="2" size="medium" onlogin="facebookModalLogin();">Connect</fb:login-button></div>
 		</form>
 	    
-	    {% if FACEBOOK_API_KEY %}
-    	    <script type="text/javascript">
+		{% if FACEBOOK_API_KEY %}
+		    <script type="text/javascript">
                 FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
             </script>
         {% endif %}
