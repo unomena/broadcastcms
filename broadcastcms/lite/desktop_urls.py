@@ -33,16 +33,24 @@ messages_urls = patterns('user_messages.views',
         name='messages_thread_delete'),
 )
 
+ajax_urls = patterns('',
+    url(r'^status-update/$', ajax_status_update, name='ajax_status_update'),
+    url(r'^account-links/$', ajax_account_links, name='ajax_account_links'),
+    url(r'^sign-out/$', ajax_sign_out, name='ajax_sign_out'),
+    url(r'^home/friends/$', ajax_home_friends, name='ajax_home_friends'),
+    url(r'^like-stamp/(?P<slug>[\w-]+)/$', ajax_likes_stamp, name='ajax_likes_stamp'),
+)
+
 urlpatterns = patterns('',
     url(r'^$', home, name='home'),
     
     url(r'^facebook/', include('broadcastcms.facebook_integration.urls')),
     
-    url(r'account-links/$', account_links, name='account_links'),
-    url(r'logout/$', logout, name='logout'),
     url(r'comment-add/$', comment_add, name='comment_add'),
     
     url(r'^admin/(.*)', admin.site.root),
+    
+    url(r'^ajax/', include(ajax_urls)),
     
     url(r'^account/settings/image/$', account_settings_image, name='account_settings_image'),
     url(r'^account/settings/details/$', account_settings_details, name='account_settings_details'),
@@ -54,7 +62,7 @@ urlpatterns = patterns('',
     url(r'^account/friends/remove/(?P<user_pk>[\w-]+)/$$', account_friends_remove, name='account_friends_remove'),
     url(r'^account/friends/response/(\d+)/$',
         'friends.views.respond_to_friendship_invitation',
-        {'redirect_to_view': 'account_friends'},
+        {'redirect_to_view': 'account_friends_my'},
         name='account_friends_reply'),
     url(r'^account/friends/facebook/$',
         'broadcastcms.facebook_integration.views.invite',
