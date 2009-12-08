@@ -47,7 +47,7 @@ class MobileLoginForm(forms.Form):
 class RegistrationForm(forms.Form):
     username = formfields.UsernameField(
         max_length=100,
-        label='Alias:',
+        label='Username:',
         help_text='Must be at least 4 characters, letters, numbers and underscores only.',
         widget=forms.TextInput(attrs={'class':'required'}),
         error_messages={
@@ -98,7 +98,7 @@ class RegistrationForm(forms.Form):
         label='Legal Stuff:',
         help_text='I agree to the website terms of use',
         widget=forms.CheckboxInput(attrs={'class':'required'}),
-        error_messages={'required': 'Please accept our terms &amp; conditions</a> to complete registration.'}
+        error_messages={'required': 'Please accept our terms &amp; conditions to continue.'}
     )
     
 class MobileRegistrationForm(forms.Form):
