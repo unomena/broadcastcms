@@ -47,9 +47,68 @@ from broadcastcms.utils import mail_user
 from broadcastcms.label.models import Label
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
-from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode
+from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, LikesStampNode
 import utils
 
+# Ajax
+def ajax_account_links(request):
+    """
+    Wrapper exposing the account_links inclusion tag as a view.
+    """
+    if not request.is_ajax():
+        raise Http404
+    
+    context = RequestContext(request, {})
+    return HttpResponse(AccountLinksNode().render(context))
+
+def ajax_status_update(request):
+    """
+    Wrapper exposing the status_update inclusion tag as a view.
+    """
+    if not request.is_ajax():
+        raise Http404
+
+    context = RequestContext(request, {})
+    return HttpResponse(StatusUpdateNode().render(context))
+
+def ajax_home_friends(request):
+    """
+    Wrapper exposing the home_friends inclusion tag as a view.
+    """
+    if not request.is_ajax():
+        raise Http404
+
+    context = RequestContext(request, {})
+    return HttpResponse(HomeFriendsNode().render(context))
+
+def ajax_likes_stamp(request, slug):
+    """
+    Wrapper exposing the likes_stamp inclusion tag as a view.
+    """
+    #if not request.is_ajax():
+    #    raise Http404
+
+    from django import template
+    context = RequestContext(request, {})
+    instance = get_object_or_404(ContentBase, slug=slug)
+
+    context.update({
+        'instance': instance 
+    })
+    obj = template.Variable('instance')
+
+    return HttpResponse(LikesStampNode(obj).render(context))
+
+
+def ajax_sign_out(request):
+    if not request.is_ajax():
+        raise Http404
+    
+    if request.user.is_authenticated():
+        auth.logout(request)
+    
+    return HttpResponse("")
+    
 # Account
 def gen_inv_response(user):
     return { 
@@ -345,10 +404,16 @@ def account_friends_remove(request, user_pk):
 @login_required
 def account_friends_my(request):
     friends = Friendship.objects.friends_for_user(request.user)
-    invitations = FriendshipInvitation.objects.invitations(request.user)
+    #invitations = FriendshipInvitation.objects.invitations(request.user)
+    
+    # create pager
+    page_obj = utils.paging([friend['friend'] for friend in friends], 'page', request, 5)
+    friends = page_obj.object_list
+
     return render_to_response('desktop/content/account/friends/my.html', {
-        'friends': [o['friend'] for o in friends],
-        'invitations': invitations,
+        'friends': friends,
+        'page_obj': page_obj,
+        #'invitations': invitations,
     }, context_instance=RequestContext(request))
 
 @login_required
@@ -647,12 +712,6 @@ def galleries_content(request, slug, template_name='desktop/generic/object_detai
     )
 
 # Misc
-def account_links(request):
-    """
-    Wrapper exposing the account_links inclusion tag as a view.
-    """
-    context = RequestContext(request, {})
-    return HttpResponse(AccountLinksNode().render(context))
 
 def contact(request):
     context = RequestContext(request, {})
@@ -777,11 +836,6 @@ def comment_add(request):
     })
     return HttpResponse(CommentsNode('instance').render(context))
 
-def logout(request):
-    if request.user.is_authenticated():
-        auth.logout(request)
-    return account_links(request)
-    
 def home(request):
     context = RequestContext(request, {})
     return render_to_response('desktop/content/home.html', context)
@@ -1245,13 +1299,9 @@ class ContentBaseViews(object):
         return '/404'
 
     def post_head(self, context):
-
         # create a short sharing url
         host = "http://%s" % context['request'].META['HTTP_HOST']
         share_url = "%s/%s" % (host, self.pk)
-
-        # create voting url
-        vote_url = reverse('xmlhttprequest_vote_on_object', kwargs={'slug': self.slug})
 
         # get site name
         current_site = Site.objects.get_current()
@@ -1282,7 +1332,6 @@ class ContentBaseViews(object):
             'instance': self,
             'owner': self.owner,
             'host': host,
-            'vote_url': vote_url,
             'share_url': share_url,
             'mailto_url': mailto_url,
             'facebook_url': facebook_url,
@@ -1423,6 +1472,32 @@ class UserViews(object):
         context.update(inv_response[status])
 
         return render_to_string('desktop/content/user/listing.html', context)
+    
+    def render_block(self, context):
+        request = context['request']
+        
+        are_friends = Friendship.objects.are_friends(self, request.user)
+        if are_friends:
+            status = 'friends'
+        else:
+            status = str(FriendshipInvitation.objects.invitation_status(self, request.user))
+  
+        inv_response = gen_inv_response(user = self)
+
+        update_count = StatusUpdate.objects.filter(user=self).count()
+        like_count = Vote.objects.filter(user=self).count()
+        comment_count = Comment.objects.filter(user=self).count()
+        context = {
+            'user': self,
+            'profile': self.profile,
+            'update_count': update_count,
+            'like_count': like_count,
+            'comment_count': comment_count,
+        }
+
+        context.update(inv_response[status])
+
+        return render_to_string('desktop/content/user/block.html', context)
 
 class SongViews(object):
     def render_modals_content(self, context):
@@ -1443,7 +1518,6 @@ class StatusUpdateViews(object):
         return render_to_string('desktop/content/status_update/update.html', context)
         
 class MessageViews(object):
-    
     def render_listing_sent(self, context):
         thread = self.thread
         users = thread.users.exclude(pk=self.sender.pk).order_by('username')
