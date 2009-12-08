@@ -7,11 +7,29 @@ register = template.Library()
 class ScaledImageURLNode(template.Node):
     def __init__(self, obj, width=None, height=None):
         self.obj = template.Variable(obj)
-        self.width = width
-        self.height = height
+
+        try:
+            self.width = int(width)
+        except ValueError:
+            self.width = template.Variable(width)
+        try:
+            self.height = int(height)
+        except ValueError:
+            self.height = template.Variable(height)
 
     def render(self, context):
+        
         width, height = self.width, self.height
+        if isinstance(self.width, int):
+            width = self.width
+        else:
+            width = self.width.resolve(context)
+        
+        if isinstance(self.height, int):
+            height = self.height
+        else:
+            height = self.height.resolve(context)
+            
         obj = self.obj.resolve(context)
         image = obj.image
         try:
