@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django import template
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 
@@ -468,6 +469,14 @@ def modal_updates(parser, token):
 # Misc
 
 @register.tag
+def status_update(parser, token):
+    return StatusUpdateNode()
+
+class StatusUpdateNode(template.Node):
+    def render(self, context):
+        return render_to_string('desktop/inclusion_tags/skeleton/status_update.html', context)
+
+@register.tag
 def paging(parser, token):
     token = token.split_contents()
     if not len(token) == 2:
@@ -530,6 +539,38 @@ class SocialPagingNode(template.Node):
             'page_obj': page_obj
         }
         return render_to_string('desktop/inclusion_tags/misc/social_paging.html', context)
+
+@register.tag
+def likes_stamp(parser, token):
+    try:
+        tag_name, obj_name = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError, "%s requires exactly 1 argument" % token.contents
+    
+    obj = template.Variable(obj_name)
+    return LikesStampNode(obj)
+
+class LikesStampNode(template.Node):
+    def __init__(self, obj):
+        self.obj = obj
+
+    def render(self, context):
+        instance = self.obj.resolve(context)
+        
+        # create voting url
+        vote_url = reverse('xmlhttprequest_vote_on_object', kwargs={'slug': instance.slug})
+
+        # get site name
+        current_site = Site.objects.get_current()
+        site_name = current_site.name
+        
+        context = {
+            'user': context['request'].user, 
+            'instance': instance,
+            'vote_url': vote_url,
+            'site_name': site_name,
+        }
+        return render_to_string('desktop/inclusion_tags/misc/likes_stamp.html', context)
 
 @register.tag
 def comments(parser, token):
