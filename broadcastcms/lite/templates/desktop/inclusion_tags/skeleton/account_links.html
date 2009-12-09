@@ -7,7 +7,7 @@
         </a>
     </p>
     <p class="logged_info">
-        <span class="logged_name">Hello {{ user.username }}</span><br />
+        <span class="logged_name">Hello {{ limited_username }}</span><br />
     	<span class="logged_links"><a href="{% url messages_inbox %}">Messages {% if messages %}({{ messages }}){% endif %}</a> | {% if fb_authenticated %}<a id="fb_sign_out" href="{% url ajax_sign_out %}">Sign out</a>{% else %}<a id="sign_out" href="{% url ajax_sign_out %}">Sign out</a>{% endif %}</span>
     </p>
 {% else %}
