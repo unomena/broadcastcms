@@ -1,13 +1,9 @@
-{% load scaled_image_tags %}
+{% load template_tags %}
 
 <div class="update">
     <p class="update_avatar">
         <a href="#">
-            {% if profile.facebook_id and profile.use_facebook_picture %}
-                <fb:profile-pic linked="false" uid="{{ profile.facebook_id }}" width="50" height="50" />
-            {% else %}
-                <img src="{% if profile.image %}{% scaled_image_url profile 50 50%}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="50" height="50" alt="" />
-            {% endif %}
+            {% profile_image profile 50 50 %}
         </a>
     </p>
 	<p class="update_content">
