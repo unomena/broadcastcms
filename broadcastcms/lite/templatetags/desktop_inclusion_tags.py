@@ -17,6 +17,7 @@ from broadcastcms.show.models import Credit, Show
 from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.radio.models import Song
 from broadcastcms.cache.decorators import cache_view_function
+from broadcastcms.status.models import StatusUpdate
 
 register = template.Library()
 
@@ -43,9 +44,12 @@ class AccountLinksNode(template.Node):
         
             # get unread message count
             messages = Thread.objects.unread(user).count()
-
+            username = user.username
+            limited_username = "%s..." % username[:10] if len(username) > 10 else username
+        
         context.update({
             'user': user,
+            'limited_username': limited_username,
             'profile': profile,
             'fb_authenticated': request.fb_authenticated,
             'messages': messages,
@@ -204,22 +208,21 @@ class HomeStatusUpdatesNode(template.Node):
         credits = Credit.objects.filter(role='1', show__in=Show.permitted.all).select_related('castmember')
         castmember_owners = [credit.castmember.owner for credit in credits]
 
-        from broadcastcms.status.models import StatusUpdate
         castmember_status_updates = StatusUpdate.objects.filter(user__in=castmember_owners).select_related('user').order_by('-timestamp')[:4]
-        """
+
+        current = None
+        friends_status_updates = []
         if user.is_authenticated():
             friends = Friendship.objects.friends_for_user(user)
-            friends_count = len(friends)
-            friends = [friend['friend'] for friend in friends][:10]
-    
-            context.update({
-                'friends': friends,
-                'friends_count': friends_count
-            })
-        """
+            friends = [friend['friend'] for friend in friends]
+            friends_status_updates = StatusUpdate.objects.filter(user__in=friends).select_related('user').order_by('-timestamp')[:4]
+
+            current = StatusUpdate.objects.current_status(user)
 
         context.update({
             'castmember_status_updates': castmember_status_updates,
+            'friends_status_updates': friends_status_updates,
+            'current': current,
         })
 
         return render_to_string('desktop/inclusion_tags/home/status_updates.html', context)
@@ -328,16 +331,16 @@ class OnAirNode(template.Node):
 
 @register.tag
 def home_news(parser, token):
-    news_labels = Label.objects.filter(title__iexact="news", is_visible=False)
+    news_labels = Label.objects.filter(title__iexact="news")
     queryset = ContentBase.permitted.filter(labels__in=news_labels).order_by("-created")[:18]
     more_url = reverse('news')
-    return UpdatesNode(queryset, panels=3, node_class="updates pink", heading="Latest News", more_url=more_url)
+    return UpdatesNode(queryset, rows_per_panel=6, node_class="updates pink", heading="Latest News", more_url=more_url)
 
 @register.tag
 def home_competitions(parser, token):
     queryset = Competition.permitted.order_by("-created")[:3]
     more_url = reverse('competitions')
-    return UpdatesNode(queryset, panels=1, node_class="updates align-right events yellow", heading="Competitions", more_url=more_url, show_images=False)
+    return UpdatesNode(queryset, rows_per_panel=3, node_class="updates align-right events yellow", heading="Competitions", more_url=more_url, show_images=False)
 
 @register.tag
 def home_events(parser, token):
@@ -351,12 +354,12 @@ def home_events(parser, token):
 
     queryset = queryset[:3]
     more_url = reverse('events')
-    return UpdatesNode(queryset, panels=1, node_class="updates align-right events blue", heading="Events", more_url=more_url, show_images=False)
+    return UpdatesNode(queryset, rows_per_panel=3, node_class="updates align-right events blue", heading="Events", more_url=more_url, show_images=False)
 
 class UpdatesNode(template.Node):
-    def __init__(self, queryset, panels, node_class, heading, more_url, show_images=True):
+    def __init__(self, queryset, rows_per_panel, node_class, heading, more_url, show_images=True):
         self.queryset = queryset
-        self.panels = panels
+        self.rows_per_panel = rows_per_panel
         self.node_class = node_class
         self.heading = heading
         self.more_url = more_url
@@ -365,20 +368,18 @@ class UpdatesNode(template.Node):
     def build_panels(self):
         """
         Returns panels containing objects. Pannels are build according
-        to the number of panels requested and the number of objects in the queryset.
+        to the number of rows per panel requested and the number of objects in the queryset.
         """
         object_list = list(self.queryset)
         object_list_count = len(object_list)
-        panel_object_count = object_list_count / self.panels
-        panel_object_count = 1 if panel_object_count == 0 else panel_object_count
         
         panels = []
         if object_list_count > 0:
             # generate instance slice offsets from which to populate panels
-            slices = range(0, object_list_count, panel_object_count)
+            slices = range(0, object_list_count, self.rows_per_panel)
             # populate panels based on instance slices
             for slice_start in slices:
-                panels.append(object_list[slice_start: slice_start + panel_object_count])
+                panels.append(object_list[slice_start: slice_start + self.rows_per_panel])
 
         return panels
 
