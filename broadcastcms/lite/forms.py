@@ -18,7 +18,7 @@ from models import Settings
 
 class LoginForm(forms.Form):
     username = forms.CharField(
-        max_length=100,
+        max_length=30,
         label='Username: ',
         widget=forms.TextInput(attrs={'class':'required'}),
         error_messages={'required': 'Please enter a username.'}
@@ -46,7 +46,7 @@ class MobileLoginForm(forms.Form):
     
 class RegistrationForm(forms.Form):
     username = formfields.UsernameField(
-        max_length=100,
+        max_length=30,
         label='Username:',
         help_text='Must be at least 4 characters, letters, numbers and underscores only.',
         widget=forms.TextInput(attrs={'class':'required'}),
@@ -197,7 +197,7 @@ class MobileRegistrationForm(forms.Form):
 
 class ProfileForm(forms.Form):
     username = formfields.UsernameField(
-        max_length=100,
+        max_length=30,
         label='Alias:',
         help_text='Must be at least 4 characters, letters, numbers and underscores only.',
         widget=forms.TextInput(attrs={'class':'required'}),
