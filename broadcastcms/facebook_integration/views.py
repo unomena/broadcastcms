@@ -44,7 +44,10 @@ def finish_signup_existing(request):
         
                 # Update profile
                 profile = user.profile
-                profile.facebook_url = user_info["profile_url"]
+                try:
+                    profile.facebook_url = user_info["profile_url"]
+                except KeyError:
+                    pass
                 profile.facebook_id = user_info["uid"]
                 profile.save()
                 auth.login(request, user)
