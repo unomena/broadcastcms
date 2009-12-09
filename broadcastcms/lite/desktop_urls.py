@@ -38,6 +38,7 @@ ajax_urls = patterns('',
     url(r'^account-links/$', ajax_account_links, name='ajax_account_links'),
     url(r'^sign-out/$', ajax_sign_out, name='ajax_sign_out'),
     url(r'^home/friends/$', ajax_home_friends, name='ajax_home_friends'),
+    url(r'^home/status-updates/$', ajax_home_status_updates, name='ajax_home_status_updates'),
     url(r'^like-stamp/(?P<slug>[\w-]+)/$', ajax_likes_stamp, name='ajax_likes_stamp'),
 )
 
