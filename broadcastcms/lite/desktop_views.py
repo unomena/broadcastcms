@@ -47,7 +47,7 @@ from broadcastcms.utils import mail_user
 from broadcastcms.label.models import Label
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
-from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, LikesStampNode
+from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
 import utils
 
 # Ajax
@@ -80,6 +80,16 @@ def ajax_home_friends(request):
 
     context = RequestContext(request, {})
     return HttpResponse(HomeFriendsNode().render(context))
+
+def ajax_home_status_updates(request):
+    """
+    Wrapper exposing the home_status_updates inclusion tag as a view.
+    """
+    if not request.is_ajax():
+        raise Http404
+
+    context = RequestContext(request, {})
+    return HttpResponse(HomeStatusUpdatesNode().render(context))
 
 def ajax_likes_stamp(request, slug):
     """
@@ -891,18 +901,16 @@ def handler500(request):
 
 # Mailers
 def mailer_new_user(request, username, password):
-    current_site = Site.objects.get_current()
-    site_name = current_site.name
-    site_domain = current_site.domain
+    site = Site.objects.get_current()
     host = "http://%s" % request.META['HTTP_HOST']
-    subject = "Welcome to %s" % site_name
+    subject = render_to_string("desktop/mailers/account/new_user_subject.txt", {'site': site}).strip()
     
-    return (render_to_string('desktop/mailers/new_user.html', {
+    return (render_to_string('desktop/mailers/account/new_user_body.html', {
         'username': username, 
         'password': password,
         'host': host,
-        'site_name': site_name,
-        'site_domain': site_domain,
+        'site': site,
+        'mailer_title': 'Welcome',
     }), subject)
 
 def mailer_friend_request(request, from_user, to_user, invitation):
