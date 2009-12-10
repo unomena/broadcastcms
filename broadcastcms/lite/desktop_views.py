@@ -1518,10 +1518,24 @@ class SongViews(object):
 class StatusUpdateViews(object):
     def render_updates(self, context):
         user = self.user
+        user_twitter_username = user.profile.twitter_username
+        
+        # build retweet url
+        credit = "@%s" % user_twitter_username if user_twitter_username else ""
+        status = "RT "
+        if credit:
+            status += "%s " % credit
+        status += self.text
+        status = status[:140]
+        retweet_url = "http://twitter.com/home?%s" % urlencode({
+            'status': status,
+        })
+
         context = {
             'object': self,
             'user': user,
             'profile': user.profile,
+            'retweet_url': retweet_url, 
         }
         return render_to_string('desktop/content/status_update/update.html', context)
         
