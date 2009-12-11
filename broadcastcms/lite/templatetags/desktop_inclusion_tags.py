@@ -654,7 +654,7 @@ class AccountSideNavNode(template.Node):
                 'title': "See My Friends' Recent Activity",
                 'section': 'activity',
                 'class': 'friends_activity',
-                'url': reverse('account_friends_activity'),
+                'url': reverse('account_friends_activity_all'),
             },
             {
                 'title': "Find More Friends",
@@ -695,12 +695,11 @@ class AccountMenuNode(template.Node):
                 'section': 'messages',
                 'url': reverse('messages_inbox'),
             },
-            #XXX: History
-            #{
-            #    'title': 'History',
-            #    'section': 'history',
-            #    'url': reverse('account_history'),
-            #},
+            {
+                'title': 'History',
+                'section': 'history',
+                'url': reverse('account_history'),
+            },
             {
                 'title': 'Friends',
                 'section': 'friends',
