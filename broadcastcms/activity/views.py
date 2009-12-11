@@ -16,7 +16,7 @@ from broadcastcms.activity.models import ActivityEvent
 #    }, context_instance=RequestContext(request))
 
 
-# XXX SS:I've moved this to lite/desktop_views.py under account_friends_activity
+# XXX SS:I've moved this to lite/desktop_views.py under account_friends_activity_all
 #@login_required
 #def friends_activity(request):
 #    friends = Friendship.objects.friends_for_user(request.user)
