@@ -13,6 +13,17 @@ def settings(request):
     settings = Settings.objects.get_or_create(pk='1')[0]
     return {'settings': settings}
 
+def determine_section(path):
+    # remove starting '/' if present
+    if path.startswith('/'):
+        path = path[1:]
+
+    # section is determined by first path element, defaults to home
+    path = path.split('/')
+    section = path[0] if len(path) > 0 else 'home'
+    section = section if section in SITE_SECTIONS else 'home'
+
+    return section
 
 @cache_context_processor(10*10, respect_path=True)
 def section(request):
@@ -21,15 +32,7 @@ def section(request):
     it to context['section']. Section defaults to 'home'.
     """
     path = request.path
-    
-    # remove starting '/' present
-    if path.startswith('/'):
-        path = path[1:]
-
-    # section is determined by first path element, defaults to home
-    path = path.split('/')
-    section = path[0] if len(path) > 0 else 'home'
-    section = section if section in SITE_SECTIONS else 'home'
+    section = determine_section(path)
 
     return {'section': section}
 
