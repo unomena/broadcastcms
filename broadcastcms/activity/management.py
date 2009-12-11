@@ -16,9 +16,9 @@ from broadcastcms.status.models import StatusUpdate
 def record_comment(sender, comment, request, **kwargs):
     ActivityEvent.objects.create(user=comment.user,
         event_type=ActivityEvent.EVENT_COMMENT,
-        content_type=comment.content_type,
-        object_id=comment.object_pk)
-
+        content_type=ContentType.objects.get_for_model(comment),
+        object_id=comment.pk)
+        
 comment_was_posted.connect(record_comment)
 
 def record_friendship(sender, instance, raw, created, **kwargs):
@@ -31,7 +31,7 @@ def record_friendship(sender, instance, raw, created, **kwargs):
             event_type=ActivityEvent.EVENT_FRIEND,
             content_type=ct, object_id=instance.to_user.pk)
 
-post_save.connect(record_friendship, sender=Friendship)
+#post_save.connect(record_friendship, sender=Friendship)
 
 def record_vote(sender, instance, raw, created, **kwargs):
     if created:
