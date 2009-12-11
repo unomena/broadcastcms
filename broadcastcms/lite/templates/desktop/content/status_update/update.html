@@ -5,12 +5,12 @@
 
 <div class="update">
     <p class="update_avatar">
-        <a href="#">
+        <a href="{% url account_friends_activity user.pk %}">
             {% profile_image profile 50 50 %}
         </a>
     </p>
 	<p class="update_content">
-        <a href="user-friends-profile.html">{{ user.username }}</a> 
+        <a href="{% url account_friends_activity user.pk %}">{{ user.username }}</a> 
 	    <span class="update_text">{{ object.text }}</span>
 		<span class="update_meta">{{ object.timestamp|timesince }} Ago {% ifequal object.source 1 %} via Twitter {% endifequal %}| <a href="#" class="update_meta_like">{{ score.score }}</a></span>
 		<span class="update_btns">
