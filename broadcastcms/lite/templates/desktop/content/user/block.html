@@ -2,7 +2,7 @@
 
 <div class="friend_item">
     <p class="user_avatar">
-        <a href="user-friends-profile.html">
+        <a href="{% url account_friends_activity user.pk %}">
             {% profile_image profile 50 50 %}
         </a>
     </p>
@@ -11,5 +11,5 @@
 	<p class="user_meta">{{ update_count }} Status Updates  |  {{ like_count }} Likes  |  {{ comment_count }} Comments</p>
 	<p class="user_sendmessage"><a href="user-messages-create.html">Send Message</a></p>
 	<p class="user_unfriend"><a {% if action_href %}href="{{ action_href }}"{% endif %} id="user_{{ user.pk }}" class="{{ action_class }}">{{ action_text }}</a></p>
-	<p class="user_viewprofile"><a href="user-friends-profile.html">View Profile</a></p>
+	<p class="user_viewprofile"><a href="{% url account_friends_activity user.pk %}">View Profile</a></p>
 </div>
