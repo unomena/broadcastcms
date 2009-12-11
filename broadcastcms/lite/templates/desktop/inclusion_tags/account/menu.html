@@ -1,12 +1,9 @@
-{% load scaled_image_tags %}
+{% load template_tags %}
+
 <div class="page_head user">
     <h1>
         <span class="avatar">
-            {% if profile.facebook_id and profile.use_facebook_picture %}
-                <fb:profile-pic uid="{{ profile.faecbook_id }}" width="41" height="41" />
-            {% else %}
-                <img src="{% if profile.image %}{% scaled_image_url profile 41 41 %}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="41" height="41" alt="" />
-            {% endif %}
+            {% profile_image profile 41 41 %}
         </span>
         {{ user.username }} &nbsp;
         <img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" />
