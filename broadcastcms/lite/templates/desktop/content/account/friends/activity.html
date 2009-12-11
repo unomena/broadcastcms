@@ -1,21 +1,31 @@
 {% extends "desktop/base/account.html" %}
 
 {% load desktop_inclusion_tags %}
-{% load friends_tags %}
+{% load public_tags %}
+{% load template_tags %}
 
 {% block left %}
     {% account_menu %}
-    {% account_thanks %}
-    
-    <div class="page_form">
-        {% if events %}
-            <ul>
-                {% for event in events %}
-                    <li>At {{ event.timestamp }} {{ event.user }} had an event of type {{ event.get_event_type_display }} with {{ event.content_object }}.</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No events.</p>
+			
+    <div class="social">
+        {% if object_list %}
+    		<h2 class="smaller no-bg">{{ user.username }}'s Activities</h2>
+            <div class="thread_participants">
+                <a>
+                    {% profile_image user.profile 35 35 %}
+                </a>
+            </div>
         {% endif %}
-    </div>
+	    <div class="social_body">
+            {% if object_list %}
+                {% social_paging page_obj %}
+            
+                {% for object in object_list %}
+                    {% call_view object render_listing %} 
+                {% endfor %}        
+            {% else %}
+	    		<h2 class="smaller no-bg">{{ user.username }} appears to be inactive. Please check back later.</h2>
+            {% endif %}
+		</div>
+	</div><!--/social-->
 {% endblock %}
