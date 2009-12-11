@@ -3,6 +3,7 @@
 {% load desktop_inclusion_tags %}
 {% load public_tags %}
 {% load scaled_image_tags %}
+{% load template_tags %}
 
 {% block left %}
     {% account_menu %}
@@ -15,11 +16,7 @@
             {% for user in thread.users.distinct %}
                 <a>
                 {% with user.profile as profile %}
-                    {% if profile.facebook_id and profile.use_facebook_picture %}
-                        <fb:profile-pic linked="false" uid="{{ profile.facebook_id }}" width="35" height="35" />
-                    {% else %}
-                        <img src="{% if profile.image %}{% scaled_image_url profile 35 35%}{% else %}/media/bcms/images/examples/avatar_logged.jpg{% endif %}" width="35" height="35" alt="" />
-                    {% endif %}
+                    {% profile_image profile 35 35 %}
                 {% endwith %}
                 </a>
             {% endfor %}
