@@ -45,6 +45,7 @@ from broadcastcms.show.models import Show, CastMember
 from broadcastcms.status.models import StatusUpdate
 from broadcastcms.utils import mail_user
 from broadcastcms.label.models import Label
+from broadcastcms.lite.context_processors import determine_section
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
@@ -427,19 +428,48 @@ def account_friends_my(request):
     }, context_instance=RequestContext(request))
 
 @login_required
-def account_friends_activity(request):
+def account_friends_activity(request, user_pk):
+    user = get_object_or_404(User, pk = user_pk)
+    activity_events = ActivityEvent.objects.filter(user=user).order_by('-timestamp')
+    
+    # create pager
+    page_obj = utils.paging(activity_events, 'page', request, 10)
+    object_list = page_obj.object_list
+
+    return render_to_response("desktop/content/account/friends/activity.html", {
+        "user": user,
+        "object_list": object_list,
+        "page_obj": page_obj,
+        "show_avatar": False,
+    }, context_instance=RequestContext(request))
+
+def account_friends_activity_all(request):
     friends = Friendship.objects.friends_for_user(request.user)
     friends = [o["friend"] for o in friends]
-    events = ActivityEvent.objects.filter(user__in=friends)
-    return render_to_response("desktop/content/account/friends/activity.html", {
-        "events": events,
+    activity_events = ActivityEvent.objects.filter(user__in=friends).order_by('-timestamp')
+    
+    # create pager
+    page_obj = utils.paging(activity_events, 'page', request, 10)
+    object_list = page_obj.object_list
+
+    return render_to_response("desktop/content/account/friends/activity_all.html", {
+        "object_list": object_list,
+        "page_obj": page_obj,
+        "show_avatar": True,
     }, context_instance=RequestContext(request))
 
 @login_required
 def account_history(request):
-    events = ActivityEvent.objects.filter(user=request.user)
+    activity_events = ActivityEvent.objects.filter(user=request.user).order_by('-timestamp')
+    
+    # create pager
+    page_obj = utils.paging(activity_events, 'page', request, 10)
+    object_list = page_obj.object_list
+
     return render_to_response("desktop/content/account/history.html", {
-        "events": events,
+        "object_list": object_list,
+        "page_obj": page_obj,
+        "show_avatar": False,
     }, context_instance=RequestContext(request))
 
 @login_required
@@ -1539,6 +1569,13 @@ class StatusUpdateViews(object):
         }
         return render_to_string('desktop/content/status_update/update.html', context)
         
+    def render_activity_listing(self, context, activity):
+        context.update({
+            'object': self,
+            'activity': activity,
+        })
+        return render_to_string('desktop/content/status_update/activity_listing.html', context)
+
 class MessageViews(object):
     def render_listing_sent(self, context):
         thread = self.thread
@@ -1575,7 +1612,47 @@ class MessageViews(object):
             'profile': profile,
         }
         return render_to_string('desktop/content/message/listing_thread.html', context)
+       
+class ActivityEventViews(object):
+    def render_listing(self, context):
+        return self.content_object.render_activity_listing(context, self)
+
+class VoteViews(object):
+    def render_activity_listing_status_update(self, context, activity):
+        content = self.object
+        context.update({
+            'content': content,
+            'activity': activity,
+            'user': content.user,
+        })
+        return render_to_string('desktop/content/vote/activity_listing_status_update.html', context)
         
+    def render_activity_listing(self, context, activity):
+        content = self.object
+        if isinstance(content, StatusUpdate):
+            return self.render_activity_listing_status_update(context, activity)        
+        else:
+            content_url = content.url(context)
+            content_section = determine_section(content_url)
+            context.update({
+                'activity': activity,
+                'content': content,
+                'content_url': content_url,
+                'content_section': content_section,
+            })
+            return render_to_string('desktop/content/vote/activity_listing.html', context)
+
+class CommentViews(object):
+    def render_activity_listing(self, context, activity):
+        content = self.content_object
+        content_url = content.url(context)
+        context.update({
+            'object': self,
+            'activity': activity,
+            'content': content,
+            'content_url': content_url,
+        })
+        return render_to_string('desktop/content/comment/activity_listing.html', context)
     
 public.site.register(CastMember, CastMemberViews)
 public.site.register(ChartEntry, ChartEntryViews)
@@ -1591,3 +1668,6 @@ public.site.register(User, UserViews)
 public.site.register(Song, SongViews)
 public.site.register(StatusUpdate, StatusUpdateViews)
 public.site.register(Message, MessageViews)
+public.site.register(ActivityEvent, ActivityEventViews)
+public.site.register(Vote, VoteViews)
+public.site.register(Comment, CommentViews)
