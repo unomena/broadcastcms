@@ -41,7 +41,7 @@ def format_rich_text(rich_text):
 def fetch_from_cache(source):
     destination = source
     if source.startswith('http'):
-        destination = '%s/generate_cache/%s' % (SCRIPT_PATH, hashlib.md5(source).hexdigest())
+        destination = '%s/json_loader_cache/%s' % (SCRIPT_PATH, hashlib.md5(source).hexdigest())
         if not USE_CACHE or not os.path.exists(destination):
             #print "Fetching %s..." % source
             f = open(destination, 'w')
