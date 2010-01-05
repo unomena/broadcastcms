@@ -1,0 +1,19 @@
+{% extends "desktop/generic/base_generic.html" %}
+{% load public_tags %}
+
+{% block generic %}
+    {% for entry in object_list %}
+        {% with entry.day as day %}
+    	    <div class="page_stamp">
+	            <p class="page_stamp_date">
+		            <span class="month">{{ day|date:"M" }}</span>
+    		    	<span class="day">{{ day|date:"j" }}</span>
+    	    	</p>
+	    	    <p class="page_stamp_title">{{ day|date:"l j F Y" }} {% ifequal day.date today %}<span>(Today)</span>{% endifequal %}</p>
+    	    </div><!--/stamp-->
+        {% endwith %}
+        {% for event in entry.events %}
+            {% call_view event render_listing %}
+        {% endfor %}
+    {% endfor %}
+{% endblock %}
