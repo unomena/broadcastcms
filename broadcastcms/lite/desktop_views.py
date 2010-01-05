@@ -34,7 +34,7 @@ from broadcastcms.base.models import ContentBase
 from broadcastcms.calendar.models import Entry
 from broadcastcms.chart.models import Chart, ChartEntry
 from broadcastcms.competition.models import Competition
-from broadcastcms.event.models import Event
+from broadcastcms.event.models import Event, Appearance
 from broadcastcms.gallery.models import Gallery
 from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.post.models import Post
@@ -1169,7 +1169,50 @@ class ShowsLineUp(object):
         )
 
 def shows_dj_appearances(request, slug):
-    return none
+    castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
+    context = RequestContext(request, {})
+    header = utils.CastMemberHeader(request, castmember)
+
+    appearances = Appearance.objects.permitted().filter(castmember=castmember)
+    events = [appearance.event for appearance in appearances]
+    entries = Entry.objects.permitted().filter(content__in=events).order_by('start')
+    
+    entry_dict = {}
+    for entry in entries:
+        now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        start = entry.start.replace(hour=0, minute=0, second=0, microsecond=0)
+        if start < now:
+            start = now
+        end = entry.end
+        content = entry.content
+        if content:
+            content = content.as_leaf_class()
+            while start < end:
+                if entry_dict.has_key(start):
+                    entry_dict[start].append(content)
+                else:
+                    entry_dict[start] = [content]
+                start += timedelta(days=1)
+    
+
+    days = entry_dict.keys()
+    days.sort()
+    entries = []
+    for day in days:
+        entries.append({'day': day, 'events': entry_dict[day]})
+    
+    # create pager
+    page_obj = utils.paging(entries, 'page', request, 5)
+    object_list = page_obj.object_list
+
+    context.update({
+        'today': date.today(),
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'object_list': object_list,
+        'header': header
+    })
+    return render_to_response('desktop/content/shows/dj_appearances.html', context)
 
 def shows_dj_blog(request, slug, template_name='desktop/generic/object_listing_wide.html'):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
@@ -1215,6 +1258,9 @@ def shows_dj_content(request, castmember_slug, content_slug, template_name='desk
             'header': header,
         },
     )
+
+def shows_dj_appearances_content(request, castmember_slug, content_slug, template_name='desktop/generic/object_detail.html'):
+    return shows_dj_content(request, castmember_slug, content_slug, template_name)
 
 # Model Views
 class CodeBannerViews(object):
@@ -1288,6 +1334,9 @@ class ContentBaseViews(object):
                 castmembers = CastMember.permitted.filter(owner=owner)
                 if castmembers:
                     return reverse('shows_dj_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
+                elif self.classname in ['Event',]:
+                    castmembers = self.castmembers.permitted()
+                    return reverse('shows_dj_appearances_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
         
         def handle_galleries(self):
             if self.classname in ['Gallery',]:
