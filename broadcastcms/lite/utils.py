@@ -184,7 +184,7 @@ class PageMenu(object):
                     active = False
                 
             if item.has_key('path'):
-                if self.request.path == item['path']:
+                if self.request.path.startswith(item['path']):
                     active = True
                 else:
                     active = False
@@ -276,11 +276,11 @@ class CastMemberPageMenu(PageMenu):
             #    'view_name': 'shows_dj_contact',
             #    'view_kwargs': {'slug': castmember.slug},
             #},
-            #{
-            #    'title': 'Appearances',
-            #    'view_name': 'shows_dj_appearances',
-            #    'view_kwargs': {'slug': castmember.slug},
-            #}
+            {
+                'title': 'Appearances',
+                'view_name': 'shows_dj_appearances',
+                'view_kwargs': {'slug': castmember.slug},
+            },
         ]
         super(CastMemberPageMenu, self).__init__(request)
 
