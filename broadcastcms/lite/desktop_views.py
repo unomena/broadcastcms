@@ -47,7 +47,7 @@ from broadcastcms.utils import mail_user
 from broadcastcms.label.models import Label
 from broadcastcms.lite.context_processors import determine_section
 
-from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm
+from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
 import utils
 
@@ -1176,7 +1176,7 @@ def shows_dj_appearances(request, slug):
     appearances = Appearance.objects.permitted().filter(castmember=castmember)
     events = [appearance.event for appearance in appearances]
     entries = Entry.objects.permitted().filter(content__in=events).order_by('start')
-    
+   
     entry_dict = {}
     for entry in entries:
         now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -1231,7 +1231,28 @@ def shows_dj_blog(request, slug, template_name='desktop/generic/object_listing_w
     )
 
 def shows_dj_contact(request, slug):
-    return none
+    castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
+    header = utils.CastMemberHeader(request, castmember)
+    context = RequestContext(request, {})
+    form_class = make_contact_form(request, base_class=_BaseCastmemberContactForm)
+    sent = False
+
+    if request.method == "POST":
+        form = form_class(data=request.POST, castmember=castmember)
+
+        if form.is_valid(request):
+            form.send_message()
+            sent = True
+    else:
+        form = form_class(castmember=castmember)
+        
+    context.update({
+        'castmember': castmember,
+        'header': header,
+        'form': form,
+        'sent': sent,
+    })
+    return render_to_response('desktop/content/shows/dj_contact.html', context)
 
 def shows_dj_profile(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
@@ -1335,7 +1356,7 @@ class ContentBaseViews(object):
                 if castmembers:
                     return reverse('shows_dj_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
                 elif self.classname in ['Event',]:
-                    castmembers = self.castmembers.permitted()
+                    castmembers = self.as_leaf_class().castmembers.permitted()
                     return reverse('shows_dj_appearances_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
         
         def handle_galleries(self):
