@@ -1,0 +1,104 @@
+{% extends "desktop/content/shows/dj_base.html" %}
+{% load desktop_inclusion_tags %}
+
+{% block left %}
+    {{ header.render }}
+	{% if sent %}
+    	<div class="page_container rich">
+    		<h3>Thanks for getting in touch!</h3>
+            <p>We'll get back to you as soon as possible.</p>
+        </div>
+    {% else %}
+	    <div class="page_form">
+		    <h2>Fill in the form below to contact {{ castmember.title }}:</h2>
+    		<form id="frmDJContact" method="post" action="{% url shows_dj_contact castmember.slug %}" method="POST" class="cmxform">
+            {% with form.name as field %}
+                {% if field %}
+				    <div class="page_form_row">
+                        {{ field.label_tag }}
+                        <p class="text_input">
+                            {{ field }}
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+                     </div>
+				    <p class="clearfix"></p>
+                {% endif %}
+            {% endwith %}
+            {% with form.email as field %}
+                {% if field %}
+				    <div class="page_form_row">
+                        {{ field.label_tag }}
+                        <p class="text_input">
+                            {{ field }}
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+                     </div>
+				    <p class="clearfix"></p>
+                {% endif %}
+            {% endwith %}
+            {% with form.subject as field %}
+                {% if field %}
+				    <div class="page_form_row">
+                        {{ field.label_tag }}
+                        <p class="text_input">
+                            {{ field }}
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+                     </div>
+				    <p class="clearfix"></p>
+                {% endif %}
+            {% endwith %}
+            {% with form.recaptcha_response_field as field %}
+                {% if field %}
+                    <p class="spam_dj_contact">
+                        <span id="recaptcha_image" style="width: 300px; height: 57px;"></span>
+                    </p>
+				    <div class="page_form_row">
+                        {{ field.label_tag }}
+                        <p class="text_input">
+                            {{ field }}
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+					    <p class="note">{{ field.help_text }}</p>
+                     </div>
+				    <p class="clearfix"></p>
+                    <script type="text/javascript">
+                        Recaptcha.create(
+                            "6LdcYgcAAAAAAEq2mn0KoUfM18BsgjSkuyLu-Pzk",
+                            "", 
+                            { theme: "custom" }
+                        );
+                    </script>
+                {% endif %}
+            {% endwith %}
+            {% with form.message as field %}
+                {% if field %}
+				    <div class="page_form_row">
+                        {{ field.label_tag }}
+					    <p class="text_area_short">
+                            {{ field }}
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+                     </div>
+				    <p class="clearfix"></p>
+                {% endif %}
+            {% endwith %}
+			<div class="page_form_row no-pad">
+			    <p class="label">&nbsp;</p>
+				<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-send_message.jpg" name="submit" /></p>
+			</div>
+		    </form>
+		</div><!--/form-->
+        {% endif %}
+		<p class="clearfix"></p>
+{% endblock %}
