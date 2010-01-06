@@ -84,7 +84,7 @@ urlpatterns = patterns('',
     url(r'competitions/rules/$', competitions_rules, name='competitions_rules'),
     url(r'competitions/(?P<slug>[\w-]+)/$', competitions_content, name='competitions_content'),
     
-    url(r'contact/$', contact, name='contact'),
+    url(r'^contact/$', contact, name='contact'),
     
     url(r'events/$', events, name='events'),
     url(r'events/(?P<slug>[\w-]+)/$', events_content, name='events_content'),
