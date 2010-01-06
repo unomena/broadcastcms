@@ -271,11 +271,11 @@ class CastMemberPageMenu(PageMenu):
                 'view_name': 'shows_dj_profile',
                 'view_kwargs': {'slug': castmember.slug},
             },
-            #{
-            #    'title': 'Contact',
-            #    'view_name': 'shows_dj_contact',
-            #    'view_kwargs': {'slug': castmember.slug},
-            #},
+            {
+                'title': 'Contact',
+                'view_name': 'shows_dj_contact',
+                'view_kwargs': {'slug': castmember.slug},
+            },
             {
                 'title': 'Appearances',
                 'view_name': 'shows_dj_appearances',
