@@ -2,7 +2,14 @@
 {% load public_tags %}
 
 {% block generic %}
-    {% for object in object_list %}
-        {% call_view object.as_leaf_class render_listing %}
-    {% endfor %}
+    {% if object_list %}
+        {% for object in object_list %}
+            {% call_view object.as_leaf_class render_listing %}
+        {% endfor %}
+    {% else %}
+    	<div class="page_container rich">
+            <h3>This section does not currently have any content. Please check back later...</h3>
+            <p>Alternatively head on over to the <a href="{% url home %}">home page</a>. Or give us a piece of your mind by <a href="{% url contact %}">contacting us here</a>.</p>
+        </div>
+    {% endif %}
 {% endblock %}
