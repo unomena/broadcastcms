@@ -1,4 +1,5 @@
 from datetime import datetime
+import threading
 
 from django import forms
 from django.contrib.auth.models import User
@@ -512,10 +513,27 @@ class _BaseContactForm(forms.Form):
         subject = "Contact message from %s: %s" % (site_name, self.cleaned_data['subject'])
         message = self.cleaned_data['message']
         recipients = self.get_recipients()
-        from_address = "%s <%s>" % (name, email)
+        if recipients:
+            from_address = "%s <%s>" % (name, email)
         
-        mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
-        mail.send(fail_silently=False)
+            mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
+            t = threading.Thread(target=mail.send, kwargs={'fail_silently': False})
+            t.setDaemon(True)
+            t.start()
+
+class _BaseCastmemberContactForm(_BaseContactForm):
+    def __init__(self, castmember, *args, **kwargs):
+        self.castmember = castmember
+        super(_BaseCastmemberContactForm, self).__init__(*args, **kwargs)
+
+    def get_recipients(self):
+        castmember_email = self.castmember.owner.email
+        if not castmember_email:
+            mail_managers('Error: No email address specified', 'Users are trying to contact %s for which no email address could be found.' % self.castmember.title, fail_silently=False)
+            recipients = None
+        else:
+            recipients = [castmember_email,]
+        return recipients
 
 class _BaseMobileContactForm(forms.Form):
     
@@ -554,16 +572,16 @@ class _BaseMobileContactForm(forms.Form):
         mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
         mail.send(fail_silently=False)
 
-def make_contact_form(request):
+def make_contact_form(request, base_class=_BaseContactForm):
     user = request.user
     if request.user.is_authenticated():
-        class AuthenticatedContactForm(_BaseContactForm):
+        class AuthenticatedContactForm(base_class):
             from_name = '%s %s' % (user.first_name, user.last_name)
             from_email = user.email
 
         return AuthenticatedContactForm
     else:
-        class AnonymousContactForm(_BaseContactForm):
+        class AnonymousContactForm(base_class):
             name = forms.CharField(
                 max_length=100,
                 label='Your Name',
@@ -575,7 +593,7 @@ def make_contact_form(request):
             )
             recaptcha_response_field = forms.CharField(
                 max_length=100,
-                label='',
+                label='Human?',
                 help_text='Spam prevention code. Enter the words above.',
                 widget=forms.TextInput(attrs={'class':'required', 'id': 'recaptcha_response_field', 'autocomplete': 'off'}),
                 error_messages={'required': 'Please enter the words above.'}
