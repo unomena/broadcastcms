@@ -754,7 +754,38 @@ class AccountMessagesMenuNode(template.Node):
             'items': items,
             'section': section,
         }
-        return render_to_string('desktop/inclusion_tags/account/messages_menu.html', context)
+        return render_to_string('desktop/inclusion_tags/account/sub_menu.html', context)
+
+@register.tag
+def account_friends_find_menu(parser, token):
+    return AccountFriendsFindMenuNode()
+
+class AccountFriendsFindMenuNode(template.Node):
+    def render(self, context):
+        request = context['request']
+        
+        items = [
+            {
+                'title': 'Find People You Know',
+                'section': 'find',
+                'url': reverse('account_friends_find'),
+            },
+        ]
+
+        if context['request'].fb_authenticated:
+            items.append({
+                'title': 'Invite Facebook Friends',
+                'section': 'facebook',
+                'url': reverse('account_friends_facebook_invite'),
+            })
+
+        section = request.path.split('/')[3]
+
+        context = {
+            'items': items,
+            'section': section,
+        }
+        return render_to_string('desktop/inclusion_tags/account/sub_menu.html', context)
 
 @register.tag
 def account_thanks(parser, token):
