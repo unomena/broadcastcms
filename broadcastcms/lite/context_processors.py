@@ -5,7 +5,7 @@ from broadcastcms.lite.models import Settings
 
 SITE_SECTIONS = ['home', 'shows', 'chart', 'competitions', 'news', 'events', 'galleries', 'reviews',]
 
-@cache_context_processor(10*10)
+@cache_context_processor(10*60)
 def settings(request):
     """
     Get or create a lite settings object and add it to context['settings'].
@@ -25,7 +25,7 @@ def determine_section(path):
 
     return section
 
-@cache_context_processor(10*10, respect_path=True)
+@cache_context_processor(10*60, respect_path=True)
 def section(request):
     """
     Determines the current site section from request path and adds
@@ -37,7 +37,7 @@ def section(request):
     return {'section': section}
 
 
-@cache_context_processor(10*10)
+@cache_context_processor(10*60)
 def site(request):
     """
     Get current site and add its name and domain to context['site_name']
