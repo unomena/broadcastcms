@@ -27,7 +27,10 @@ class ModelsTestCase(TestCase):
                 ImageBanner.objects.create(url='private %s image banner' % section, is_public=False), 
                 ImageBanner.objects.create(url='public %s image banner' % section, is_public=True),
             ]
-            setattr(site_settings, 'banner_section_%s' % section, banners)
+            b = getattr(site_settings, 'banner_section_%s' % section)
+            b.clear()
+            for banner in banners:
+                b.add(banner)
             site_settings.save()
             self.setContext(path=section)
             # only public banners are returned by default
