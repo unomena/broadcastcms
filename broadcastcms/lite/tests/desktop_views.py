@@ -2,7 +2,7 @@ from django.test import TestCase
 
 class DesktopViewsTestCase(TestCase):
     def assertSkeletonTemplatesUsed(self, response):
-        self.assertTemplateUsed(response, 'desktop/sections/base.html')
+        self.assertTemplateUsed(response, 'desktop/base/base.html')
         self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/masthead.html')
         self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/account_links.html')
         self.assertTemplateUsed(response, 'desktop/inclusion_tags/skeleton/mastfoot.html')
