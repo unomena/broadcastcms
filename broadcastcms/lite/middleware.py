@@ -20,6 +20,7 @@ class URLSwitchMiddleware(object):
             host = request.META['HTTP_HOST']
         else:
             return
+        # disregard port info
         host = host.split(':')[0] 
         # only change urlconf if a valid switch is found
         if url_switches.has_key(host):
