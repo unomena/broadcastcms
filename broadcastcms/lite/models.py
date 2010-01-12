@@ -121,6 +121,12 @@ class Settings(models.Model):
                                                  blank=True, 
                                                  limit_choices_to={'is_public': True},
                                                  verbose_name='Galleries')
+    banner_section_reviews = models.ManyToManyField(Banner, 
+                                                 related_name='banner_section_reviews', 
+                                                 null=True, 
+                                                 blank=True, 
+                                                 limit_choices_to={'is_public': True},
+                                                 verbose_name='Reviews')
     
     # Metrics
     metrics = models.TextField(
