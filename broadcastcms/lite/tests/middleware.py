@@ -7,23 +7,20 @@ from broadcastcms.test.mocks import RequestFactory
 class MiddlewareTestCase(TestCase):
     def setUp(self):
         self.url_switch = URLSwitchMiddleware()
-
-    def testURLSwitchMiddleware(self):
-        # setup
+        settings.ROOT_URLCONF = 'dummy'
         settings.URL_SWITCHES = {
-            'url1:8000': 'module1.app1.urls1',
+            'url1': 'module1.app1.urls1',
             'url2': 'module2.app2.urls2',
         }
 
-        # ROOT_URLCONF should change for valid switches.
-        for key, value in settings.URL_SWITCHES.items():
-            settings.ROOT_URLCONF = 'dummy'
-            request = RequestFactory(HTTP_HOST=key).get('/')
-            self.url_switch.process_request(request)
-            self.failUnlessEqual(settings.ROOT_URLCONF, value)
-        
-        # ROOT_URLCONF should not change for invalid swicthes.
-        settings.ROOT_URLCONF = 'dummy'
+    def testURLSwitchMiddleware(self):
+        # request urlconf should not be changed or set for invalid hosts.
         request = RequestFactory(HTTP_HOST='bogus_host').get('/')
         self.url_switch.process_request(request)
-        self.failUnlessEqual(settings.ROOT_URLCONF, 'dummy')
+        self.failUnlessRaises(request.urlconf, AttributeError)
+
+        # request urlconf should change for valid switches.
+        for key, value in settings.URL_SWITCHES.items():
+            request = RequestFactory(HTTP_HOST=key).get('/')
+            self.url_switch.process_request(request)
+            self.failUnlessEqual(request.urlconf, value)
