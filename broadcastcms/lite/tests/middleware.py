@@ -17,7 +17,7 @@ class MiddlewareTestCase(TestCase):
         # request urlconf should not be changed or set for invalid hosts.
         request = RequestFactory(HTTP_HOST='bogus_host').get('/')
         self.url_switch.process_request(request)
-        self.failUnlessRaises(request.urlconf, AttributeError)
+        self.failIf(hasattr(request, 'urlconf'))
 
         # request urlconf should change for valid switches.
         for key, value in settings.URL_SWITCHES.items():
