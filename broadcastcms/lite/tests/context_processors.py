@@ -37,4 +37,4 @@ class ContextProcessorsTestCase(TestCase):
 
         # if a settings object exists it should be returned
         site_settings = Settings.objects.get_or_create(pk='1')[0]
-        self.failUnless(settings(request)['settings'] == site_settings)
+        self.failUnless(site_settings == settings(request)['settings'])
