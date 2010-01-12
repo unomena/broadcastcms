@@ -1,7 +1,7 @@
 from django.test import Client
+from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 
-# RequestFactory shamelessly stolen from http://www.djangosnippets.org/snippets/963/
 class RequestFactory(Client):
     """
     Taken from DjangoSnippet 963, http://www.djangosnippets.org/snippets/963/
@@ -38,4 +38,10 @@ class RequestFactory(Client):
         }
         environ.update(self.defaults)
         environ.update(request)
-        return WSGIRequest(environ)
+        request = WSGIRequest(environ)
+        handler = BaseHandler()
+        handler.load_middleware()
+        for middleware_method in handler._request_middleware:
+            middleware_method(request)
+        
+        return request
