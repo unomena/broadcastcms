@@ -41,6 +41,7 @@ EVENT_COUNT = 10
 EVENT_ENTRY_COUNT = 20
 LOCATION_COUNT = 5
 FRIENDSHIP_COUNT = 4
+PROMO_WIDGET_SLOT_COUNT = 3
 
 def clear_and_sync():
     ADMIN_USER = 'admin'
@@ -288,6 +289,31 @@ def create_friendships():
         })
     return friendships
 
+def create_promo_widget_slots():
+    slots = []
+    for i in range(1, PROMO_WIDGET_SLOT_COUNT + 1):
+        slots.append({
+            "model": "promo.promowidgetslot",
+            "fields": {
+                "title": "Promo Widget Slot %s Title" % i,
+                "is_public": True,
+                "widget": {
+                    "model": "promo.promowidget",
+                    "fields": {
+                        "title": "PromoWidget 1 Title",
+                        "is_public": True,
+                    }
+                },
+                "content": {
+                    "model": "post.post",
+                    "fields": {
+                        "title": "Post %s Title" % i
+                    }
+                }
+            }
+        })
+    return slots
+
 def create_shows():
     shows = []
     for i in range(1, SHOW_COUNT + 1):
@@ -533,7 +559,12 @@ def create_settings():
         "model": "lite.settings",
         "fields": {
             "id": "1",
-            "homepage_featured_labels": [str(pk) for pk in random.sample(range(1, LABEL_COUNT + 1), random.randint(0, LABEL_COUNT))],
+            "homepage_promo_widget": { 
+                "model": "promo.promowidget",
+                "fields": {
+                    "title": "PromoWidget 1 Title",
+                }
+            },
             "terms": "Terms Content",
             "privacy": "Privacy Content",
             "about": "About Content",
@@ -650,6 +681,7 @@ def generate():
     objects += create_locations()
     objects += create_entries()
     objects += create_provinces()
+    objects += create_promo_widget_slots()
     objects += create_settings()
     
     load_json(objects)
