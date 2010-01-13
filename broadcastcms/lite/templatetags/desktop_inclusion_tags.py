@@ -233,39 +233,42 @@ class FeaturesNode(template.Node):
     @cache_view_function(10*60)
     def render(self, context):
         """
-        Renders the homepage features box. Content is featured by labeling it
-        and then selecting labels to feature in the setting object's homepage featured labels field.
-        Only public content and visible labels will render.
-        A maximum of 3 labels will render.
+        Renders the homepage features box. 
+        Content is featured through a PromoWidget, which is specified 
+        in the setting object's 'homepage promo widget' field.
+        Only public content will render.
+        Returns an empty string if no sutiable content is found to render.
         """
-        # grab featured labels from settings
+        # grab promo widget from settings
         settings = context['settings']
-        homepage_featured_labels = settings.homepage_featured_labels.filter(is_visible=True)[:3]
-       
-        # build a dictionary with label, content and url keys corresponding to 
-        # a featured label and its last created content.
-        features = []
-        for label in homepage_featured_labels:
-            content = ModelBase.objects.permitted().filter(labels__exact=label).order_by('-pk')
-            if content: 
-                content = content[0].as_leaf_class()
-                # for objects with a url field return the fields value as its url
-                # otherwise try and generate a url from the object's url method
-                try:
-                    url = content.url(context)
-                except TypeError:
-                    url = content.url
-                feature = {
-                    'label': label, 
-                    'content': content,
-                    'url': url,
-                }
-                features.append(feature)
-    
-        context.update({
-            'features': features
-        })
-        return render_to_string('desktop/inclusion_tags/home/features.html', context)
+        promo_widget = settings.homepage_promo_widget
+        # only public promo widget with public slots containing public content qualify as valid items
+        if promo_widget:
+            if promo_widget.is_public:
+                slots = promo_widget.promowidgetslot_set.permitted()
+                if slots:
+                    items = []
+                    for slot in slots:
+                        content = slot.content
+                        if content.is_public:
+                            content = content.as_leaf_class()
+                            # grab item url from view method or property
+                            try:
+                                url = content.url(context)
+                            except TypeError:
+                                url = content.url
+                            items.append({
+                                'title': slot.title,
+                                'content': content,
+                                'url': url,
+                            })
+
+                    if items: 
+                        context = {
+                            'items': items
+                        }
+                        return render_to_string('desktop/inclusion_tags/home/features.html', context)
+        return ''
 
 @register.tag
 def on_air(parser, token):
