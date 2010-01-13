@@ -1,23 +1,21 @@
 {% load scaled_image_tags public_tags %}
 
-{% if features %}
 <div class="promo">
     <div id="controller">
-        {% for feature in features %}
+        {% for item in items %}
     	    <div class="jFlowControl">
-	    	    <a href="javascript: void(0);" class="promo_on">{{ feature.label.title }}</a>
-				<p class="promo_title"><a href="{{ feature.url }}"> {{ feature.content.title }}</a></p>
-				<p class="promo_detail">{{ feature.content.description }}</p>
+	    	    <a href="javascript: void(0);" class="promo_on">{{ item.title }}</a>
+				<p class="promo_title"><a href="{{ item.url }}"> {{ item.content.title }}</a></p>
+				<p class="promo_detail">{{ item.content.description }}</p>
 			</div>
         {% endfor %}
 	</div>
 	<div id="slides">
-        {% for feature in features %}
+        {% for item in items %}
 	        <div>
-			    <p><img src="{% scaled_image_url feature.content 414 260 %}" width="414" height="260" alt="" /></p>
-				<p class="btn"><a href="{{ feature.url }}">View Details</a></p>
+			    <p><img src="{% scaled_image_url item.content 414 260 %}" width="414" height="260" alt="" /></p>
+				<p class="btn"><a href="{{ item.url }}">View Details</a></p>
 			</div>
         {% endfor %}
 	</div>
 </div><!--/Promo-->
-{% endif %}
