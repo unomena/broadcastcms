@@ -28,10 +28,11 @@ def account_links(parser, token):
     return AccountLinksNode()
 
 class AccountLinksNode(template.Node):
+    @cache_view_function(2*60, respect_user=True)
     def render(self, context):
         """
-        Renders anonymous avatar, sign in and sign up for anonymous users.
-        Renders avatar, profile and sign out for authenticated users.
+        Renders anonymous avatar, sign in and sign up links for anonymous users.
+        Renders avatar, messages and sign out links for authenticated users.
         """
         request = context['request']
 
@@ -61,7 +62,6 @@ def masthead(parser, token):
     return MastheadNode()
 
 class MastheadNode(template.Node):
-    #@cache_view_function(10*60, respect_path=True, respect_user=True)
     def render(self, context):
         """
         Renders the sitewide masthead, including site logo, site section links, search and account links.
@@ -90,7 +90,6 @@ def mastfoot(parser, token):
     return MastfootNode()
 
 class MastfootNode(template.Node):
-    @cache_view_function(10*60)
     def render(self, context):
         """
         Renders the sitewide footer.
@@ -147,7 +146,6 @@ def metrics(parser, token):
     return MetricsNode()
 
 class MetricsNode(template.Node):
-    @cache_view_function(10*60)
     def render(self, context):
         settings = context['settings']
         metrics = settings.metrics
@@ -288,20 +286,13 @@ class OnAirNode(template.Node):
         entries = Entry.objects.permitted().by_content_type(content_type).upcoming().filter(content__is_public=True)
         return entries[0] if entries else None
 
-    def get_primary_castmember(self, show):
-        """
-        Returns the primary public castmember for the given show.
-        Primary castmember is determined by credit roles.
-        """
-        credits = show.credits.all().filter(castmember__is_public=True).order_by('role')
-        return credits[0].castmember if credits else None
-    
-    #@cache_view_function(2*60)
+    @cache_view_function(2*60)
     def render(self, context):
         """
         Renders the homepage On Air box containing details on the
-        current show and current song as well as listen live, studio
-        cam and castmember blog links
+        current or upcoming show and current song as well as listen live, studio
+        cam and castmember blog links.
+        Returns an empty string if no show is found.
         """
         # get a show to display, either currently on air or coming up
         on_air = True
@@ -310,24 +301,32 @@ class OnAirNode(template.Node):
             show_entry = self.get_public_next_on_air_entry(Show)
             on_air = False
         show = show_entry.content.as_leaf_class() if show_entry else None
-       
-        # get the primary castmember for the current on air show
-        primary_castmember = self.get_primary_castmember(show) if show else None
+      
+        if show:
+            # get the primary castmember for the current on air show
+            primary_castmembers = show.primary_castmembers
+            primary_castmember = primary_castmembers[0] if primary_castmembers else None
+            
+            # build the nice with string linking to each castmembers blog
+            with_str = " & ".join(['<a href="%s">%s</a>' % (castmember.url(), castmember.title) for castmember in primary_castmembers])
         
-        # get the current playing song and artist info
-        song_entry = self.get_public_on_air_entry(Song)
-        song = song_entry.content.as_leaf_class() if song_entry else None
-        artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
+            # get the current playing song and artist info
+            song_entry = self.get_public_on_air_entry(Song)
+            song = song_entry.content.as_leaf_class() if song_entry else None
+            artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
 
-        context.update({
-            'entry': show_entry,
-            'show': show,
-            'on_air': on_air,
-            'primary_castmember': primary_castmember,
-            'song': song,
-            'artist': artist,
-        })
-        return render_to_string('desktop/inclusion_tags/home/on_air.html', context)
+            context.update({
+                'entry': show_entry,
+                'show': show,
+                'on_air': on_air,
+                'with_str': with_str,
+                'primary_castmember': primary_castmember,
+                'song': song,
+                'artist': artist,
+            })
+            return render_to_string('desktop/inclusion_tags/home/on_air.html', context)
+        else:
+            return ''
 
 @register.tag
 def home_news(parser, token):
@@ -475,7 +474,13 @@ def status_update(parser, token):
 
 class StatusUpdateNode(template.Node):
     def render(self, context):
-        return render_to_string('desktop/inclusion_tags/skeleton/status_update.html', context)
+        """
+        Return status update form for authenticated users, empty string otherwise.
+        """
+        if context['request'].user.is_authenticated():
+            return render_to_string('desktop/inclusion_tags/skeleton/status_update.html', context)
+        else:
+            return ''
 
 @register.tag
 def paging(parser, token):
@@ -842,7 +847,8 @@ class NowPlayingNode(OnAirNode):
         show = show_entry.content.as_leaf_class() if show_entry else None
        
         # get the primary castmember for the current on air show
-        primary_castmember = self.get_primary_castmember(show) if show else None
+        primary_castmembers = show.primary_castmembers if show else None
+        primary_castmember = primary_castmembers[0] if primary_castmembers else None
         
         # get the current playing song and artist info
         song_entry = self.get_public_on_air_entry(Song)
@@ -851,7 +857,8 @@ class NowPlayingNode(OnAirNode):
         
         next_entry = self.get_next_entry(Show)
         next_show = next_entry.content.as_leaf_class() if next_entry else None
-        next_castmember = self.get_primary_castmember(next_show) if next_show else None
+        next_castmembers = next_show.primary_castmembers if next_show else None
+        next_castmember = next_castmembers[0] if next_castmembers else None
         next_str = "%s%s" % (next_show.title, " with %s" % next_castmember.title if next_castmember else "") if next_show else ''
         next_str = next_str[:40] + ' ...' if len(next_str) > 40 else next_str
         context.update({
