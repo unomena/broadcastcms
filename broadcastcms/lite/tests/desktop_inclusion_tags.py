@@ -43,6 +43,12 @@ class DesktopInclusionTagsTestCase(TestCase):
         self.failUnless('Messages' in response_string)
         self.failUnless('Sign out' in response_string)
 
+        # long usernames are truncated to 10 characters with a trailing '...'
+        user = User.objects.create_user('abcdefghijkl', 'test@test.com', 'abcdefghijkl')
+        self.context['request'].user = authenticate(username='abcdefghijkl', password='abcdefghijkl')
+        response_string = account_links('', '').render(self.context)
+        self.failUnless('Hello abcdefghij...' in response_string)
+
     def testFeatures(self):
         #setup labels
         contentless_label = Label.objects.create(title="contentless label", is_visible=True)
@@ -180,6 +186,7 @@ class DesktopInclusionTagsTestCase(TestCase):
         response_string = masthead('', '').render(self.context)
         self.failUnless('search' in response_string and 'partner-pub-id' in response_string)
 
+
     def testMastfoot(self):
         # setup
         self.setContext(path='/')
@@ -267,29 +274,39 @@ class DesktopInclusionTagsTestCase(TestCase):
         self.setContext(path='/')
         response =  on_air('', '').render(self.context)
 
-        # don't display show banner without a show     
-        self.failIf(response.replace('\n', ''))
+        # don't display show banner without a show
+        self.failIf(response)
         
-        # don't display show details without a show        
-        self.failIf('showtitle' in response)
+        # setup show content
+        show = Show.objects.create(is_public=True)
+        show_entry = Entry.objects.create(start=before_now, end=after_now, content=show, is_public=True)
+        self.setContext(path='/')
+        response =  on_air('', '').render(self.context)
         
         # don't display song details without a song        
         self.failIf('nowplaying' in response)
         
         # don't display listen live link if player controls are not specified in settings        
         self.failIf('listen_live' in response)
+        # instead display shows link
+        self.failUnless('shows' in response)
         
         # don't display studio cam link if cam image urls are not specified in settings        
         self.failIf('studio_cam' in response)
+        # instead display news link
+        self.failUnless('news' in response)
         
         # don't display my blog link without a castmember        
         self.failIf('my_blog' in response)
+        # instead display contact link
+        self.failUnless('contact' in response)
 
-        # setup some content
-        show = Show.objects.create(is_public=True)
+        # don't display with links if if show does not have primary castmembers
+        self.failIf('with' in response)
+
+        # setup some more content
         castmember = CastMember.objects.create(is_public=True)
-        Credit.objects.create(show=show, castmember=castmember)
-        show_entry = Entry.objects.create(start=before_now, end=after_now, content=show, is_public=True)
+        Credit.objects.create(show=show, castmember=castmember, role='1')
         later_show_entry = Entry.objects.create(start=later, end=much_later, content=show, is_public=True)
         song = Song.objects.create(is_public=True)
         song_entry = Entry.objects.create(start=before_now, end=after_now, content=song, is_public=True)
@@ -318,6 +335,9 @@ class DesktopInclusionTagsTestCase(TestCase):
         
         # display my blog link for a castmember        
         self.failUnless('my_blog' in response)
+        
+        # display with links if if show has primary castmembers
+        self.failUnless('with' in response)
 
         # display correct on air or coming up show tag
         self.failUnless('On Air' in response)
@@ -375,41 +395,6 @@ class DesktopInclusionTagsTestCase(TestCase):
         content = ContentBase.objects.create(title='Content', is_public=True)
         entry = Entry.objects.create(start=later, end=much_later, content=content, is_public=True)
         self.failUnless(entry == on_air('', '').get_public_next_on_air_entry(ContentBase))
-
-
-    def testOnAirGetPrimaryCastmember(self):
-        """
-        get_primary_castmember should only return the most seniour (based on role)
-        public castmember for the given show
-        """
-        # setup
-        show = Show.objects.create()
-
-        # don't retun anything if the show does not have credits 
-        self.failIf(on_air('', '').get_primary_castmember(show))
-
-        # don't return anything if the show does not have any public credits
-        castmember = CastMember.objects.create(is_public=False)
-        credit = Credit.objects.create(show=show, castmember=castmember)
-        self.failIf(on_air('', '').get_primary_castmember(show))
-
-        # expect a response if the show has credits with public castmembers
-        castmember = CastMember.objects.create(is_public=True)
-        credit = Credit.objects.create(show=show, castmember=castmember)
-        self.failUnless(on_air('', '').get_primary_castmember(show))
-        
-        # return the primary public castmember
-        show = Show.objects.create()
-        primary_private_castmember = CastMember.objects.create(is_public=False)
-        primary_public_castmember = CastMember.objects.create(is_public=True)
-        secondary_castmember = CastMember.objects.create(is_public=True)
-        Credit.objects.create(show=show, castmember=primary_private_castmember, role=1)
-        Credit.objects.create(show=show, castmember=primary_public_castmember, role=2)
-        Credit.objects.create(show=show, castmember=secondary_castmember, role=3)
-        primary_castmember = on_air('', '').get_primary_castmember(show)
-        self.failIf(primary_private_castmember == primary_castmember)
-        self.failIf(secondary_castmember == primary_castmember)
-        self.failUnless(primary_public_castmember == primary_castmember)
 
     def testSlidingUpdatesNodeGetInstances(self):
         # setup
@@ -488,6 +473,20 @@ class DesktopInclusionTagsTestCase(TestCase):
         # they were provided
         self.failUnless(dup_test == instances)
    
+    def testStatusUpdate(self):
+        self.setContext(path='/')
+        user = User.objects.create_user('test', 'test@test.com', 'test')
+        
+        # if anonymous user nothing should render
+        self.setContext(path='/')
+        response_string = status_update('', '').render(self.context)
+        self.failIf(response_string)
+        
+        # if authenticated user update form should render
+        self.context['request'].user = authenticate(username='test', password='test')
+        response_string = status_update('', '').render(self.context)
+        self.failUnless('frmStatusUpdate' in response_string)
+
     """
     def testHomeUpdates(self):
         # setup
