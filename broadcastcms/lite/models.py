@@ -8,6 +8,7 @@ from broadcastcms.event.models import Province
 from broadcastcms.label.models import Label
 from broadcastcms.integration.mailinglists import PMailer
 from broadcastcms.post.models import Post
+from broadcastcms.promo.models import PromoWidget
 from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.scaledimage import ScaledImageField
 
@@ -21,13 +22,13 @@ def get_update_choices():
     return choices
 
 class Settings(models.Model):
-    homepage_featured_labels = models.ManyToManyField(
-        Label, 
+    homepage_promo_widget = models.ForeignKey(
+        PromoWidget,
         null=True, 
         blank=True, 
-        limit_choices_to={'is_visible': True},
-        verbose_name='Homepage Featured Labels',
-        help_text='Content labeled with these labels will be featured on the homepage.',
+        limit_choices_to={'is_public': True},
+        verbose_name='Homepage Promo Widget',
+        help_text='Promo widget displayed on the homepage.',
     )
     terms = RichTextField(
         null=True, 
