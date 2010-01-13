@@ -118,6 +118,7 @@ INSTALLED_APPS = (
     'broadcastcms.event',
     'broadcastcms.label',
     'broadcastcms.post',
+    'broadcastcms.promo',
     'broadcastcms.public',
     'broadcastcms.radio',
     'broadcastcms.scaledimage',
