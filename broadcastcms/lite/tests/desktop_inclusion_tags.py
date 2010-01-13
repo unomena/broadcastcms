@@ -14,6 +14,7 @@ from broadcastcms.label.models import Label
 from broadcastcms.lite.models import Settings
 from broadcastcms.lite.templatetags.desktop_inclusion_tags import *
 from broadcastcms.post.models import Post
+from broadcastcms.promo.models import PromoWidget, PromoWidgetSlot
 from broadcastcms.show.models import CastMember, Credit, Show
 from broadcastcms.test.mocks import RequestFactory
 
@@ -50,65 +51,60 @@ class DesktopInclusionTagsTestCase(TestCase):
         self.failUnless('Hello abcdefghij...' in response_string)
 
     def testFeatures(self):
-        #setup labels
-        contentless_label = Label.objects.create(title="contentless label", is_visible=True)
-        private_content_label = Label.objects.create(title="private content label", is_visible=True)
-        visible_label = Label.objects.create(title="visible label", is_visible=True)
-        invisible_label = Label.objects.create(title="invisible label", is_visible=False)
+        # setup
+        self.setContext(path='/')
+        response = features('', '').render(self.context)
         
-        #setup content
-        private_content = ContentBase.objects.create(title="private content", is_public=False)
-        private_content.labels= [private_content_label,visible_label]
-        private_content.save()
-        public_content = ContentBase.objects.create(title="public content", is_public=True)
-        public_content.labels = [visible_label, invisible_label,]
-        public_content.save()
+        # don't display anything if a promo widget is not set
+        self.failIf(response)
         
+        
+        # setup promo widget
+        promo_widget = PromoWidget.objects.create(title="promo widget", is_public=False)
+
         # setup settings
         site_settings = Settings.objects.get_or_create(pk='1')[0]
-        site_settings.homepage_featured_labels = [contentless_label, private_content_label, invisible_label, visible_label]
+        site_settings.homepage_promo_widget = promo_widget
         site_settings.save()
+        
         self.setContext(path='/')
         response = features('', '').render(self.context)
         
-        # labels with no content should not render
-        self.failIf(contentless_label.title in response)
+        # don't display anything for a private promo widget
+        self.failIf(response)
         
-        # labels with private content should not render
-        self.failIf(private_content_label.title in response)
-        
-        # invisible labels should not render, even if they have public content
-        self.failIf(invisible_label.title in response)
-        
-        # visible labels with public content should render
-        self.failUnless(visible_label.title in response)
+        # setup content
+        private_content = ContentBase.objects.create(title="private content", is_public=False)
+        public_content = ContentBase.objects.create(title="public content", is_public=True)
 
-        # private content should not render
-        self.failIf(private_content.title in response)
-        
-        # public content should render
-        self.failUnless(public_content.title in response)
+        # setup slots
+        private_slot_private_content = PromoWidgetSlot.objects.create(title="private slot private content", content=private_content, widget=promo_widget, is_public=False)
+        private_slot_public_content = PromoWidgetSlot.objects.create(title="private slot public content", content=public_content, widget=promo_widget, is_public=False)
+        public_slot_private_content = PromoWidgetSlot.objects.create(title="public slot private content", content=private_content, widget=promo_widget, is_public=True)
+        public_slot_public_content = PromoWidgetSlot.objects.create(title="public slot public content", content=public_content, widget=promo_widget, is_public=True)
 
-        # maximum of 3 labels should render
-        site_settings.homepage_featured_labels = []
-        for i in range(1,5):
-            label = Label.objects.create(title="label %s" % i, is_visible=True)
-            public_content.labels.add(label)
-            site_settings.homepage_featured_labels.add(label)
-        public_content.save()
-        site_settings.save()
+        promo_widget.is_public = True
+        promo_widget.save()
+        
+        # gen response
         self.setContext(path='/')
         response = features('', '').render(self.context)
-        self.failIf("label 4" in response)
 
+        # private slot with private content should not render
+        self.failIf("private slot private content" in response)
+        
+        # private slot with public content should not render
+        self.failIf("private slot public content" in response)
+        
+        # public slot with private content should not render
+        self.failIf("public slot private content" in response)
+       
+        # public slot with public content should render
+        self.failUnless("public slot public content" in response)
+        
         # modelbase objects should be renderable (i.e. image banners)
-        label = Label.objects.create(title="modelbase label", is_visible=True)
-        content = ImageBanner.objects.create(title="modelbase content", is_public=True)
-        content.labels.add(label)
-        content.save()
-        site_settings.homepage_featured_labels = []
-        site_settings.homepage_featured_labels.add(label)
-        site_settings.save()
+        modelbase_content = ImageBanner.objects.create(title="modelbase content", is_public=True)
+        slot= PromoWidgetSlot.objects.create(title="modelbase slot", content=modelbase_content, widget=promo_widget, is_public=True)
         self.setContext(path='/')
         response = features('', '').render(self.context)
         self.failUnless("modelbase content" in response)
