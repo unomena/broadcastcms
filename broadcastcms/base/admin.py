@@ -20,6 +20,10 @@ def restrict_fieldsets(request, fieldsets):
     Removes fields user does not have privileges to edit.
     For now we simply remove the is_public field for non superusers and non owners.
     """
+
+    #XXX: killing restrictions for now
+    return fieldsets
+
     if request.user.is_superuser:
         return fieldsets
     
