@@ -17,3 +17,6 @@ class PromoWidgetSlot(ModelBase):
         limit_choices_to = ~Q(classname__in=['PromoWidget', 'PromoWidgetSlot', 'ModelBase', 'ContentBase',]) & Q(is_public=True),
         related_name="slot_content",
     )
+    class Meta:
+        verbose_name = 'Promo Widget Slot'
+        verbose_name_plural = 'Promo Widget Slots'
