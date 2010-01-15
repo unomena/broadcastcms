@@ -9,11 +9,7 @@ class PodcastSeries(ContentBase):
         verbose_name = 'Podcast Series'
         verbose_name_plural = 'Podcast Series'
 
-class PodcastEpisode(ContentBase):
-    podcast_series = models.ForeignKey(
-        PodcastSeries, 
-        related_name='episodes'
-    )
+class PodcastStandalone(ContentBase):
     length = models.CharField(
         help_text="The length of the podcast in minutes.", 
         max_length=32, 
@@ -23,6 +19,15 @@ class PodcastEpisode(ContentBase):
     audio = models.FileField(
         help_text="The audio clip for this podcast", 
         upload_to='content/audio'
+    )
+    class Meta():
+        verbose_name = 'Standalone Podcast'
+        verbose_name_plural = 'Standalone Podcasts'
+    
+class PodcastEpisode(PodcastStandalone):
+    podcast_series = models.ForeignKey(
+        PodcastSeries, 
+        related_name='episodes'
     )
     
     class Meta():
