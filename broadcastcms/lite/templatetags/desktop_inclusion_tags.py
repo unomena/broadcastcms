@@ -385,6 +385,7 @@ class UpdatesNode(template.Node):
 
         return panels
 
+    @cache_view_function(10*60, respect_path=True, respect_self_attrs=['heading',])
     def render(self, context):
         panels = self.build_panels()
         context = {
