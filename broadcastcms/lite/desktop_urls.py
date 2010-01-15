@@ -105,11 +105,16 @@ urlpatterns = patterns('',
     url(r'modals/password_reset/$', modals_password_reset, name='modals_password_reset'),
     url(r'modals/register/$', modals_register, name='modals_register'),
 
+    url(r'^podcasts/rss/$', podcasts_rss, name='podcasts_rss'),
+    
     url(r'reviews/(?P<slug>[\w-]+)/$', reviews_content, name='reviews_content'),
     url(r'reviews/$', reviews, name='reviews'),
     
     url(r'shows/line-up/$', ShowsLineUp(), name='shows_line_up'),
     url(r'shows/(?P<slug>[\w-]+)/blog/$', shows_dj_blog, name='shows_dj_blog'),
+    url(r'shows/(?P<slug>[\w-]+)/podcasts/$', shows_dj_podcasts, name='shows_dj_podcasts'),
+    url(r'shows/(?P<slug>[\w-]+)/podcasts/rss/$', shows_dj_podcasts_rss, name='shows_dj_podcasts_rss'),
+    url(r'shows/(?P<castmember_slug>[\w-]+)/podcasts/(?P<podcast_slug>[\w-]+)/$', shows_dj_podcasts_content, name='shows_dj_podcasts_content'),
     url(r'shows/(?P<slug>[\w-]+)/profile/$', shows_dj_profile, name='shows_dj_profile'),
     url(r'shows/(?P<slug>[\w-]+)/contact/$', shows_dj_contact, name='shows_dj_contact'),
     url(r'shows/(?P<slug>[\w-]+)/appearances/$', shows_dj_appearances, name='shows_dj_appearances'),
