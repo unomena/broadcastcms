@@ -267,6 +267,11 @@ class CastMemberPageMenu(PageMenu):
                 'view_kwargs': {'slug': castmember.slug},
             },
             {
+                'title': 'Podcasts',
+                'view_name': 'shows_dj_podcasts',
+                'view_kwargs': {'slug': castmember.slug},
+            },
+            {
                 'title': 'Profile',
                 'view_name': 'shows_dj_profile',
                 'view_kwargs': {'slug': castmember.slug},
