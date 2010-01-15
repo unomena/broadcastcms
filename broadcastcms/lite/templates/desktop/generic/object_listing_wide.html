@@ -3,6 +3,7 @@
 
 {% block generic %}
     {% if object_list %}
+        {% block above_listing %}{% endblock %}
         {% for object in object_list %}
             {% call_view object.as_leaf_class render_listing %}
         {% endfor %}
