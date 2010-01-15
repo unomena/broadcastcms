@@ -117,6 +117,7 @@ INSTALLED_APPS = (
     'broadcastcms.gallery',
     'broadcastcms.event',
     'broadcastcms.label',
+    'broadcastcms.podcast',
     'broadcastcms.post',
     'broadcastcms.promo',
     'broadcastcms.public',
