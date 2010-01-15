@@ -1,0 +1,11 @@
+{% extends "desktop/generic/object_listing_wide.html" %}
+{% load public_tags %}
+
+{% block above_listing %}
+    <div class="podcasts_block">
+	    <h1>Subscribe &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+		<div class="podcast_tray"><h2>{{ castmember.title }} Podcasts:</h2><input type="text" name="podcasts1" id="podcasts1" value="http://{{ site_domain }}{% url shows_dj_podcasts_rss castmember.slug %}" /></div>
+		<div class="podcast_tray"><h2>All {{ site_name }} Podcasts:</h2><input type="text" name="podcasts2" id="podcasts2" value="http://{{ site_domain }}{% url podcasts_rss %}" /></div>
+		<h1>Episodes &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+	</div>
+{% endblock %}
