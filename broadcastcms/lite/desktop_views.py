@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 import calendar
+import mimetypes
 
 from django.conf import settings
 from django.contrib import auth
@@ -19,7 +20,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.loader import render_to_string
-from django.utils import simplejson
+from django.utils import simplejson, feedgenerator
 from django.utils.http import urlencode
 from django.views.generic import list_detail
 
@@ -37,6 +38,9 @@ from broadcastcms.competition.models import Competition
 from broadcastcms.event.models import Event, Appearance
 from broadcastcms.gallery.models import Gallery
 from broadcastcms.integration.captchas import ReCaptcha
+from broadcastcms.label.models import Label
+from broadcastcms.lite.context_processors import determine_section
+from broadcastcms.podcast.models import PodcastStandalone
 from broadcastcms.post.models import Post
 from broadcastcms.radio.models import Song
 from broadcastcms.richtext.fields import RichTextField
@@ -44,8 +48,6 @@ from broadcastcms.scaledimage.fields import get_image_scales
 from broadcastcms.show.models import Show, CastMember
 from broadcastcms.status.models import StatusUpdate
 from broadcastcms.utils import mail_user
-from broadcastcms.label.models import Label
-from broadcastcms.lite.context_processors import determine_section
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
@@ -1117,6 +1119,10 @@ def studio_cam(request):
 
     return render_to_response('desktop/popups/studio_cam.html', context)
 
+# Podcasts
+def podcasts_rss(request):
+    return None
+
 # Reviews
 def reviews(request, template_name='desktop/generic/object_listing_wide.html'):
     reviews_label = Label.objects.get(title__iexact='reviews')
@@ -1229,6 +1235,63 @@ def shows_dj_blog(request, slug, template_name='desktop/generic/object_listing_w
             'header': header,
         },
     )
+
+def shows_dj_podcasts(request, slug, template_name='desktop/content/shows/dj_podcasts.html'):
+    castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
+    owner = castmember.owner 
+    queryset = PodcastStandalone.permitted.filter(owner=owner).order_by("-created") if owner else []
+    header = utils.CastMemberHeader(request, castmember)
+
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        paginate_by=10,
+        extra_context={
+            'castmember': castmember,
+            'header': header,
+        },
+    )
+
+def shows_dj_podcasts_content(request, slug, template_name='desktop/content/shows/dj_podcasts.html'):
+    castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
+    owner = castmember.owner 
+    queryset = PodcastStandalone.permitted.filter(owner=owner).order_by("-created") if owner else []
+    header = utils.CastMemberHeader(request, castmember)
+
+    return list_detail.object_list(
+        request=request,
+        queryset=queryset,
+        template_name=template_name,
+        paginate_by=10,
+        extra_context={
+            'castmember': castmember,
+            'header': header,
+        },
+    )
+
+def shows_dj_podcasts_rss(request, slug):
+    castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
+    owner = castmember.owner 
+    context = RequestContext(request, {})
+    
+    queryset = PodcastStandalone.permitted.filter(owner=owner).order_by("-created") if owner else []
+
+    feed = feedgenerator.Rss201rev2Feed(
+        title="%s Podcasts" % context['site_name'],
+        link=reverse('shows_dj_podcasts', kwargs={'slug': castmember.slug}),
+        description=u"Latest podcasts for %s." % castmember.title,
+        language=u"en")
+
+    for item in queryset:
+        url = item.url(context)
+        feed.add_item(
+            title=item.title,
+            link="http://%s/%s" % (context['site_domain'], url),
+            description=item.description,
+            enclosure=feedgenerator.Enclosure("http://%s/%s" % (context['site_domain'], item.audio), str(item.audio.size), mimetypes.guess_type(item.audio.name)[0]),
+        )
+    return HttpResponse(feed.writeString('UTF-8'), mimetype="application/rss+xml")
 
 def shows_dj_contact(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
