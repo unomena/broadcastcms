@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 from django.utils import simplejson as json
@@ -17,7 +17,12 @@ def update(request):
         if request.is_ajax():
             return HttpResponse(json.dumps({"updated": True, "text": truncate_words(text, 6)}),
                 mimetype="application/json")
+
+    raise Http404
+    #XXX: kill standalone view template for now
+    """
         else:
             return redirect(update)
     return render_to_response("desktop/content/account/update_status.html", {
     }, context_instance=RequestContext(request))
+    """
