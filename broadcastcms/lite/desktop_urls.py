@@ -37,13 +37,22 @@ ajax_urls = patterns('',
     url(r'^status-update/$', ajax_status_update, name='ajax_status_update'),
     url(r'^account-links/$', ajax_account_links, name='ajax_account_links'),
     url(r'^sign-out/$', ajax_sign_out, name='ajax_sign_out'),
-    url(r'^home/friends/$', ajax_home_friends, name='ajax_home_friends'),
-    url(r'^home/status-updates/$', ajax_home_status_updates, name='ajax_home_status_updates'),
     url(r'^like-stamp/(?P<slug>[\w-]+)/$', ajax_likes_stamp, name='ajax_likes_stamp'),
+    url(r'^widgets/your-friends/$', ajax_widgets_your_friends, name='ajax_widgets_your_friends'),
+    url(r'^widgets/status-updates/$', ajax_widgets_status_updates, name='ajax_widgets_status_updates'),
 )
 
+from broadcastcms.widgets.widgets import Advert, NewsCompetitionsEvents, OnAir, Promotions, StatusUpdates, YourFriends
+home_args = {
+    'widgets': {
+        'top': (OnAir(),),
+        'left': (Promotions(), NewsCompetitionsEvents(),),
+        'right': (Advert(), YourFriends(), StatusUpdates()),
+    }, 
+}
+
 urlpatterns = patterns('',
-    url(r'^$', home, name='home'),
+    url(r'^$', top_left_right, home_args, name='home'),
     
     url(r'^facebook/', include('broadcastcms.facebook_integration.urls')),
     
