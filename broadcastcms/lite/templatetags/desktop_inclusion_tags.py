@@ -28,7 +28,7 @@ def account_links(parser, token):
     return AccountLinksNode()
 
 class AccountLinksNode(template.Node):
-    @cache_view_function(2*60, respect_user=True)
+    @cache_view_function(10*60, respect_user=True)
     def render(self, context):
         """
         Renders anonymous avatar, sign in and sign up links for anonymous users.
@@ -62,6 +62,7 @@ def masthead(parser, token):
     return MastheadNode()
 
 class MastheadNode(template.Node):
+    @cache_view_function(10*60, respect_user=True, respect_path=True)
     def render(self, context):
         """
         Renders the sitewide masthead, including site logo, site section links, search and account links.
@@ -90,6 +91,7 @@ def mastfoot(parser, token):
     return MastfootNode()
 
 class MastfootNode(template.Node):
+    @cache_view_function(10*60, respect_user=True)
     def render(self, context):
         """
         Renders the sitewide footer.
@@ -479,12 +481,10 @@ def status_update(parser, token):
 class StatusUpdateNode(template.Node):
     def render(self, context):
         """
-        Return status update form for authenticated users, empty string otherwise.
+        Return status update form for authenticated users,
+        auth_reload span for anonymous.
         """
-        if context['request'].user.is_authenticated():
-            return render_to_string('desktop/inclusion_tags/skeleton/status_update.html', context)
-        else:
-            return ''
+        return render_to_string('desktop/inclusion_tags/skeleton/status_update.html', context)
 
 @register.tag
 def paging(parser, token):
