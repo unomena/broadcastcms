@@ -84,6 +84,7 @@ class ModelBase(PermissionBase):
     slug = models.SlugField(
         editable=False,
         max_length='275',
+        db_index=True,
     )
     content_type = models.ForeignKey(
         ContentType, 
