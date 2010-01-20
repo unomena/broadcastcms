@@ -4,12 +4,8 @@
     <div class="logo"><a href="{% url home %}"></a></div>	
 		
     <div class="logged">
-        <span class="auth_reload" src="{% url ajax_status_update %}">
-            {% status_update %}
-        </span>
-        <span class="auth_reload" src="{% url ajax_account_links %}">
-            {% account_links %}
-        </span>
+        {% status_update %}
+        {% account_links %}
 	</div>
 	<div class="nav">
 	    <ul>
@@ -32,6 +28,4 @@
 			</div>
         {% endif %}
 	</div>
-
-	
 </div><!--/MAST_HEAD-->
