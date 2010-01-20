@@ -6,38 +6,24 @@ from common import *
 
 def test_login():
     # setup
+    user = User.objects.create_user(username='valid_username', password='valid_password', email='email@ddress.com')
+    user.save()
     client = WindmillTestClient(__name__)
-    #user = User.objects.create_user(username='username', password='password', email='foo@bar.com')
-    #user.save()
-
-
     load_home(client)
+
     client.click(link=u'Sign in')
-    client.waits.forElement(xpath=u'//*[@id="TB_ajaxContent"]', timeout=u'8000')
-    client.type(text=u'test_user', id=u'id_username')
-    client.type(text=u'test_password', id=u'id_password')
+    client.waits.forElement(timeout=u'', id=u'login_submit')
+    # empty fields
     client.click(id=u'login_submit')
-
-    """
-    # Errors when no fields supplied
-    client.click(link=u'Login')
-    client.waits.forElement(timeout=u'5000', id=u'TB_ajaxContent')
-    client.click(id=u'login')
-    client.waits.forElement(timeout=u'5000', id=u'TB_ajaxContent')
-    client.asserts.assertText(xpath=u"//form[@id='frmLogin']/div/p[2]/span", validator=u'Please enter a username.')
-    client.asserts.assertText(xpath=u"//form[@id='frmLogin']/div[2]/p[2]/span", validator=u'Please enter a password.')
-
-    # Errors when authorization fails
-    client.type(text=u'foo', id=u'id_username')
-    client.type(text=u'bar', id=u'id_password')
-    client.click(id=u'login')
-    client.waits.sleep(milliseconds=u'5000')
-    client.asserts.assertText(xpath=u"//form[@id='frmLogin']/div/span", validator=u'The username and password you entered is incorrect.')
-
-    # Login success
-    client.type(text=u'username', id=u'id_username')
-    client.type(text=u'password', id=u'id_password')
-    client.click(id=u'login')
-    client.waits.forElement(timeout=u'5000', id=u'logout_link')
-    """
-
+    client.asserts.assertText(xpath=u"//form[@id='frmLogin']/div[1]/p/label", validator=u'This field is required.')
+    client.asserts.assertText(xpath=u"//form[@id='frmLogin']/div[2]/p/label", validator=u'This field is required.')
+    # incorrect fields
+    client.type(text=u'incorrect username', id=u'id_username')
+    client.type(text=u'incorrect password', id=u'id_password')
+    client.click(id=u'login_submit')
+    # correct fields
+    client.type(text=u'valid_username', id=u'id_username')
+    client.type(text=u'valid_password', id=u'id_password')
+    client.click(id=u'login_submit')
+    # login success
+    client.waits.forElement(timeout=u'', id=u'sign_out')
