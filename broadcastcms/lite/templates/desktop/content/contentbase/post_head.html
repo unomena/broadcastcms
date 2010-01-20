@@ -1,8 +1,6 @@
 {% load desktop_inclusion_tags %}
 <div class="post_head">
-    <span class="auth_reload" src="{% url ajax_likes_stamp instance.slug %}">
-        {% likes_stamp instance %}
-    </span>
+    {% likes_stamp instance %}
     <p class="post_meta">
         <span>{% if owner %}By <a href="{{ owner.url }}">{{ owner.username }}</a> on {% endif %}{{ instance.created|date:"j F Y" }}</span>
         <span>&nbsp; | &nbsp;</span>
