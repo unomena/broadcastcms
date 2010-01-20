@@ -473,10 +473,10 @@ class DesktopInclusionTagsTestCase(TestCase):
         self.setContext(path='/')
         user = User.objects.create_user('test', 'test@test.com', 'test')
         
-        # if anonymous user nothing should render
+        # if anonymous user form should not render
         self.setContext(path='/')
         response_string = status_update('', '').render(self.context)
-        self.failIf(response_string)
+        self.failIf('frmStatusUpdate' in response_string)
         
         # if authenticated user update form should render
         self.context['request'].user = authenticate(username='test', password='test')
