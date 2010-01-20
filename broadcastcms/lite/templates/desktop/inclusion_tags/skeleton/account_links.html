@@ -1,21 +1,23 @@
 {% load template_tags %}
 
-{% if user.is_authenticated %}
-    <p class="logged_avatar">
-        <a href="{% url account_settings_image %}">
-            {% profile_image profile 35 35 %}
-        </a>
-    </p>
-    <p class="logged_info">
-        <span class="logged_name">Hello {{ limited_username }}</span><br />
-    	<span class="logged_links"><a href="{% url messages_inbox %}">Messages {% if messages %}({{ messages }}){% endif %}</a> | {% if fb_authenticated %}<a id="fb_sign_out" href="{% url ajax_sign_out %}">Sign out</a>{% else %}<a id="sign_out" href="{% url ajax_sign_out %}">Sign out</a>{% endif %}</span>
-    </p>
-{% else %}
-    <p class="logged_avatar">
-        <a><img src="/media/bcms/images/examples/avatar_logged.jpg" width="35" height="35" alt="" /></a>
-    </p>
-    <p class="logged_info">
-        <span class="logged_name">Hello Stranger</span><br />
-    	<span class="logged_links"><a href="{% url modals_login %}?height=370&amp;width=540" class="thickbox">Sign in</a> | <a href="{% url modals_register %}?height=630&amp;width=515" class="thickbox">Sign up</a></span>
-    </p>
-{% endif %}
+<span class="auth_reload" src="{% url ajax_account_links %}">
+    {% if user.is_authenticated %}
+        <p class="logged_avatar">
+            <a href="{% url account_settings_image %}">
+                {% profile_image profile 35 35 %}
+            </a>
+        </p>
+        <p class="logged_info">
+            <span class="logged_name">Hello {{ limited_username }}</span><br />
+    	    <span class="logged_links"><a href="{% url messages_inbox %}">Messages {% if messages %}({{ messages }}){% endif %}</a> | {% if fb_authenticated %}<a id="fb_sign_out" href="{% url ajax_sign_out %}">Sign out</a>{% else %}<a id="sign_out" href="{% url ajax_sign_out %}">Sign out</a>{% endif %}</span>
+        </p>
+    {% else %}
+        <p class="logged_avatar">
+            <a><img src="/media/bcms/images/examples/avatar_logged.jpg" width="35" height="35" alt="" /></a>
+        </p>
+        <p class="logged_info">
+            <span class="logged_name">Hello Stranger</span><br />
+        	<span class="logged_links"><a href="{% url modals_login %}?height=370&amp;width=540" class="thickbox">Sign in</a> | <a href="{% url modals_register %}?height=630&amp;width=515" class="thickbox">Sign up</a></span>
+        </p>
+    {% endif %}
+</span>
