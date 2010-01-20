@@ -1,6 +1,10 @@
-<div class="logged_status">
-    <form id="frmStatusUpdate" action="{% url status_update %}" method="post">
-	    <p class="status_update"><input type="text" name="status_update" value="Update your status here..." /></p>
-		<p class="status_update_btn"><input type="submit" name="submit" value="Update" /></p>
-    </form>
-</div>
+<span class="auth_reload" src="{% url ajax_status_update %}">
+    {% if request.user.is_authenticated %}
+        <div class="logged_status">
+            <form id="frmStatusUpdate" action="{% url status_update %}" method="post">
+	            <p class="status_update"><input type="text" name="status_update" value="Update your status here..." /></p>
+        		<p class="status_update_btn"><input type="submit" name="submit" value="Update" /></p>
+            </form>
+        </div>
+    {% endif %}
+</span>
