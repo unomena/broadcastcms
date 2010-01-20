@@ -25,8 +25,7 @@ class PodcastStandaloneAdmin(ContentBaseAdmin):
     fieldsets = deepcopy(ContentBaseAdmin.fieldsets)
     for fieldset in fieldsets:
         if fieldset[0] == None:
-            fieldset[1]['fields'] += ('length', 'audio')
-
+            fieldset[1]['fields'] += ('content', 'length', 'audio')
 
 admin.site.register(PodcastSeries, PodcastSeriesAdmin)
 admin.site.register(PodcastStandalone, PodcastStandaloneAdmin)
