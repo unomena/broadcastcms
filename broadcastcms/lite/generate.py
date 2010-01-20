@@ -24,11 +24,15 @@ IMAGES = ['%s/generate_resources/0.jpg' % SCRIPT_PATH,
           '%s/generate_resources/7.jpg' % SCRIPT_PATH,
           '%s/generate_resources/8.jpg' % SCRIPT_PATH,
           '%s/generate_resources/9.jpg' % SCRIPT_PATH]
+PODCASTS = ['%s/generate_resources/1.mp3' % SCRIPT_PATH,]
 SHOW_COUNT =    10 
 SHOW_CREDIT_COUNT =  20 
+STATUS_UPDATE_COUNT =  20 
 CASTMEMBER_COUNT =  10
 LABEL_COUNT = 5
+ADMIN_FRIENDS_COUNT = 25
 POST_COUNT = 200
+PODCAST_COUNT = 50
 BANNER_COUNT = 5
 SONG_COUNT = 10
 ARTIST_COUNT = 10
@@ -138,6 +142,28 @@ def create_posts():
             }
         })
     return posts
+
+def create_podcasts():
+    podcasts = []
+    for i in range(1, PODCAST_COUNT + 1):
+        podcasts.append({
+            "model": "podcast.podcaststandalone",
+            "fields": {
+                "title": "Podcast %s Title" % i,
+                "description": "Post %s Description" % i,
+                "content": "Post %s Content" % i,
+                "is_public": True,
+                "image": random.sample(IMAGES, 1)[0],
+                "audio": random.sample(PODCASTS, 1)[0],
+                "owner": {
+                    "model": "auth.user",
+                    "fields": {
+                        "username": "castmember%s" % random.randint(1, CASTMEMBER_COUNT),
+                    },
+                },
+            }
+        })
+    return podcasts
 
 def create_banners():
     banners = []
@@ -654,6 +680,64 @@ def create_settings():
         }
     }]
     return settings
+   
+def create_status_updates():
+    timestamp = datetime.now()
+    
+    status_updates = []
+    for i in range(1, STATUS_UPDATE_COUNT + 1):
+        status_updates.append({
+            "model": "status.statusupdate",
+            "fields": {
+                "text": "Status Update %s Title" % i,
+                "timestamp": str(timestamp), 
+                "source": random.randint(0,1),
+                "user": {
+                    "model": "auth.user",
+                    "fields": {
+                        "username": random.sample(["friend%s" % random.randint(1, ADMIN_FRIENDS_COUNT), "castmember%s" % random.randint(1, CASTMEMBER_COUNT)], 1)[0],
+                    },
+                },
+            }
+        })
+        timestamp = timestamp - timedelta(minutes = 1)
+    return status_updates
+
+def create_admin_friends():
+    friends = []
+    profiles = []
+    for i in range(1, ADMIN_FRIENDS_COUNT + 1):
+        friends.append({
+            "model": "friends.friendship",
+            "fields": {
+                "to_user": {
+                    "model": "auth.user",
+                    "fields": {
+                        "username": "friend%s" % i,
+                    },
+                },
+                "from_user": {
+                    "model": "auth.user",
+                    "fields": {
+                        "username": "admin",
+                    },
+                },
+            }
+        })
+        profiles.append({
+            "model": "lite.userprofile", 
+            "fields": {
+                "image": random.sample(IMAGES, 1)[0],
+                "user": {
+                    "model": "auth.user",
+                    "fields": {
+                        "username": "friend%s" % i,
+                    }
+                },
+            }
+        })
+
+    return friends + profiles
     
 def generate():
     choice = raw_input('Do you want to clear and sync the db? Warning: All data will be lost! y/n: ').lower()
@@ -667,6 +751,7 @@ def generate():
     objects += create_profiles()
     objects += create_friendships()
     objects += create_posts()
+    objects += create_podcasts()
     objects += create_shows()
     objects += create_show_credits()
     objects += create_songs()
@@ -683,5 +768,7 @@ def generate():
     objects += create_provinces()
     objects += create_promo_widget_slots()
     objects += create_settings()
+    objects += create_admin_friends()
+    objects += create_status_updates()
     
     load_json(objects)
