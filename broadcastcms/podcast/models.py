@@ -10,6 +10,7 @@ class PodcastSeries(ContentBase):
         verbose_name_plural = 'Podcast Series'
 
 class PodcastStandalone(ContentBase):
+    content = RichTextField()
     length = models.CharField(
         help_text="The length of the podcast in minutes.", 
         max_length=32, 
