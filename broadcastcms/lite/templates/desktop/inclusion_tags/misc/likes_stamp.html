@@ -1,6 +1,7 @@
 {% load voting_tags %}
 
 {% score_for_object instance.contentbase as score %}
+<span class="auth_reload" src="{% url ajax_likes_stamp instance.slug %}">
 <p class="post_stamp">
     <span class="ps_likes_num">{{ score.score }}</span>
     <span class="ps_likes">Likes</span>
@@ -27,3 +28,4 @@
         <span class="ps_like"><a class="thickbox" href="{% url modals_login %}?height=370&width=540">Log in</a></span>
     {% endif %}
 </p>
+</span>
