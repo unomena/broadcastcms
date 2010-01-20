@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 import calendar
 import mimetypes
 
+from django import template
 from django.conf import settings
 from django.contrib import auth
 from django.contrib import comments
@@ -45,63 +46,58 @@ from broadcastcms.post.models import Post
 from broadcastcms.radio.models import Song
 from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.scaledimage.fields import get_image_scales
-from broadcastcms.show.models import Show, CastMember
+from broadcastcms.show.models import Show, CastMember, Credit
 from broadcastcms.status.models import StatusUpdate
 from broadcastcms.utils import mail_user
+from broadcastcms.utils.decorators import ajax_required
+from broadcastcms.widgets.widgets import YourFriends, StatusUpdates
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
 import utils
 
 # Ajax
+def obj_render_wrapper(request, obj, context=None):
+    """
+    Thin wrapper exposing an objects's render method as a view.
+    """
+    if not context:
+        context = RequestContext(request, {})
+    return HttpResponse(obj.render(context))
+
+@ajax_required
 def ajax_account_links(request):
     """
-    Wrapper exposing the account_links inclusion tag as a view.
+    Exposes the account_links inclusion tag as a view.
     """
-    if not request.is_ajax():
-        raise Http404
-    
-    context = RequestContext(request, {})
-    return HttpResponse(AccountLinksNode().render(context))
+    return obj_render_wrapper(request, AccountLinksNode())
 
+@ajax_required
 def ajax_status_update(request):
     """
-    Wrapper exposing the status_update inclusion tag as a view.
+    Thin wrapper exposing the status_update inclusion tag as a view.
     """
-    if not request.is_ajax():
-        raise Http404
+    return obj_render_wrapper(request, StatusUpdateNode())
 
-    context = RequestContext(request, {})
-    return HttpResponse(StatusUpdateNode().render(context))
-
-def ajax_home_friends(request):
+@ajax_required
+def ajax_widgets_your_friends(request):
     """
-    Wrapper exposing the home_friends inclusion tag as a view.
+    Exposes the YourFriends widget as a view.
     """
-    if not request.is_ajax():
-        raise Http404
+    return obj_render_wrapper(request, YourFriends())
 
-    context = RequestContext(request, {})
-    return HttpResponse(HomeFriendsNode().render(context))
-
-def ajax_home_status_updates(request):
+@ajax_required
+def ajax_widgets_status_updates(request):
     """
-    Wrapper exposing the home_status_updates inclusion tag as a view.
+    Exposes the StatusUpdates widget as a view.
     """
-    if not request.is_ajax():
-        raise Http404
-
-    context = RequestContext(request, {})
-    return HttpResponse(HomeStatusUpdatesNode().render(context))
-
+    return obj_render_wrapper(request, StatusUpdates())
+    
+@ajax_required
 def ajax_likes_stamp(request, slug):
     """
-    Wrapper exposing the likes_stamp inclusion tag as a view.
+    Exposes the LikesStampNode inclusion tag as a view.
     """
-    #if not request.is_ajax():
-    #    raise Http404
-
-    from django import template
     context = RequestContext(request, {})
     instance = get_object_or_404(ContentBase, slug=slug)
 
@@ -110,13 +106,10 @@ def ajax_likes_stamp(request, slug):
     })
     obj = template.Variable('instance')
 
-    return HttpResponse(LikesStampNode(obj).render(context))
+    return obj_render_wrapper(request, LikesStampNode(obj), context)
 
-
+@ajax_required
 def ajax_sign_out(request):
-    if not request.is_ajax():
-        raise Http404
-    
     if request.user.is_authenticated():
         auth.logout(request)
     
@@ -878,9 +871,16 @@ def comment_add(request):
     })
     return HttpResponse(CommentsNode('instance').render(context))
 
-def home(request):
-    context = RequestContext(request, {})
-    return render_to_response('desktop/content/home.html', context)
+#def home(request):
+#    context = RequestContext(request, {})
+#    return render_to_response('desktop/content/home.html', context)
+
+def top_left_right(request, widgets, template='desktop/layout/top_left_right.html'):
+    return render_to_response(
+        template, 
+        widgets, 
+        context_instance=RequestContext(request)
+    )
 
 def search_results(request):
     context = RequestContext(request, {})
@@ -1289,7 +1289,7 @@ def shows_dj_podcasts_rss(request, slug):
             title=item.title,
             link="http://%s/%s" % (context['site_domain'], url),
             description=item.description,
-            enclosure=feedgenerator.Enclosure("http://%s/%s" % (context['site_domain'], item.audio), str(item.audio.size), mimetypes.guess_type(item.audio.name)[0]),
+            enclosure=feedgenerator.Enclosure("http://%s/media/%s" % (context['site_domain'], item.audio), str(item.audio.size), mimetypes.guess_type(item.audio.name)[0]),
         )
     return HttpResponse(feed.writeString('UTF-8'), mimetype="application/rss+xml")
 
@@ -1455,7 +1455,11 @@ class ContentBaseViews(object):
             ('reviews', handle_reviews),
         ]
 
-        section = context['section']
+        try:
+            section = context['section']
+        except KeyError:
+            section = 'home'
+
         for section_handler in section_handlers:
             if section == section_handler[0]:
                 url = section_handler[1](self)
@@ -1693,12 +1697,20 @@ class StatusUpdateViews(object):
         retweet_url = "http://twitter.com/home?%s" % urlencode({
             'status': status,
         })
+        
+        # determine if the update is from a castmember (user with credit of role 1)
+        castmember = False
+        castmembers = CastMember.objects.filter(owner=user)
+        if castmembers:
+            castmember = castmembers[0] if Credit.objects.filter(castmember=castmembers[0], role__exact='1') else False
 
         context = {
+            'request': context['request'],
             'object': self,
             'user': user,
             'profile': user.profile,
             'retweet_url': retweet_url, 
+            'castmember': castmember,
         }
         return render_to_string('desktop/content/status_update/update.html', context)
         
