@@ -1,3 +1,4 @@
+import mimetypes
 import os
 import sys
 import simplejson as json
@@ -5,9 +6,10 @@ import urllib
 import hashlib
 import cStringIO 
 import unicodedata
+import random
 #from BeautifulSoup import BeautifulSoup
 
-from django.db.models import get_model
+from django.db.models import get_model, FileField
 from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.related import ManyToManyField
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -18,15 +20,17 @@ from broadcastcms.scaledimage.fields import ScaledImageField
 SCRIPT_PATH = os.path.dirname( os.path.realpath( __file__ ) )
 USE_CACHE = True
 
-def load_image(instance, source):
+def load_file(field, source):
     source = fetch_from_cache(source)
     size = os.path.getsize(source)
-    image_file = cStringIO.StringIO()
-    image_file.write(open(source, 'r').read())
-    field_name = u'image'
-    name = source.split('/')[-1]
-    content_type = 'image/jpeg'
-    return InMemoryUploadedFile(image_file, 'image', name, 'image/jpeg', size, None)
+    f = cStringIO.StringIO()
+    f.write(open(source, 'r').read())
+    field_name = str(field)
+    file_name = source.split('/')[-1]
+    content_type=mimetypes.guess_type(file_name)[0]
+    elements = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456890'
+    file_name = '%s.%s' % (''.join([random.choice(elements) for n in range(8)]), file_name.split('.')[-1])
+    return InMemoryUploadedFile(f, field_name, file_name, content_type, size, None)
 
 def format_rich_text(rich_text):
     #rich_text = unicodedata.normalize('NFKD', rich_text).encode('ascii','ignore')
@@ -56,6 +60,7 @@ def generate_item(item):
     fields = {}
     many_to_many_fields = {}
     scaled_image_fields = {}
+    file_fields = {}
     password_field = ''
 
     for field, value in item['fields'].items():
@@ -77,6 +82,9 @@ def generate_item(item):
         elif isinstance(model_field, ScaledImageField):
             if value:
                 scaled_image_fields[str(field)] = value
+        elif isinstance(model_field, FileField):
+            if value:
+                file_fields[str(field)] = value
         elif isinstance(model_field, RichTextField):
             value = format_rich_text(value)
             fields[str(field)] = value
@@ -99,9 +107,14 @@ def generate_item(item):
                 obj_field.add(value)
     
         for field, value in scaled_image_fields.items():
-            field = getattr(obj, field)
-            image = load_image(model_instance, value)
-            field.save(image.name, image)
+            field_attr = getattr(obj, field)
+            f = load_file(field, value)
+            field_attr.save(f.name, f)
+        
+        for field, value in file_fields.items():
+            field_attr = getattr(obj, field)
+            f = load_file(field, value)
+            field_attr.save(f.name, f)
 
         if password_field:
             obj.set_password(password_field)
