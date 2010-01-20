@@ -2,7 +2,6 @@
 {% load voting_tags %}
 
 {% score_for_object object as score %}
-
 <div class="update">
     <p class="update_avatar">
         <a href="{% url account_friends_activity user.pk %}">
@@ -14,9 +13,13 @@
 	    <span class="update_text">{{ object.text }}</span>
 		<span class="update_meta">{{ object.timestamp|timesince }} Ago {% ifequal object.source 1 %} via Twitter {% endifequal %}| <a href="#" class="update_meta_like">{{ score.score }}</a></span>
 		<span class="update_btns">
-            <a class="update_btn_like" href="{% url xmlhttprequest_vote_on_status object.id %}">I Like</a>
-			<a href="#" class="update_btn_dm">Direct Message</a>
 			<a href="{{ retweet_url }}" class="update_btn_retweet">Retweet</a>
+            {% if request.user.is_authenticated %}
+                <a class="update_btn_like" href="{% url xmlhttprequest_vote_on_status object.id %}">I Like</a>
+            {% else %}
+                <a class="update_btn_like thickbox" href="{% url modals_login %}?height=370&amp;width=540" >Log In</a>
+            {% endif %}
+			<a href="{% if castmember %}{% url shows_dj_contact castmember.slug %}{% else %}{% url message_create %}{% endif %}" class="update_btn_dm">Direct Message</a>
 		</span>
 	</p>
 </div>
