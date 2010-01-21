@@ -1,5 +1,5 @@
 {% load template_tags %}
-<span class="auth_reload" src="{% url ajax_widgets_your_friends %}">
+<span class="auth_reload" src="{% url session_your_friends %}">
     <div class="updates friends purple">
         {% if request.user.is_authenticated %}
             {% if friends %}
