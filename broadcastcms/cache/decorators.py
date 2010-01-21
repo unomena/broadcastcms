@@ -52,7 +52,8 @@ def cache_context_processor(seconds, respect_path=False, respect_get=False, resp
     return wrap
 
 def get_nginx_key(request, respect_session):
-    key = request.get_full_path()
+    #key = request.get_full_path()
+    key = request.path_info
     if respect_session:
         if request.user.is_authenticated(): 
             key += '.%s' % request.session.session_key
