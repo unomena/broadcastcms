@@ -122,7 +122,25 @@ def ajax_sign_out(request):
         auth.logout(request)
     
     return HttpResponse("")
-    
+   
+# RSS
+def rss_object_list(context, title, link, description, queryset):
+    feed = feedgenerator.Rss201rev2Feed(
+        title=title,
+        link=link,
+        description=description,
+        language=u"en")
+
+    for item in queryset:
+        url = item.url(context)
+        feed.add_item(
+            title=item.title,
+            link="http://%s/%s" % (context['site_domain'], url),
+            description=item.description,
+            enclosure=feedgenerator.Enclosure("http://%s/media/%s" % (context['site_domain'], item.audio), str(item.audio.size), mimetypes.guess_type(item.audio.name)[0]),
+        )
+    return HttpResponse(feed.writeString('UTF-8'), mimetype="application/rss+xml")
+
 # Account
 def gen_inv_response(user):
     return { 
@@ -1130,7 +1148,12 @@ def studio_cam(request):
 
 # Podcasts
 def podcasts_rss(request):
-    return None
+    context = RequestContext(request, {})
+    title = "%s Podcasts" % context['site_name']
+    link = reverse('home')
+    description = "Latest podcasts for %s." % context['site_name']
+    queryset = PodcastStandalone.permitted.order_by("-created")
+    return rss_object_list(context, title, link, description, queryset)
 
 # Reviews
 def reviews(request, template_name='desktop/generic/object_listing_wide.html'):
@@ -1262,19 +1285,17 @@ def shows_dj_podcasts(request, slug, template_name='desktop/content/shows/dj_pod
         },
     )
 
-def shows_dj_podcasts_content(request, slug, template_name='desktop/content/shows/dj_podcasts.html'):
-    castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
-    owner = castmember.owner 
-    queryset = PodcastStandalone.permitted.filter(owner=owner).order_by("-created") if owner else []
+def shows_dj_podcasts_content(request, castmember_slug, podcast_slug, template_name='desktop/generic/object_detail.html'):
+    castmember = get_object_or_404(CastMember, slug=castmember_slug, is_public=True)
+    queryset = ContentBase.permitted
     header = utils.CastMemberHeader(request, castmember)
 
-    return list_detail.object_list(
+    return list_detail.object_detail(
         request=request,
         queryset=queryset,
+        slug=podcast_slug,
         template_name=template_name,
-        paginate_by=10,
         extra_context={
-            'castmember': castmember,
             'header': header,
         },
     )
@@ -1283,24 +1304,11 @@ def shows_dj_podcasts_rss(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
     owner = castmember.owner 
     context = RequestContext(request, {})
-    
     queryset = PodcastStandalone.permitted.filter(owner=owner).order_by("-created") if owner else []
-
-    feed = feedgenerator.Rss201rev2Feed(
-        title="%s Podcasts" % context['site_name'],
-        link=reverse('shows_dj_podcasts', kwargs={'slug': castmember.slug}),
-        description=u"Latest podcasts for %s." % castmember.title,
-        language=u"en")
-
-    for item in queryset:
-        url = item.url(context)
-        feed.add_item(
-            title=item.title,
-            link="http://%s/%s" % (context['site_domain'], url),
-            description=item.description,
-            enclosure=feedgenerator.Enclosure("http://%s/media/%s" % (context['site_domain'], item.audio), str(item.audio.size), mimetypes.guess_type(item.audio.name)[0]),
-        )
-    return HttpResponse(feed.writeString('UTF-8'), mimetype="application/rss+xml")
+    title = "%s Podcasts" % context['site_name']
+    link = reverse('shows_dj_podcasts', kwargs={'slug': castmember.slug})
+    description = "Latest podcasts for %s." % castmember.title
+    return rss_object_list(context, title, link, description, queryset)
 
 def shows_dj_contact(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
@@ -1426,7 +1434,10 @@ class ContentBaseViews(object):
             if owner:
                 castmembers = CastMember.permitted.filter(owner=owner)
                 if castmembers:
-                    return reverse('shows_dj_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
+                    if self.classname in ['PodcastStandalone',]:
+                        return reverse('shows_dj_podcasts_content', kwargs={'castmember_slug': castmembers[0].slug, 'podcast_slug': self.slug})
+                    else:
+                        return reverse('shows_dj_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
                 elif self.classname in ['Event',]:
                     castmembers = self.as_leaf_class().castmembers.permitted()
                     return reverse('shows_dj_appearances_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
@@ -1625,6 +1636,15 @@ class PostViews(object):
             'self': self,
         }
         return render_to_string('desktop/content/posts/article_body.html', context)
+
+class PodcastStandaloneViews(object):
+    def render_article_body(self, context):
+        castmember = CastMember.objects.filter(owner=self.owner)
+        context.update({
+            'self': self,
+            'castmember': castmember[0] if castmember else None,
+        })
+        return render_to_string('desktop/content/podcaststandalone/article_body.html', context)
        
 class UserViews(object):
     def url(self):
@@ -1818,6 +1838,7 @@ public.site.register(Event, EventViews)
 public.site.register(Gallery, GalleryViews)
 public.site.register(ImageBanner, ImageBannerViews)
 public.site.register(Post, PostViews)
+public.site.register(PodcastStandalone, PodcastStandaloneViews)
 public.site.register(User, UserViews)
 public.site.register(Song, SongViews)
 public.site.register(StatusUpdate, StatusUpdateViews)
