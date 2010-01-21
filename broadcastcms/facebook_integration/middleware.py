@@ -59,8 +59,8 @@ class FacebookConnectMiddleware(object):
                             user = profile.user
                             user.backend = "django.contrib.auth.backends.ModelBackend"
                             auth.login(request, user)
-                            # allow requests for ajax views
-                            if request.path.startswith('/ajax'):
+                            # allow requests for ajax and session views
+                            if request.path.startswith('/ajax') or request.path.startswith('/session'):
                                 if API_KEY in request.COOKIES:
                                     # @@@ may need more checks before assuming this is true
                                     request.fb_authenticated = True
