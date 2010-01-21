@@ -1,0 +1,12 @@
+<div class="podcast_body info">
+    <p>
+        {{ self.content|safe }}
+    </p>
+</div>
+<div class="podcast_body listen">
+    {% comment %}
+    <div class="tray listen_tray"><h2>Listen to this podcast</h2><img src="/media/goodhopefm/images/examples/player.jpg" width="282" height="25" alt="" /></div>
+    {% endcomment %}
+	<div class="tray"><h2>Download it</h2><a href="/media/{{ self.audio }}" class="btn_download"></a><span class="file_size">({{ self.audio.size|filesizeformat }})</span></div>
+	{% if castmember %}<div class="tray"><h2 class="subscribe">Subscribe</h2><input type="text" name="podcasts1" id="podcasts1" value="http://{{ site_domain }}{% url shows_dj_podcasts_rss castmember.slug %}" /></div>{% endif %}
+</div>	
