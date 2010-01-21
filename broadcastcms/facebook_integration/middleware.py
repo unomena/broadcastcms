@@ -9,7 +9,6 @@ from django.contrib import auth
 
 from broadcastcms.facebook_integration.utils import (facebook_signature,
     facebook_api_request, API_KEY)
-from broadcastcms.lite.desktop_views import ajax_account_links
 from broadcastcms.lite.models import UserProfile
 
 
