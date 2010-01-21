@@ -18,6 +18,7 @@ from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.radio.models import Song
 from broadcastcms.cache.decorators import cache_view_function
 from broadcastcms.status.models import StatusUpdate
+from broadcastcms.widgets.widgets import SSIContentResolver
 
 register = template.Library()
 
@@ -27,9 +28,12 @@ register = template.Library()
 def account_links(parser, token):
     return AccountLinksNode()
 
-class AccountLinksNode(template.Node):
+class AccountLinksNode(SSIContentResolver, template.Node):
+    def get_absolute_url(self):
+        return reverse('session_account_links')
+
     @cache_view_function(10*60, respect_user=True)
-    def render(self, context):
+    def render_content(self, context):
         """
         Renders anonymous avatar, sign in and sign up links for anonymous users.
         Renders avatar, messages and sign out links for authenticated users.
@@ -478,8 +482,11 @@ def modal_updates(parser, token):
 def status_update(parser, token):
     return StatusUpdateNode()
 
-class StatusUpdateNode(template.Node):
-    def render(self, context):
+class StatusUpdateNode(SSIContentResolver, template.Node):
+    def get_absolute_url(self):
+        return reverse('session_status_update')
+
+    def render_content(self, context):
         """
         Return status update form for authenticated users,
         auth_reload span for anonymous.
