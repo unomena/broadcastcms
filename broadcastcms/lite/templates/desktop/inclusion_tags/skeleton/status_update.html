@@ -1,4 +1,4 @@
-<span class="auth_reload" src="{% url ajax_status_update %}">
+<span class="auth_reload" src="{% url session_status_update %}">
     {% if request.user.is_authenticated %}
         <div class="logged_status">
             <form id="frmStatusUpdate" action="{% url status_update %}" method="post">
