@@ -34,12 +34,15 @@ messages_urls = patterns('user_messages.views',
 )
 
 ajax_urls = patterns('',
-    url(r'^status-update/$', ajax_status_update, name='ajax_status_update'),
-    url(r'^account-links/$', ajax_account_links, name='ajax_account_links'),
     url(r'^sign-out/$', ajax_sign_out, name='ajax_sign_out'),
     url(r'^like-stamp/(?P<slug>[\w-]+)/$', ajax_likes_stamp, name='ajax_likes_stamp'),
-    url(r'^widgets/your-friends/$', ajax_widgets_your_friends, name='ajax_widgets_your_friends'),
-    url(r'^widgets/status-updates/$', ajax_widgets_status_updates, name='ajax_widgets_status_updates'),
+)
+
+session_urls = patterns('',
+    url(r'^account-links/$', session_account_links, name='session_account_links'),
+    url(r'^status-update/$', session_status_update, name='session_status_update'),
+    url(r'^your-friends/$', session_your_friends, name='session_your_friends'),
+    url(r'^status-updates/$', session_status_updates, name='session_status_updates'),
 )
 
 from broadcastcms.widgets.widgets import Advert, NewsCompetitionsEvents, OnAir, Promotions, StatusUpdates, YourFriends
@@ -61,6 +64,8 @@ urlpatterns = patterns('',
     url(r'^admin/(.*)', admin.site.root),
     
     url(r'^ajax/', include(ajax_urls)),
+    
+    url(r'^session/', include(session_urls)),
     
     url(r'^account/settings/image/$', account_settings_image, name='account_settings_image'),
     url(r'^account/settings/details/$', account_settings_details, name='account_settings_details'),
