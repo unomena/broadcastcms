@@ -34,6 +34,7 @@ from broadcastcms.activity.models import ActivityEvent
 from broadcastcms.banner.models import CodeBanner, ImageBanner
 from broadcastcms.base.models import ContentBase
 from broadcastcms.calendar.models import Entry
+from broadcastcms.cache.decorators import cache_for_nginx
 from broadcastcms.chart.models import Chart, ChartEntry
 from broadcastcms.competition.models import Competition
 from broadcastcms.event.models import Event, Appearance
@@ -56,7 +57,6 @@ from forms import make_competition_form, make_contact_form, LoginForm, ProfileFo
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
 import utils
 
-# Ajax
 def obj_render_wrapper(request, obj, context=None):
     """
     Thin wrapper exposing an objects's render method as a view.
@@ -65,33 +65,41 @@ def obj_render_wrapper(request, obj, context=None):
         context = RequestContext(request, {})
     return HttpResponse(obj.render(context))
 
-@ajax_required
-def ajax_account_links(request):
+def obj_render_content_wrapper(request, obj, context=None):
     """
-    Exposes the account_links inclusion tag as a view.
+    Thin wrapper exposing an objects's render_content method as a view.
     """
-    return obj_render_wrapper(request, AccountLinksNode())
+    if not context:
+        context = RequestContext(request, {})
+    return HttpResponse(obj.render_content(context))
 
-@ajax_required
-def ajax_status_update(request):
+@cache_for_nginx(60*1, respect_session=True)
+def session_account_links(request):
     """
-    Thin wrapper exposing the status_update inclusion tag as a view.
+    Returns the account_links tag's content as a response.
     """
-    return obj_render_wrapper(request, StatusUpdateNode())
+    return obj_render_content_wrapper(request, AccountLinksNode())
 
-@ajax_required
-def ajax_widgets_your_friends(request):
+@cache_for_nginx(60*10, respect_session=True)
+def session_status_update(request):
+    """
+    Returns the status_update tag's content as a response.
+    """
+    return obj_render_content_wrapper(request, StatusUpdateNode())
+
+@cache_for_nginx(60*10, respect_session=True)
+def session_your_friends(request):
     """
     Exposes the YourFriends widget as a view.
     """
-    return obj_render_wrapper(request, YourFriends())
+    return obj_render_content_wrapper(request, YourFriends())
 
-@ajax_required
-def ajax_widgets_status_updates(request):
+@cache_for_nginx(60*1, respect_session=True)
+def session_status_updates(request):
     """
     Exposes the StatusUpdates widget as a view.
     """
-    return obj_render_wrapper(request, StatusUpdates())
+    return obj_render_content_wrapper(request, StatusUpdates())
     
 @ajax_required
 def ajax_likes_stamp(request, slug):
@@ -875,6 +883,7 @@ def comment_add(request):
 #    context = RequestContext(request, {})
 #    return render_to_response('desktop/content/home.html', context)
 
+@cache_for_nginx(60 * 1)
 def top_left_right(request, widgets, template='desktop/layout/top_left_right.html'):
     return render_to_response(
         template, 
