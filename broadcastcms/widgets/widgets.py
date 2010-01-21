@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 
 from friends.models import Friendship
@@ -11,6 +13,27 @@ from broadcastcms.label.models import Label
 from broadcastcms.radio.models import Song
 from broadcastcms.show.models import Credit, Show
 from broadcastcms.status.models import StatusUpdate
+
+class SSIContentResolver(object):
+    """
+    Renders either an SSI tag or normal render based on debug mode.
+    """
+    def render(self, context):
+        """
+        Returns either self.render_ssi or self.render_content based on debug mode.
+        self.render_content to be implimented by subclasses.
+        """
+        if settings.DEBUG:
+            return self.render_content(context)
+        else:
+            return self.render_ssi()
+
+    def render_ssi(self):
+        """
+        Renders SSI tag. URL is determined through self.get_absolute_url()
+        which subclasses have to impliment
+        """
+        return '<!--# include virtual="%s" -->' % self.get_absolute_url()
 
 class Advert(object):
     """
@@ -199,10 +222,12 @@ class NewsCompetitionsEvents(object):
         }
         return render_to_string('news_competitions_events.html', context)
 
-class StatusUpdates(object):
+class StatusUpdates(SSIContentResolver):
     """
     Renders status updates for DJ's and Friends.
     """
+    def get_absolute_url(self):
+        return reverse('session_status_updates')
 
     def get_castmember_updates(self):
         """
@@ -226,7 +251,7 @@ class StatusUpdates(object):
         return friends_status_updates
         
     @cache_view_function(5*60, respect_user=True)
-    def render(self, context):
+    def render_content(self, context):
         """
         Renders the widget.
         """
@@ -239,13 +264,16 @@ class StatusUpdates(object):
         })
         return render_to_string('status_updates.html', context)
 
-class YourFriends(object):
+class YourFriends(SSIContentResolver):
     """
     Renders friends listing for currently logged in user.
     If anonymous renders link to find friends page.
     """
+    def get_absolute_url(self):
+        return reverse('session_your_friends')
+
     @cache_view_function(10*60, respect_user=True)
-    def render(self, context):
+    def render_content(self, context):
         """
         Renders the widget.
         """
