@@ -1,6 +1,6 @@
 {% load public_tags %}
 
-<span class="auth_reload" src="{% url ajax_widgets_status_updates %}">
+<span class="auth_reload" src="{% url session_status_updates %}">
     {% if castmember_updates or friends_updates %}
         <div class="updates global green">
             <h1>Update Stream</h1>
