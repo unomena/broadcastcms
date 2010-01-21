@@ -150,8 +150,8 @@ def create_podcasts():
             "model": "podcast.podcaststandalone",
             "fields": {
                 "title": "Podcast %s Title" % i,
-                "description": "Post %s Description" % i,
-                "content": "Post %s Content" % i,
+                "description": "Podcast %s Description" % i,
+                "content": "Podcast %s Content" % i,
                 "is_public": True,
                 "image": random.sample(IMAGES, 1)[0],
                 "audio": random.sample(PODCASTS, 1)[0],
