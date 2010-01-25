@@ -18,7 +18,7 @@ from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.radio.models import Song
 from broadcastcms.cache.decorators import cache_view_function
 from broadcastcms.status.models import StatusUpdate
-from broadcastcms.widgets.widgets import SSIContentResolver
+from broadcastcms.widgets.utils import SSIContentResolver
 
 register = template.Library()
 
@@ -29,10 +29,9 @@ def account_links(parser, token):
     return AccountLinksNode()
 
 class AccountLinksNode(SSIContentResolver, template.Node):
-    def get_absolute_url(self):
-        return reverse('session_account_links')
+    user_unique = True
 
-    @cache_view_function(10*60, respect_user=True)
+    #@cache_view_function(10*60, respect_user=True)
     def render_content(self, context):
         """
         Renders anonymous avatar, sign in and sign up links for anonymous users.
@@ -60,6 +59,9 @@ class AccountLinksNode(SSIContentResolver, template.Node):
             'messages': messages,
         })
         return render_to_string('desktop/inclusion_tags/skeleton/account_links.html', context)
+
+    def get_ssi_url(self):
+        return reverse('ssi_account_links_node')
 
 @register.tag
 def masthead(parser, token):
@@ -483,8 +485,10 @@ def status_update(parser, token):
     return StatusUpdateNode()
 
 class StatusUpdateNode(SSIContentResolver, template.Node):
-    def get_absolute_url(self):
-        return reverse('session_status_update')
+    user_unique = True
+    
+    def get_ssi_url(self):
+        return reverse('ssi_status_update_node')
 
     def render_content(self, context):
         """
