@@ -38,24 +38,24 @@ ajax_urls = patterns('',
     url(r'^like-stamp/(?P<slug>[\w-]+)/$', ajax_likes_stamp, name='ajax_likes_stamp'),
 )
 
-session_urls = patterns('',
-    url(r'^account-links/$', session_account_links, name='session_account_links'),
-    url(r'^status-update/$', session_status_update, name='session_status_update'),
-    url(r'^your-friends/$', session_your_friends, name='session_your_friends'),
-    url(r'^status-updates/$', session_status_updates, name='session_status_updates'),
+ssi_urls = patterns('',
+    url(r'^account-links-node/$', ssi_account_links_node, name='ssi_account_links_node'),
+    url(r'^status-update-node/$', ssi_status_update_node, name='ssi_status_update_node'),
+    #url(r'^your-friends/$', session_your_friends, name='session_your_friends'),
+    #url(r'^status-updates/$', session_status_updates, name='session_status_updates'),
 )
 
-from broadcastcms.widgets.widgets import Advert, NewsCompetitionsEvents, OnAir, Promotions, StatusUpdates, YourFriends
-home_args = {
-    'widgets': {
-        'top': (OnAir(),),
-        'left': (Promotions(), NewsCompetitionsEvents(),),
-        'right': (Advert(), YourFriends(), StatusUpdates()),
-    }, 
-}
+#from broadcastcms.widgets.widgets import Advert, NewsCompetitionsEvents, StatusUpdates, YourFriends
+#home_args = {
+#    'widgets': {
+#        'left': (NewsCompetitionsEvents(),),
+#        'right': (Advert(), YourFriends(), StatusUpdates()),
+#    }, 
+#}
 
 urlpatterns = patterns('',
-    url(r'^$', top_left_right, home_args, name='home'),
+    #url(r'^$', top_left_right, home_args, name='home'),
+    url(r'^$', layout_view, name='home'),
     
     url(r'^facebook/', include('broadcastcms.facebook_integration.urls')),
     
@@ -65,12 +65,13 @@ urlpatterns = patterns('',
     
     url(r'^ajax/', include(ajax_urls)),
     
-    url(r'^session/', include(session_urls)),
+    url(r'^ssi/', include(ssi_urls)),
     
     url(r'^account/settings/image/$', account_settings_image, name='account_settings_image'),
     url(r'^account/settings/details/$', account_settings_details, name='account_settings_details'),
     url(r'^account/settings/subscriptions/$', account_settings_subscriptions, name='account_settings_subscriptions'),
-    url(r'^account/friends/my/$', account_friends_my, name='account_friends_my'),
+    #url(r'^account/friends/my/$', account_friends_my, name='account_friends_my'),
+    url(r'^account/friends/my/$', layout_view, name='account_friends_my'),
     url(r'^account/friends/activity/all/$', account_friends_activity_all, name='account_friends_activity_all'),
     url(r'^account/friends/activity/(?P<user_pk>[\w-]+)/$', account_friends_activity, name='account_friends_activity'),
     url(r'^account/friends/find/$', account_friends_find, name='account_friends_find'),
