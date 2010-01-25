@@ -1,6 +1,6 @@
 {% load template_tags %}
 
-<span class="auth_reload" src="{% url session_account_links %}">
+<span class="auth_reload" src="{% url ssi_account_links_node %}">
     {% if user.is_authenticated %}
         <p class="logged_avatar">
             <a href="{% url account_settings_image %}">
