@@ -51,11 +51,49 @@ from broadcastcms.show.models import Show, CastMember, Credit
 from broadcastcms.status.models import StatusUpdate
 from broadcastcms.utils import mail_user
 from broadcastcms.utils.decorators import ajax_required
-from broadcastcms.widgets.widgets import YourFriends, StatusUpdates
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
 import utils
+
+def resolve_pattern(request):
+    from django.core import urlresolvers
+    from django.core.urlresolvers import Resolver404
+    from django.conf import settings
+    urlconf = getattr(request, "urlconf", settings.ROOT_URLCONF)
+    self = urlresolvers.RegexURLResolver(r'^/', urlconf)
+    path = request.path_info
+    
+    tried = []
+    match = self.regex.search(path)
+    if match:
+        new_path = path[match.end():]
+        for pattern in self.url_patterns:
+            try:
+                sub_match = pattern.resolve(new_path)
+            except Resolver404, e:
+                sub_tried = e.args[0].get('tried')
+                if sub_tried is not None:
+                    tried.extend([(pattern.regex.pattern + '   ' + t) for t in sub_tried])
+                else:
+                    tried.append(pattern.regex.pattern)
+            else:
+                if sub_match:
+                    sub_match_dict = dict([(smart_str(k), v) for k, v in match.groupdict().items()])
+                    sub_match_dict.update(self.default_kwargs)
+                    for k, v in sub_match[2].iteritems():
+                        sub_match_dict[smart_str(k)] = v
+                    return pattern
+                tried.append(pattern.regex.pattern)
+        raise Resolver404, {'tried': tried, 'path': new_path}
+    raise Resolver404, {'path' : path}
+
+@cache_for_nginx(60*1)
+def layout_view(request):
+    from broadcastcms.widgets.models import Layout
+    pattern = resolve_pattern(request)
+    layout = get_object_or_404(Layout, view_name=pattern.name, is_public=True)
+    return layout.as_leaf_class().render(request)
 
 def obj_render_wrapper(request, obj, context=None):
     """
@@ -73,28 +111,28 @@ def obj_render_content_wrapper(request, obj, context=None):
         context = RequestContext(request, {})
     return HttpResponse(obj.render_content(context))
 
-@cache_for_nginx(60*1, respect_session=True)
-def session_account_links(request):
+@cache_for_nginx(60*1)
+def ssi_account_links_node(request):
     """
     Returns the account_links tag's content as a response.
     """
     return obj_render_content_wrapper(request, AccountLinksNode())
 
-@cache_for_nginx(60*10, respect_session=True)
-def session_status_update(request):
+@cache_for_nginx(60*1)
+def ssi_status_update_node(request):
     """
     Returns the status_update tag's content as a response.
     """
     return obj_render_content_wrapper(request, StatusUpdateNode())
 
-@cache_for_nginx(60*10, respect_session=True)
+@cache_for_nginx(60*10)
 def session_your_friends(request):
     """
     Exposes the YourFriends widget as a view.
     """
     return obj_render_content_wrapper(request, YourFriends())
 
-@cache_for_nginx(60*1, respect_session=True)
+@cache_for_nginx(60*1)
 def session_status_updates(request):
     """
     Exposes the StatusUpdates widget as a view.
@@ -1371,6 +1409,9 @@ class CodeBannerViews(object):
 class ImageBannerViews(object):
     def render(self):
         return render_to_string('desktop/content/banners/image_banner.html', {"self": self})
+
+    def get_context_url(self, context):
+        return self.url
 
 class ContentBaseViews(object):
     def render_updates(self, context):
