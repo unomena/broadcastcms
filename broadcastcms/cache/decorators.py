@@ -51,6 +51,7 @@ def cache_context_processor(seconds, respect_path=False, respect_get=False, resp
         return wrap_f
     return wrap
 
+"""
 def get_nginx_key(request, respect_session):
     #key = request.get_full_path()
     key = request.path_info
@@ -69,6 +70,26 @@ def cache_for_nginx(seconds, respect_session=False):
             if not cached_result:
                 result = f(request, *args, **kwargs)
                 cache.set(key, result._get_content(), seconds)
+                #cache.set(key, key, seconds)
+            return f(request, *args, **kwargs)
+        return wrap_f
+    return wrap
+"""
+
+def get_nginx_key(request):
+    key = request.META.get('MEMCACHED_KEY', request.get_full_path())
+    return key
+
+def cache_for_nginx(seconds):
+    def wrap(f):
+        def wrap_f(request, *args, **kwargs):
+            key = get_nginx_key(request)
+            cached_result = cache.get(key)
+            if not cached_result:
+                result = f(request, *args, **kwargs)
+                #cache.set(key, result._get_content(), seconds)
+                cache.set(key, result._get_content() + "<!-- cached_key_%s -->" % key, seconds)
+                return result
             return f(request, *args, **kwargs)
         return wrap_f
     return wrap
