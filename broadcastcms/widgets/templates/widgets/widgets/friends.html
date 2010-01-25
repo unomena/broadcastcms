@@ -1,0 +1,21 @@
+{% load desktop_inclusion_tags public_tags %}
+
+<div class="social">
+    <div class="social_body">
+        {% if friends %}
+            {% social_paging page_obj %}
+                
+            {% for friend in friends %}
+                {% if forloop.counter0|divisibleby:"2" or forloop.first %}
+				    <div class="friend_tray">
+                {% endif %}
+                        {% call_view friend render_block %}
+                {% if forloop.counter|divisibleby:"2" or forloop.last %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+    		<h2 class="smaller no-bg">You don't have any friends. <a href="{% url account_friends_find %}">Click here to go find some now.</a></h2>
+        {% endif %}
+	</div>
+</div><!--/social-->

@@ -1,0 +1,3 @@
+{% load public_tags scaled_image_tags %}
+
+<a href="{% call_view content get_context_url %}"><img class="banner_widget" src="{% scaled_image_url content widget.width widget.height %}" width="{{ widget.width }}" height="{{ widget.height }}" alt="" /></a>
