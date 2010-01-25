@@ -145,6 +145,7 @@ IMAGE_SCALES = {
                 (55, 55),
                 (188, 104),
                 (150, 84),
+                (945, 292),
             )
         },
     },
@@ -205,3 +206,5 @@ IMAGE_SCALES = {
 FACEBOOK_API_KEY = '76f92b0c84d3d371ee18175e2be1c3bc'
 
 FACEBOOK_API_SECRET = 'd3ac4c835b56590bc5aef8dfa04717e8'
+
+SSI_ENABLED = True
