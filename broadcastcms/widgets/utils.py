@@ -17,10 +17,11 @@ class SSIContentResolver(object):
         Returns either self.render_ssi or self.render_content based on self.user_unique 
         and settings.SSI_ENABLED.  self.render_content to be implimented by subclasses.
         """
-        if self.user_unique and settings.SSI_ENABLED:
-            return self.render_ssi(context)
+        leaf = self.get_leaf()
+        if leaf.user_unique and settings.SSI_ENABLED:
+            return leaf.render_ssi(context)
         else:
-            return self.get_leaf().render_content(context)
+            return leaf.render_content(context)
                 
         
     def render_ssi(self, context):
