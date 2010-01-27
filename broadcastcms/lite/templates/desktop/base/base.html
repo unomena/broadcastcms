@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 {% load desktop_inclusion_tags %}
+{% load facebook_tags %}
+
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"{% block extra_html %}{% endblock %}>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -7,7 +9,6 @@
 	<meta name="description" content="" />
 	<meta name="keywords" content="" />
     <link rel="icon" type="image/jpeg" href="/media/bcms/images/favicon.jpg">
-
 	<link rel="stylesheet" type="text/css" href="/media/bcms/includes/reset.css" />
 	<link rel="stylesheet" type="text/css" href="/media/bcms/includes/style-positions.css" />
 	<link rel="stylesheet" type="text/css" href="/media/bcms/includes/styles.css" />
@@ -42,42 +43,25 @@
 	<!--script type="text/javascript" src="/media/bcms/includes/coda-slider.js"></script-->
 	<!--Promo-->
 	<script type="text/javascript" src="/media/bcms/includes/jquery.flow.1.1.min.js"></script>
-    {% if FACEBOOK_API_KEY %}
-        <!--Facebook-->
-        <script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php" type="text/javascript"></script>
-        <script type="text/javascript" src="/media/bcms/includes/facebook.js"></script>
-    {% endif %}
-
+    {% facebook_js %}
     {% block head %}{% endblock %}
 </head>
 
 <body>
     {% block body %}
-
         <div class="main"><a id="top"></a>
             <div class="wrapper">
-
                 {% masthead %}
-
             	<div class="mast_body">
-
                     {% block content_body %}{% endblock %}
-        	    
                 </div><!--/MAST_BODY-->
             </div><!--/MAIN-->
         </div><!--/WRAPPER-->
         <div class="mast_foot">
-
             {% mastfoot %}
-
         </div><!--/MAST_FOOT-->
-
     {% endblock %}
-
-    <script type="text/javascript">
-        FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
-    </script>
-    
+    {% initialize_facebook_connect %}
     {% metrics %}
 </body>
 </html>
