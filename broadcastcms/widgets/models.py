@@ -572,6 +572,42 @@ class StatusUpdates(Widget):
         })
         return render_to_string('widgets/widgets/status_updates.html', context)
 
+class YourFriends(Widget):
+    """
+    Renders friends listing for currently logged in user.
+    If anonymous renders link to find friends page.
+    """
+    user_unique = True
+    
+    class Meta():
+        verbose_name = 'Your Friends Widget'
+        verbose_name_plural = 'Your Friends Widgets'
+    
+    def get_ssi_url(self):
+        return reverse('ssi_widget', kwargs={'slug': self.slug})
+
+    def render_content(self, context):
+        """
+        Renders the widget.
+        """
+        request = context['request']
+        user = request.user
+        context.update({
+            'widget': self,
+        })
+       
+        if user.is_authenticated():
+            friends = Friendship.objects.friends_for_user(user)
+            friends_count = len(friends)
+            friends = [friend['friend'] for friend in friends][:10]
+    
+            context.update({
+                'friends': friends,
+                'friends_count': friends_count
+            })
+        return render_to_string('widgets/widgets/your_friends.html', context)
+
+
 class Layout(ModelBase):
     view_name = models.CharField(max_length=128, choices=VIEW_CHOICES)
 
