@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from broadcastcms.base.admin import ModelBaseAdmin, ModelBaseTabularInline
 
-from models import AccountMenuWidget, BannerWidget, FacebookSetupWidget, FriendsWidget, FriendsSideNavWidget, NowPlayingWidget, NewsCompetitionsEvents, OnAirWidget, SlidingPromoWidget, SlidingPromoWidgetSlot, StatusUpdates, YourFriends
+from models import AccountMenuWidget, BannerWidget, EmbedWidget, FacebookSetupWidget, FriendsWidget, FriendsSideNavWidget, NowPlayingWidget, NewsCompetitionsEvents, OnAirWidget, SlidingPromoWidget, SlidingPromoWidgetSlot, StatusUpdates, YourFriends
 
 class SlidingPromoWidgetSlotInline(ModelBaseTabularInline):
     model = SlidingPromoWidgetSlot
@@ -23,6 +23,7 @@ class SlidingPromoWidgetAdmin(ModelBaseAdmin):
 
 admin.site.register(AccountMenuWidget)
 admin.site.register(BannerWidget)
+admin.site.register(EmbedWidget)
 admin.site.register(FacebookSetupWidget)
 admin.site.register(FriendsWidget)
 admin.site.register(FriendsSideNavWidget)

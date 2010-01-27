@@ -114,6 +114,19 @@ class BannerWidget(Widget):
         }
         return render_to_string('widgets/widgets/banner.html', context)
 
+class EmbedWidget(Widget):
+    code = models.TextField(help_text='The full HTML/Javascript code snippet to be embedded.')
+    
+    class Meta():
+        verbose_name = 'Embed Widget'
+        verbose_name_plural = 'Embed Widgets'
+
+    def render_content(self, context):
+        context = {
+            'widget': self,
+        }
+        return render_to_string('widgets/widgets/embed.html', context)
+
 class FacebookSetupWidget(Widget):
     class Meta():
         verbose_name = 'Facebook Setup Widget'
