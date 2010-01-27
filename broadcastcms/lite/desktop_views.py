@@ -1318,7 +1318,7 @@ def shows_dj_appearances(request, slug):
 def shows_dj_blog(request, slug, template_name='desktop/generic/object_listing_wide.html'):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
     owner = castmember.owner 
-    queryset = ContentBase.permitted.filter(owner=owner).exclude(classname__in=['CastMember', 'Show']).order_by("-created") if owner else []
+    queryset = ContentBase.permitted.filter(owner=owner).exclude(classname__in=['PodcastStandalone', 'CastMember', 'Show']).order_by("-created") if owner else []
     header = utils.CastMemberHeader(request, castmember)
 
     return list_detail.object_list(
