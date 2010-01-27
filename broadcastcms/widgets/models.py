@@ -14,13 +14,18 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 
 from facebookconnect.models import FacebookProfile
+from friends.models import Friendship
 
 from broadcastcms.base.models import ModelBase, ContentBase
 from broadcastcms.calendar.models import Entry
+from broadcastcms.competition.models import Competition
+from broadcastcms.event.models import Event
+from broadcastcms.label.models import Label
 from broadcastcms.lite.desktop_urls import urlpatterns
 from broadcastcms.lite.forms import FacebookRegistrationForm, LoginForm
 from broadcastcms.radio.models import Song
-from broadcastcms.show.models import Show
+from broadcastcms.show.models import Credit, Show
+from broadcastcms.status.models import StatusUpdate
         
 from utils import SSIContentResolver
 
@@ -277,6 +282,82 @@ class FriendsSideNavWidget(Widget):
         }
         return render_to_string('widgets/widgets/friends_side_nav.html', context)
 
+
+class NewsCompetitionsEvents(Widget):
+    """
+    Renders the latest news, competitions and events.
+    Only public content will render.
+    """
+    class Meta():
+        verbose_name = 'News Competitions Events Widget'
+        verbose_name_plural = 'News Competitions Events Widgets'
+    
+    class Panel(object):
+        def __init__(self, queryset, rows_per_panel):
+            """
+            Build panels based on number of objects in queryset and the
+            number of rows required per panel. For instance with a rows_per_panel
+            of 6 and queryset containing 15 objects, 3 panels will be created
+            containing 6, 6 and 3 objects respectively.
+            """
+            object_list = list(queryset)
+            object_list_count = len(object_list)
+        
+            panels = []
+            if object_list_count > 0:
+                # generate instance slice offsets from which to populate panels
+                slices = range(0, object_list_count, rows_per_panel)
+                # populate panels based on instance slices
+                for slice_start in slices:
+                    panels.append(object_list[slice_start: slice_start + rows_per_panel])
+
+            self.panels = panels
+            self.render_controls = (len(panels) > 1)
+
+    @property
+    def news_panel(self):
+        """
+        Returns queryset containing 3 items labeled 'News'.
+        """
+        news_labels = Label.objects.filter(title__iexact="news")
+        queryset = ContentBase.permitted.filter(labels__in=news_labels).order_by("-created")[:18]
+        return self.Panel(queryset, 6)
+
+    @property
+    def competitions(self):
+        """
+        Returns queryset containing 3 competitions.
+        """
+        queryset = Competition.permitted.order_by("-created")[:3]
+        return queryset
+    
+    @property
+    def events(self):
+        """
+        Returns queryset containing 3 upcomming events.
+        """
+        queryset = []
+        entries = Entry.objects.permitted().upcoming().by_content_type(Event).order_by('start')
+        if entries:
+            for entry in entries:
+                content = entry.content
+                if content not in queryset:
+                    queryset.append(content)
+
+        queryset = queryset[:3]
+        return queryset
+
+    def render_content(self, context):
+        """
+        Renders the widget.
+        """
+        context = {
+            'news_panel': self.news_panel,
+            'competitions': self.competitions,
+            'events': self.events,
+        }
+        return render_to_string('widgets/widgets/news_competitions_events.html', context)
+
 class NowPlayingWidget(Widget):
     class Meta():
         verbose_name = 'Now Playing Widget'
@@ -378,7 +459,7 @@ class OnAirWidget(Widget):
             # get the current playing song and artist info
             song_entry = self.get_public_on_air_entry(Song)
             song = song_entry.content.as_leaf_class() if song_entry else None
-            artist = song.credits.all().filter(artist__is_public=True).order_by('role') if song else None
+            artist = song.get_primary_artist() if song else None
 
             context.update({
                 'entry': show_entry,
@@ -441,6 +522,55 @@ class SlidingPromoWidgetSlot(ModelBase):
     class Meta:
         verbose_name = 'Sliding Promo Widget Slot'
         verbose_name_plural = 'Sliding Promo Widget Slots'
+
+
+class StatusUpdates(Widget):
+    """
+    Renders status updates for DJ's and Friends.
+    """
+    user_unique = True
+    
+    class Meta():
+        verbose_name = 'Status Updates Widget'
+        verbose_name_plural = 'Status Updates Widgets'
+    
+    def get_ssi_url(self):
+        return reverse('ssi_widget', kwargs={'slug': self.slug})
+
+    def get_castmember_updates(self):
+        """
+        Gets 4 primary castmember status updates sorted by timestamp descending.
+        Primary castmembers are determined by credits with role 1.
+        """
+        credits = Credit.objects.filter(role='1', show__in=Show.permitted.all).select_related('castmember')
+        castmember_owners = [credit.castmember.owner for credit in credits]
+        return StatusUpdate.objects.filter(user__in=castmember_owners).select_related('user').order_by('-timestamp')[:4]
+
+    def get_friends_updates(self, user):
+        """
+        Gets 4 user's friend's status updates sorted by timestamp descending.
+        """
+        friends_status_updates = []
+        if user.is_authenticated():
+            friends = Friendship.objects.friends_for_user(user)
+            friends = [friend['friend'] for friend in friends]
+            friends_status_updates = StatusUpdate.objects.filter(user__in=friends).select_related('user').order_by('-timestamp')[:4]
+
+        return friends_status_updates
+        
+    def render_content(self, context):
+        """
+        Renders the widget.
+        """
+        request = context['request']
+        user = request.user
+      
+        context.update({
+            'widget': self,
+            'castmember_updates': self.get_castmember_updates(),
+            'friends_updates': self.get_friends_updates(user),
+        })
+        return render_to_string('widgets/widgets/status_updates.html', context)
 
 class Layout(ModelBase):
     view_name = models.CharField(max_length=128, choices=VIEW_CHOICES)
