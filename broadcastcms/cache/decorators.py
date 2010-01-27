@@ -87,8 +87,9 @@ def cache_for_nginx(seconds):
             cached_result = cache.get(key)
             if not cached_result:
                 result = f(request, *args, **kwargs)
-                #cache.set(key, result._get_content(), seconds)
-                cache.set(key, result._get_content() + "<!-- cached_key_%s -->" % key, seconds)
+                cache.set(key, result._get_content(), seconds)
+                # debug, spits out key at end of cached result
+                #cache.set(key, result._get_content() + "<!-- cached_key_%s -->" % key, seconds)
                 return result
             return f(request, *args, **kwargs)
         return wrap_f
