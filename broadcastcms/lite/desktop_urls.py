@@ -41,6 +41,7 @@ ajax_urls = patterns('',
 ssi_urls = patterns('',
     url(r'^account-links-node/$', ssi_account_links_node, name='ssi_account_links_node'),
     url(r'^status-update-node/$', ssi_status_update_node, name='ssi_status_update_node'),
+    url(r'^(?P<slug>[\w-]+)/$', ssi_widget, name='ssi_widget'),
     #url(r'^your-friends/$', session_your_friends, name='session_your_friends'),
     #url(r'^status-updates/$', session_status_updates, name='session_status_updates'),
 )
