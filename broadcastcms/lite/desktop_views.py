@@ -1519,7 +1519,10 @@ class ContentBaseViews(object):
                         return reverse('shows_dj_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
                 elif self.classname in ['Event',]:
                     castmembers = self.as_leaf_class().castmembers.permitted()
-                    return reverse('shows_dj_appearances_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
+                    if castmembers:
+                        return reverse('shows_dj_appearances_content', kwargs={'castmember_slug': castmembers[0].slug, 'content_slug': self.slug})
+                    else:
+                        return None
         
         def handle_galleries(self):
             if self.classname in ['Gallery',]:
