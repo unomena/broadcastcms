@@ -1,0 +1,93 @@
+{% load facebook_tags %}
+
+<div class="page_head">
+    <h1>Hello {{ first_name }} <img width="9" height="8" alt="" src="/media/bcms/images/arrow-title_light.gif"/></h1>
+</div>
+<div class="page_form">
+    <h2 class="smaller">You're almost done. Before you proceed we need to finalize your {{ site_name }} account. <br /><br />You've got one of two options:<br /><h2 class="smaller">1. Connect your Facebook account with an existing {{ site_name }} account <img width="9" height="8" src="/media/bcms/images/arrow-title_light.gif" alt=""></h2>
+	<form id="frmLoginFallback" action="{% url facebook_setup %}" method="post" class="cmxform">
+        <input type="hidden" name="login" value="true" id="login">
+        {% for field in login_form %}
+		    <div class="page_form_row">
+                {{ field.label_tag }}
+    			<p class="text_input shift">
+                    {{ field }}
+                    {% if field.errors %}
+                        <label class="error" for="id_{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                    {% endif %}
+                </p>
+	    	</div>
+        {% endfor %}
+        {% if next %}
+            <input type="hidden" value="{{ next }}" name="next" />
+        {% endif %}
+		<div class="page_form_row no-pad">
+		    <p class="label">&nbsp;</p>
+			<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-sign_in.jpg" name="submit" /></p>
+		</div>
+	</form>
+        
+    <h2 class="smaller">2. Connect your Facebook account with a new {{ site_name }} account <img width="9" height="8" src="/media/bcms/images/arrow-title_light.gif" alt=""></h2>
+    <form id="frmRegister" action="{% url facebook_setup %}" class="cmxform" method="post">
+        <input type="hidden" name="register" value="true" id="register">
+        {% with registration_form.username as field %}
+            <div class="page_form_row">
+                {{ field.label_tag }}
+                <p class="text_input shift">
+                    {{ field }}
+                    {% if field.errors %}
+                        <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                    {% endif %}
+                </p>
+                {% if field.help_text %}
+                    <p class="note">
+                        {{ field.help_text }}
+                    </p>
+                {% endif %}
+            </div>
+        {% endwith %}
+        {% with registration_form.email as field %}
+            <div class="page_form_row">
+                {{ field.label_tag }}
+                <p class="text_input shift">
+                    {{ field }}
+                    {% if field.errors %}
+                        <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                    {% endif %}
+                </p>
+                {% if field.help_text %}
+                    <p class="note">
+                        {{ field.help_text }}
+                    </p>
+                {% endif %}
+            </div>
+        {% endwith %}
+        {% with registration_form.email_subscribe as field %}
+    	    <div class="page_form_row">
+			    <label for="email_alerts">Opt Ins:</label>
+    	    	<p class="checkbox_short">{{ field }} {{ field.help_text }}</p>
+    	    	<p class="checkbox_short no-marg">{{ registration_form.sms_subscribe }} {{ registration_form.sms_subscribe.help_text }}</p>
+    	    </div>
+        {% endwith %}
+        {% with registration_form.use_facebook_picture as field %}
+    	    <div class="page_form_row">
+                {{ field.label_tag }}
+    	    	<p class="checkbox">{{ field }} {{ field.help_text }}</p>
+    	    </div>
+        {% endwith %}
+        {% with registration_form.accept_terms as field %}
+    	    <div class="page_form_row">
+                {{ field.label_tag }}
+    	    	<p class="checkbox">{{ field }} {{ field.help_text }}
+                    {% if field.errors %}
+                        <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0|safe }}</label>
+                    {% endif %}                
+                </p>
+    	    </div>
+        {% endwith %}
+        <div class="page_form_row no-pad">
+            <p class="label">&nbsp;</p>
+            <p class="btn"><input type="image" src="/media/bcms/images/forms/btn-submit.jpg" name="submit" /></p>
+        </div>
+    </form>
+</div>
