@@ -6,6 +6,7 @@ from django import template
 from django.conf import settings
 from django.contrib import auth
 from django.contrib import comments
+from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.comments import signals
@@ -55,6 +56,30 @@ from broadcastcms.utils.decorators import ajax_required
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
 import utils
+
+def facebook_login_redirect(request, redirect_url=None):
+    """
+    Determines whether or not to redirect to account setup view
+    after facebook login. Returns json fo the form 
+    {'new_user': True/False, 'redirect': 'some/url/'}
+    """
+    # User is logging in
+    url = reverse('facebook_setup')
+    if request.POST.get(REDIRECT_FIELD_NAME,False):
+        url += "?%s=%s" % (REDIRECT_FIELD_NAME, request.POST[REDIRECT_FIELD_NAME])
+    elif redirect_url:
+        url += "?%s=%s" % (REDIRECT_FIELD_NAME, redirect_url)
+    user = authenticate(request=request)
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+            # Redirect to a success page.
+            return HttpResponse(simplejson.dumps({"new_user": False, "redirect": url}))
+        else:
+            raise FacebookAuthError('This account is disabled.')
+    elif request.facebook.uid:
+        #we have to set this user up
+        return HttpResponse(simplejson.dumps({"new_user": True, "redirect": url}))
 
 def resolve_pattern(request):
     from django.core import urlresolvers
