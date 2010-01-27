@@ -150,6 +150,15 @@ def ssi_status_update_node(request):
     """
     return obj_render_content_wrapper(request, StatusUpdateNode())
 
+@cache_for_nginx(60*1)
+def ssi_widget(request, slug):
+    """
+    Returns a widgets render_content response.
+    """
+    from broadcastcms.widgets.models import Widget
+    widget = get_object_or_404(Widget, slug=slug).get_leaf()
+    return obj_render_content_wrapper(request, widget)
+
 @cache_for_nginx(60*10)
 def session_your_friends(request):
     """
