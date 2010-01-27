@@ -117,7 +117,11 @@ def resolve_pattern(request):
 def layout_view(request):
     from broadcastcms.widgets.models import Layout
     pattern = resolve_pattern(request)
-    layout = get_object_or_404(Layout, view_name=pattern.name, is_public=True)
+    layout = Layout.permitted.filter(view_name=pattern.name)
+    if layout:
+        layout = layout[0]
+    else:
+        raise NotImplementedError("Layout not configured for view '%s'" % pattern.name)
     return layout.as_leaf_class().render(request)
 
 def obj_render_wrapper(request, obj, context=None):
