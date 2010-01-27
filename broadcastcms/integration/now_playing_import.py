@@ -1,6 +1,7 @@
 import urllib
 import xml.dom.minidom
 from random import randint
+from datetime import datetime, timedelta
 
 from broadcastcms.radio.models import Artist, Song, Credit
 from broadcastcms.calendar.models import Entry
@@ -13,7 +14,6 @@ def fetch_dom():
         return None
     return dom
     
-
 def get_text_by_tag_name(parent, name):
     elements = parent.getElementsByTagName(name)
     if elements:
@@ -87,6 +87,54 @@ def import_now_playing():
                     song = create_song(artist_title, song_title, "Performer")
                     entry, entry_created = Entry.objects.get_or_create(start=start, end=end, content=song, is_public=True)
 
+    if entry_created:
+        print "Created entry %s for song %s" % (entry, song)
+    else:
+        print "No import made"
+
+def import_now_playing_rcs(feed_url):
+    data = urllib.urlopen('%s?%s' % (feed_url, randint(0, 99999))).read()
+    parts_per_element = 7
+
+    split_elements = []
+    for element in data.split('     '):
+        if element:
+            split_elements.append(element.lstrip(' '))
+
+    slices = range(0, len(split_elements), parts_per_element)
+    feed_items = []
+    for slice_start in slices:
+        feed_items.append(split_elements[slice_start: slice_start + parts_per_element])
+
+    for feed_item in feed_items:
+        if feed_item[2].lower() == 'song':
+            artist_title = feed_item[3]
+            song_title = feed_item[4]
+            length = feed_item[5]
+            valid_song = True
+            break
+
+
+
+    if valid_song:
+        
+        # calculate start and end times. since the feed doesn't include exact play times,
+        # we let the imported song's start time be import time (now)
+        now = datetime.now()
+        start = now
+        minutes = int(length.split(':')[0])
+        seconds = int(length.split(':')[1].split('.')[0])
+        length = timedelta(minutes=minutes, seconds=seconds)
+        end = start + length
+       
+        # create song if it's not still playing
+        song = create_song(artist_title, song_title, "Performer")
+        existing_entries = Entry.objects.permitted().by_content_type(Song).now().filter(content=song)
+        if not existing_entries:
+            entry, entry_created = Entry.objects.get_or_create(start=start, end=end, content=song, is_public=True)
+        else:
+            entry_created = False
+        
     if entry_created:
         print "Created entry %s for song %s" % (entry, song)
     else:
