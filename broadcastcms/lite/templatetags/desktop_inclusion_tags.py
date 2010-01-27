@@ -50,12 +50,12 @@ class AccountLinksNode(SSIContentResolver, template.Node):
             messages = Thread.objects.unread(user).count()
             username = user.username
             limited_username = "%s..." % username[:10] if len(username) > 10 else username
-        
+       
         context.update({
             'user': user,
             'limited_username': limited_username,
             'profile': profile,
-            'fb_authenticated': request.fb_authenticated,
+            'fb_authenticated': request.facebook.check_session(request),
             'messages': messages,
         })
         return render_to_string('desktop/inclusion_tags/skeleton/account_links.html', context)
