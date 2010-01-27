@@ -1,22 +1,28 @@
 from datetime import datetime
 import inspect, sys
 
+from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.query import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 
+from facebookconnect.models import FacebookProfile
+
 from broadcastcms.base.models import ModelBase, ContentBase
 from broadcastcms.calendar.models import Entry
 from broadcastcms.lite.desktop_urls import urlpatterns
+from broadcastcms.lite.forms import FacebookRegistrationForm, LoginForm
 from broadcastcms.radio.models import Song
 from broadcastcms.show.models import Show
-
-from utils import SSIContentResolver
         
+from utils import SSIContentResolver
 
 VIEW_CHOICES = []
 for pattern in urlpatterns:
@@ -102,6 +108,117 @@ class BannerWidget(Widget):
             'content': self.content.as_leaf_class(),
         }
         return render_to_string('widgets/widgets/banner.html', context)
+
+class FacebookSetupWidget(Widget):
+    class Meta():
+        verbose_name = 'Facebook Setup Widget'
+        verbose_name_plural = 'Facebook Setup Widgets'
+    
+    def render_content(self, context):
+        """
+        This is a customization of facebookconnect.views.setup to suit our particular needs
+        """
+        request = context['request']
+        redirect_url = None
+
+        #you need to be logged into facebook.
+        if not request.facebook.uid:
+            url = reverse('account_login')
+            if request.REQUEST.get(REDIRECT_FIELD_NAME,False):
+                url += "?%s=%s" % (REDIRECT_FIELD_NAME, request.REQUEST[REDIRECT_FIELD_NAME])
+            return HttpResponseRedirect(url)
+
+        #setup forms
+        login_form = LoginForm()
+        registration_form = FacebookRegistrationForm()
+
+        #figure out where to go after setup
+        if request.REQUEST.get(REDIRECT_FIELD_NAME,False):
+            redirect_url = request.REQUEST[REDIRECT_FIELD_NAME]
+        elif redirect_url is None:
+            redirect_url = getattr(settings, "LOGIN_REDIRECT_URL", "/")
+
+        #check that this fb user is not already in the system
+        try:
+            FacebookProfile.objects.get(facebook_id=request.facebook.uid)
+            # already setup, move along please
+            return HttpResponseRedirect(redirect_url)
+        except FacebookProfile.DoesNotExist, e:
+            # not in the db, ok to continue
+            pass
+
+        #user submitted a form - which one?
+        if request.method == "POST":
+            # user setup his/her own local account in addition to their facebook
+            # account. The user will have to login with facebook unless they 
+            # reset their password.
+            if request.POST.get('register',False):
+                profile = FacebookProfile(facebook_id=request.facebook.uid)
+                fname = lname = ''
+                if profile.first_name != "(Private)":
+                    fname = profile.first_name
+                if profile.last_name != "(Private)":
+                    lname = profile.last_name
+                user = User(first_name=fname, last_name=lname)
+                registration_form = FacebookRegistrationForm(
+                                            data=request.POST, instance=user)
+                if registration_form.is_valid():
+                    user = registration_form.save()
+                    profile.user = user
+                    profile.save()
+                    login(request, authenticate(request=request))
+                    return HttpResponseRedirect(redirect_url)
+            
+            #user logs in in with an existing account, and the two are linked.
+            elif request.POST.get('login',False):
+                login_form = LoginForm(data=request.POST)
+
+                if login_form.is_valid():
+                    username = login_form.cleaned_data['username']
+                    password = login_form.cleaned_data['password']
+                    user = authenticate(username=username, password=password)
+                    if user and user.is_active:
+                        FacebookProfile.objects.get_or_create(user=user, facebook_id=request.facebook.uid)
+                        login(request, user)
+                        return HttpResponseRedirect(redirect_url)
+                    else:
+                        login_form._errors['username'] = ['Incorrect username or password.',]
+    
+        #user didn't submit a form, but is logged in already. We'll just link up their facebook
+        #account automatically.
+        elif request.user.is_authenticated():
+            try:
+                request.user.facebook_profile
+            except FacebookProfile.DoesNotExist:
+                profile = FacebookProfile(facebook_id=request.facebook.uid)
+                profile.user = request.user
+                profile.save()
+
+            return HttpResponseRedirect(redirect_url)
+    
+        # user just showed up
+        else:
+            request.user.facebook_profile = profile = FacebookProfile(facebook_id=request.facebook.uid)
+            login_form = LoginForm()
+            fname = lname = ''
+            if profile.first_name != "(Private)":
+                fname = profile.first_name
+            if profile.last_name != "(Private)":
+                lname = profile.last_name
+            user = User(first_name=fname, last_name=lname)
+            registration_form = FacebookRegistrationForm(instance=user)
+    
+    
+        template_dict = {
+            "login_form": login_form,
+            "registration_form": registration_form
+        }
+    
+        # we only need to set next if its been passed in the querystring or post vars
+        if request.REQUEST.get(REDIRECT_FIELD_NAME, False):
+            template_dict.update( {REDIRECT_FIELD_NAME: request.REQUEST[REDIRECT_FIELD_NAME]})
+        
+        return render_to_string('widgets/widgets/facebook_setup.html', template_dict, context_instance=context)
 
 class FriendsWidget(Widget):
     class Meta():
@@ -358,13 +475,30 @@ class LayoutTopLeftRight(Layout):
         return "%s for Unkown View" % self._meta.verbose_name
 
     def render(self, request):
+        context = RequestContext(request)
+        
+        #build top widgets
+        top_widgets = self.top_widgets.permitted().order_by('top_widgets_slots__position')
+        top_widgets = [widget.render(context) for widget in top_widgets]
+        #build left widgets
+        left_widgets = self.left_widgets.permitted().order_by('left_widgets_slots__position')
+        left_widgets = [widget.render(context) for widget in left_widgets]
+        #build right widgets
+        right_widgets = self.right_widgets.permitted().order_by('right_widgets_slots__position')
+        right_widgets = [widget.render(context) for widget in right_widgets]
+
+        #widgets returning a redirect should cause the page to redirect
+        for widget in top_widgets + left_widgets + right_widgets:
+            if isinstance(widget, HttpResponseRedirect):
+                return widget
+        
         return render_to_response(
             'widgets/layout/top_left_right.html', 
             {  
                 'layout': self,
-                'top_widgets': self.top_widgets.permitted().order_by('top_widgets_slots__position'),
-                'left_widgets': self.left_widgets.permitted().order_by('left_widgets_slots__position'),
-                'right_widgets': self.right_widgets.permitted().order_by('right_widgets_slots__position'),
+                'top_widgets': top_widgets,
+                'left_widgets': left_widgets,
+                'right_widgets': right_widgets,
             }, 
             context_instance=RequestContext(request)
         )
