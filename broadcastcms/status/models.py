@@ -1,11 +1,13 @@
 from datetime import datetime
+import re
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import simplejson as json
-
+from django.utils.html import urlize
+from django.utils.safestring import mark_safe
+        
 from broadcastcms.status.managers import StatusUpdateManager
-
 
 class StatusUpdate(models.Model):
     SITE_SOURCE = 0
@@ -41,3 +43,15 @@ class StatusUpdate(models.Model):
     def _set_extra_data(self, value):
         self.raw_extra_data = json.dumps(value)
     extra_data = property(_get_extra_data, _set_extra_data)
+
+    def urlize_text(self):
+        """
+        Urlizes links, including twitter links(see http://www.djangosnippets.org/snippets/1445/)
+        """
+        urlized_text = urlize(self.text, nofollow=True)
+        if self.source == self.TWITTER_SOURCE:
+            urlized_text = re.sub(r'(\s+|\A)@([a-zA-Z0-9\-_]*)\b',r'\1<a href="http://twitter.com/\2">@\2</a>', urlized_text)
+            # Link hash tags
+            urlized_text = re.sub(r'(\s+|\A)#([a-zA-Z0-9\-_]*)\b',r'\1<a href="http://search.twitter.com/search?q=%23\2">#\2</a>', urlized_text)
+
+        return mark_safe(urlized_text)
