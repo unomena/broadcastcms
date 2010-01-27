@@ -5,18 +5,18 @@
 {% block content_body %}
     
     {% for widget in top_widgets %}
-        {% call_view widget.as_leaf_class render %}
+        {{ widget|safe }}
     {% endfor %}
 
     <div class="mast_left{% if not layout.background %} no-bg{% endif %}">
         {% for widget in left_widgets %}
-            {% call_view widget.as_leaf_class render %}
+            {{ widget|safe }}
         {% endfor %}
 	</div><!--/MAST_LEFT-->
 	
     <div class="mast_right">
         {% for widget in right_widgets %}
-            {% call_view widget.as_leaf_class render %}
+            {{ widget|safe }}
         {% endfor %}
 	</div><!--/MAST_RIGHT-->
 {% endblock %}
