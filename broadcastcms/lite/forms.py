@@ -9,6 +9,7 @@ from django.core.mail import EmailMessage, mail_managers
 
 from friends.models import Friendship
 from user_messages.forms import NewMessageFormMultiple
+from facebookconnect.forms import FacebookUserCreationForm
 
 from broadcastcms.competition.models import CompetitionEntry
 from broadcastcms.event.models import Province
@@ -16,6 +17,60 @@ from broadcastcms.fields import formfields
 from broadcastcms.integration.captchas import ReCaptcha
 
 from models import Settings
+
+class FacebookRegistrationForm(FacebookUserCreationForm):
+    username = formfields.UsernameField(
+        max_length=100,
+        label='Username:',
+        help_text='Must be at least 4 characters, letters, numbers and underscores only.',
+        widget=forms.TextInput(attrs={'class':'required'}),
+        error_messages={
+            'required': 'Please enter a username.',
+            'invalid_length': 'Please enter at least 4 characters.',
+            'invalid_characters': 'Only letters, numbers and underscores.',
+            'existing': 'Sorry, that username already exists.',
+        }
+    )
+    email = forms.EmailField(
+        max_length=100,
+        label='Email:',
+        help_text='We will send you account notices here - so make sure its good.',
+        widget=forms.TextInput(attrs={'class':'required email'}),
+        error_messages={'required': 'Please enter your email address.'}
+    )
+    email_subscribe = forms.BooleanField(
+        required=False,
+        label='Email Subscribe',
+        help_text='Send Me Email Alerts.',
+    )
+    sms_subscribe = forms.BooleanField(
+        required=False,
+        label='SMS Subscribe',
+        help_text='Send Me SMS Alerts.',
+    )
+    accept_terms = forms.BooleanField(
+        label='Legal Stuff:',
+        help_text='I agree to the website terms of use.',
+        widget=forms.CheckboxInput(attrs={'class':'required'}),
+        error_messages={'required': 'Please accept our terms &amp; conditions to continue.'}
+    )
+    use_facebook_picture = forms.BooleanField(
+        required = False,
+        label='Facebook Options:',
+        help_text = "I want to use my Facebook picture on this site."
+    )
+    
+    def save(self):
+        user = super(FacebookRegistrationForm, self).save()
+
+        # Create profile
+        profile = user.profile
+        profile.email_subscribe = self.cleaned_data["email_subscribe"]
+        profile.sms_subscribe = self.cleaned_data["sms_subscribe"]
+        profile.use_facebook_picture = self.cleaned_data["use_facebook_picture"]
+        profile.save()
+        
+        return user
 
 class LoginForm(forms.Form):
     username = forms.CharField(
