@@ -45,19 +45,13 @@ ssi_urls = patterns('',
     #url(r'^status-updates/$', session_status_updates, name='session_status_updates'),
 )
 
-#from broadcastcms.widgets.widgets import Advert, NewsCompetitionsEvents, StatusUpdates, YourFriends
-#home_args = {
-#    'widgets': {
-#        'left': (NewsCompetitionsEvents(),),
-#        'right': (Advert(), YourFriends(), StatusUpdates()),
-#    }, 
-#}
-
+from facebookconnect.views import facebook_login,facebook_logout,setup
 urlpatterns = patterns('',
-    #url(r'^$', top_left_right, home_args, name='home'),
     url(r'^$', layout_view, name='home'),
     
-    url(r'^facebook/', include('broadcastcms.facebook_integration.urls')),
+    url(r'^facebook/setup/$', layout_view, name="facebook_setup"),
+    url(r'^facebook/login-redirect/$', facebook_login_redirect, name="facebook_login_redirect"),
+    (r'^facebook/', include('facebookconnect.urls')),
     
     url(r'comment-add/$', comment_add, name='comment_add'),
     
@@ -70,7 +64,6 @@ urlpatterns = patterns('',
     url(r'^account/settings/image/$', account_settings_image, name='account_settings_image'),
     url(r'^account/settings/details/$', account_settings_details, name='account_settings_details'),
     url(r'^account/settings/subscriptions/$', account_settings_subscriptions, name='account_settings_subscriptions'),
-    #url(r'^account/friends/my/$', account_friends_my, name='account_friends_my'),
     url(r'^account/friends/my/$', layout_view, name='account_friends_my'),
     url(r'^account/friends/activity/all/$', account_friends_activity_all, name='account_friends_activity_all'),
     url(r'^account/friends/activity/(?P<user_pk>[\w-]+)/$', account_friends_activity, name='account_friends_activity'),
