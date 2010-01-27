@@ -6,7 +6,6 @@ SCRIPT_PATH =  path.abspath(path.dirname(__file__))
 BUILDOUT_PATH =  path.split(path.abspath(path.join(path.dirname(sys.argv[0]))))[0]
 
 # Django settings for broadcastcmslite project.
-
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -55,14 +54,16 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'facebook.djangofb.FacebookMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'broadcastcms.facebook_integration.middleware.FacebookConnectMiddleware',
-    'broadcastcms.lite.middleware.URLSwitchMiddleware',
+    'facebookconnect.middleware.FacebookConnectMiddleware'
+    #'broadcastcms.lite.middleware.URLSwitchMiddleware',
 )
 
 LOGIN_URL = '/account/login'
+LOGIN_REDIRECT_URL = '/'
 
 ROOT_URLCONF = 'broadcastcms.lite.desktop_urls'
 
@@ -107,12 +108,12 @@ INSTALLED_APPS = (
     'haystack',
     'friends',
     'user_messages',
+    'facebookconnect',
 
     'broadcastcms.banner',
     'broadcastcms.base',
     'broadcastcms.calendar',
     'broadcastcms.competition',
-    'broadcastcms.facebook_integration',
     'broadcastcms.gallery',
     'broadcastcms.event',
     'broadcastcms.label',
@@ -204,7 +205,13 @@ IMAGE_SCALES = {
 }
 
 FACEBOOK_API_KEY = '76f92b0c84d3d371ee18175e2be1c3bc'
-
-FACEBOOK_API_SECRET = 'd3ac4c835b56590bc5aef8dfa04717e8'
+FACEBOOK_SECRET_KEY = 'd3ac4c835b56590bc5aef8dfa04717e8'
+FACEBOOK_INTERNAL = True
+FACEBOOK_CACHE_TIMEOUT = 1800
 
 SSI_ENABLED = True
+
+AUTHENTICATION_BACKENDS = (
+    'facebookconnect.models.FacebookBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
