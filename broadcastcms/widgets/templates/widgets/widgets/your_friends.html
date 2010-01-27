@@ -1,0 +1,26 @@
+{% load template_tags %}
+<span class="auth_reload" src="{{ widget.get_ssi_url }}">
+    <div class="updates friends purple">
+        {% if request.user.is_authenticated %}
+            {% if friends %}
+                <h1>Your Friends <span>({{ friends_count }})</span></h1>
+            	<ul>
+                    {% for friend in friends %}
+                        {% with friend.profile as profile %}
+            	        <li><a href="{% url account_friends_activity friend.pk %}">
+                            {% profile_image profile 50 50 %}
+                        </a></li>
+                    {% endwith %}
+                    {% endfor %}
+	            </ul>
+        	    <p class="updates_more"><a href="{% url account_friends_my %}">View all Friends</a><a href="{% url account_friends_find %}">Find more Friends</a></p>
+            {% else %}
+                <h1>Your Friends</h1>
+        	    <p class="updates_more" style="width: 100%;"><a href="{% url account_friends_find %}" style="width: 100%;">You don't have any friends. Go find some now.</a></p>
+            {% endif %}
+        {% else %}
+            <h1>Your Friends</h1>
+        	<p class="updates_more" style="width: 100%;"><a href="{% url modals_login %}?height=370&amp;width=540" class="thickbox" style="width: 100%;">Sign in to view Your Friends</a></p>
+        {% endif %}
+    </div><!--/Updates-->
+</span>
