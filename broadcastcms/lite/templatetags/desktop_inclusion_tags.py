@@ -150,6 +150,36 @@ class MastfootNode(template.Node):
         return render_to_string('desktop/inclusion_tags/skeleton/mastfoot.html', context)
 
 @register.tag
+def mastfoot_popup(parser, token):
+    return MastfootPopupNode()
+
+class MastfootPopupNode(template.Node):
+    def render(self, context):
+        """
+        Renders the popup footer.
+        Copyright Year is rendered dynamically.
+        Mobile version link is rendered only when settings.MOBILE_HOSTNAME has been defined.
+        T&C, Privacy Policy, links are rendered only when appropriate content has been provided
+        in site settings object.
+        """
+        site_settings = context['settings']
+        terms = site_settings.terms
+        privacy = site_settings.privacy
+        
+        # build the mobile url from settings.MOBILE_HOSTNAME
+        mobile_hostname = getattr(settings, 'MOBILE_HOSTNAME', None)
+        mobile_url = 'http://%s' % mobile_hostname if mobile_hostname else None
+
+        context = {
+            'terms': terms,
+            'privacy': privacy,
+            'terms_and_privacy': (terms and privacy),
+            'terms_or_privacy': (terms or privacy),
+            'mobile_url': mobile_url,
+        }
+        return render_to_string('desktop/inclusion_tags/skeleton/mastfoot.html', context)
+
+@register.tag
 def metrics(parser, token):
     return MetricsNode()
 
