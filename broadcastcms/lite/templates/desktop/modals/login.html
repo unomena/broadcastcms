@@ -1,4 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{% load facebook_tags %}
 
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 <head>
@@ -11,7 +12,6 @@
 </head>
 
 <body>
-    {% url facebook_success_login as facebook_login_success_url %}
 	<div class="modal">
 		<div class="modal_title">
 			<h1>Sign In</h1>
@@ -36,13 +36,7 @@
             </div>
 			<div class="facebook_connect_short">Facebook user? Sign in using Facebook: <fb:login-button v="2" size="medium" onlogin="facebookModalLogin();">Connect</fb:login-button></div>
 		</form>
-		
-		{% if FACEBOOK_API_KEY %}
-		    <script type="text/javascript">
-                FB.init("{{ FACEBOOK_API_KEY }}", "{% url facebook_xd_receiver %}");
-            </script>
-        {% endif %}
-	    
+        {% initialize_facebook_connect %}
 	</div><!--/MODAL-->
 </body>
 </html>
