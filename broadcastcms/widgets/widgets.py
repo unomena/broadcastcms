@@ -50,31 +50,3 @@ from broadcastcms.status.models import StatusUpdate
 #        settings = context['settings']
 #        banners = settings.get_section_banners(section)
 #        return banners[0].render() if banners else ""
-
-
-#class YourFriends(SSIContentResolver):
-#    """
-#    Renders friends listing for currently logged in user.
-#    If anonymous renders link to find friends page.
-#    """
-#    def get_absolute_url(self):
-#        return reverse('session_your_friends')
-#
-#    @cache_view_function(10*60, respect_user=True)
-#    def render_content(self, context):
-#        """
-#        Renders the widget.
-#        """
-#        request = context['request']
-#        user = request.user
-#       
-#        if user.is_authenticated():
-#            friends = Friendship.objects.friends_for_user(user)
-#            friends_count = len(friends)
-#            friends = [friend['friend'] for friend in friends][:10]
-#    
-#            context.update({
-#                'friends': friends,
-#                'friends_count': friends_count
-#            })
-#        return render_to_string('your_friends.html', context)
