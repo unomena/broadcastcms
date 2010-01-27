@@ -10,7 +10,7 @@
     </p>
 	<p class="update_content">
         <a href="{% url account_friends_activity user.pk %}">{{ user.username }}</a> 
-	    <span class="update_text">{{ object.text }}</span>
+	    <span class="update_text">{{ object.urlize_text|safe }}</span>
 		<span class="update_meta">{{ object.timestamp|timesince }} Ago {% ifequal object.source 1 %} via Twitter {% endifequal %}| <a href="#" class="update_meta_like">{{ score.score }}</a></span>
 		<span class="update_btns">
 			<a href="{{ retweet_url }}" class="update_btn_retweet">Retweet</a>
