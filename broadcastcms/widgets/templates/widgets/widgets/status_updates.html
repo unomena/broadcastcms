@@ -1,0 +1,38 @@
+{% load public_tags %}
+
+<span class="auth_reload" src="{% url ssi_widget widget.slug %}">
+    {% if castmember_updates or friends_updates %}
+        <div class="updates global green">
+            <h1>Update Stream</h1>
+        	<ul class="global_updates_nav">
+                {% if castmember_updates %}
+    	            <li class="dj_updates"><a href="#" rel="#dj_updates">DJ's</a></li>
+                {% endif %}
+                {% if friends_updates %}
+        	    	<li class="friend_updates"><a href="#" rel="#friend_updates">Your Friends</a></li>
+                {% endif %}
+    	    </ul>
+            {% if castmember_updates %}
+            	<div class="global_updates" id="dj_updates">
+                    {% for update in castmember_updates %}
+                        {% call_view update render_updates %}
+                    {% endfor %}
+	            </div>
+            {% endif %}
+            {% if friends_updates %}
+        	    <div class="global_updates" id="friend_updates">
+                    {% for update in friends_updates %}
+                        {% call_view update render_updates %}
+                    {% endfor %}
+    	        </div>
+            {% endif %}
+            <p class="updates_more"><a class="latest_status_update" href="{% url account_history %}">View Your Status Updates</a></p>
+        	<p class="clearfix"></p>
+        </div><!--/Updates-->
+        <script type="text/javascript">
+            $(document).ready(function () {
+        	    jQuery("ul.global_updates_nav a:first").click()
+            });
+        </script>
+    {% endif %}
+</span>

@@ -1,0 +1,99 @@
+{% load scaled_image_tags comments voting_tags public_tags %}
+
+{% with news_panel as panel %}
+    <div class="updates pink">
+        <div id="slider">    
+	        <h1>Latest News</h1>
+	    	{% if panel.render_controls %}
+                <div class="scroll_nav">
+	                <ul class="navigation">
+                        {% for panel in panel.panels %}
+    	                    <li><a href="#panel{{ forloop.counter }}"></a></li>
+                        {% endfor %}
+	                </ul>
+		        </div>
+            {% endif %}
+    	    <div class="scroll">
+	            <div class="scroll_container">
+                    {% for panel in panel.panels %}        
+    		            <div class="panel" id="panel{{ forloop.counter }}">
+                            {% for object in panel %}
+                                {% if forloop.first %}
+                                    <div class="chunk_item">
+                                        <div class="chunk_body_first">
+                                    	    <p class="upd_pic"><a href="{% call_view object url %}"><img src="{% scaled_image_url object 150 84 %}" width="150" height="84" alt="" /></a></p>
+                                    		<p class="upd_cat"><span class="upd_catname">{{ object.labels.visible.0.title }}</a></span></p>
+                                	    	<h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
+                                    	</div>
+                                    </div>
+                                {% else %}
+                                    {% get_comment_count for object as comment_count %}
+                                    {% score_for_object object.contentbase as score %}
+                                    <div class="chunk_item">
+                                        <div class="chunk_body">
+	                                        <p class="upd_pic"><a href="{% call_view object url %}"><img src="{% scaled_image_url object 107 60 %}" width="107" height="60" alt="" /></a></p>
+                                        	<p class="upd_cat"><span class="upd_catname"><a>{{ object.labels.visible.0.title }}</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="{{ url }}#comments">{{ comment_count }} Comments</a> | <a href="{% url modals_content object.slug %}?height=600&amp;width=720" class="thickbox">Peek &raquo;</a></span></p>
+	                                        <h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+	        			</div><!--/tray-->
+                    {% endfor %}
+    	        </div>
+            </div>
+	    </div><!--/slider-->
+		<p class="updates_more"><a href="{% url news %}">View all News Items</a></p>
+	</div><!--/Updates-->
+	<script type="text/javascript" src="/media/bcms/includes/coda-slider.js"></script>
+{% endwith %}
+
+<div class="updates align-right events yellow">
+    <h1>Competitions</h1>
+    {% for object in competitions %}
+        {% if forloop.first %}
+            <div class="chunk_item">
+                <div class="chunk_body_first">
+                    <p class="upd_pic"><a href="{% call_view object url %}"><img src="{% scaled_image_url object 150 84 %}" width="150" height="84" alt="" /></a></p>
+                    <p class="upd_cat"><span class="upd_catname">{{ object.labels.visible.0.title }}</a></span></p>
+                    <h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
+                </div>
+            </div>
+        {% else %}
+            {% get_comment_count for object as comment_count %}
+            {% score_for_object object.contentbase as score %}
+            <div class="chunk_item">
+                <div class="chunk_body">
+                    <p class="upd_cat"><span class="upd_catname"><a>{{ object.labels.visible.0.title }}</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="{{ url }}#comments">{{ comment_count }} Comments</a> | <a href="{% url modals_content object.slug %}?height=600&amp;width=720" class="thickbox">Peek &raquo;</a></span></p>
+	                <h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+	<p class="updates_more"><a href="{% url competitions %}">View all Competitions</a></p>
+</div><!--/Updates-->
+
+<div class="updates align-right events blue">
+    <h1>Events</h1>
+    {% for object in events %}
+        {% if forloop.first %}
+            <div class="chunk_item">
+                <div class="chunk_body_first">
+                    <p class="upd_pic"><a href="{% call_view object url %}"><img src="{% scaled_image_url object 150 84 %}" width="150" height="84" alt="" /></a></p>
+                    <p class="upd_cat"><span class="upd_catname">{{ object.labels.visible.0.title }}</a></span></p>
+                    <h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
+                </div>
+            </div>
+        {% else %}
+            {% get_comment_count for object as comment_count %}
+            {% score_for_object object.contentbase as score %}
+            <div class="chunk_item">
+                <div class="chunk_body">
+                    <p class="upd_cat"><span class="upd_catname"><a>{{ object.labels.visible.0.title }}</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="{{ url }}#comments">{{ comment_count }} Comments</a> | <a href="{% url modals_content object.slug %}?height=600&amp;width=720" class="thickbox">Peek &raquo;</a></span></p>
+	                <h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+	<p class="updates_more"><a href="{% url events %}">View all Upcoming Events</a></p>
+</div><!--/Updates-->
