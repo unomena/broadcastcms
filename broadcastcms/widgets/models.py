@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.query import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
@@ -16,6 +16,7 @@ from django.template import RequestContext
 from facebookconnect.models import FacebookProfile
 from friends.models import Friendship
 
+from broadcastcms.activity.models import ActivityEvent
 from broadcastcms.base.models import ModelBase, ContentBase
 from broadcastcms.calendar.models import Entry
 from broadcastcms.competition.models import Competition
@@ -26,6 +27,7 @@ from broadcastcms.lite.forms import FacebookRegistrationForm, LoginForm
 from broadcastcms.radio.models import Song
 from broadcastcms.show.models import Credit, Show
 from broadcastcms.status.models import StatusUpdate
+from broadcastcms.lite import utils
         
 from utils import SSIContentResolver
 
@@ -52,7 +54,7 @@ class AccountMenuWidget(Widget):
         verbose_name = 'Account Menu Widget'
         verbose_name_plural = 'Account Menu Widgets'
    
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         from user_messages.models import Thread
         request = context['request']
         
@@ -107,7 +109,7 @@ class BannerWidget(Widget):
         verbose_name = 'Banner Widget'
         verbose_name_plural = 'Banner Widgets'
 
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         context = {
             'widget': self,
             'content': self.content.as_leaf_class(),
@@ -121,7 +123,7 @@ class EmbedWidget(Widget):
         verbose_name = 'Embed Widget'
         verbose_name_plural = 'Embed Widgets'
 
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         context = {
             'widget': self,
         }
@@ -132,7 +134,7 @@ class FacebookSetupWidget(Widget):
         verbose_name = 'Facebook Setup Widget'
         verbose_name_plural = 'Facebook Setup Widgets'
     
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         """
         This is a customization of facebookconnect.views.setup to suit our particular needs
         """
@@ -239,11 +241,14 @@ class FacebookSetupWidget(Widget):
         return render_to_string('widgets/widgets/facebook_setup.html', template_dict, context_instance=context)
 
 class FriendsWidget(Widget):
+    user_unique = True
+    login_required = True
+    
     class Meta():
         verbose_name = 'Friends Widget'
         verbose_name_plural = 'Friends Widgets'
     
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         from friends.models import Friendship
         from broadcastcms.lite import utils
 
@@ -262,12 +267,98 @@ class FriendsWidget(Widget):
         }
         return render_to_string('widgets/widgets/friends.html', context)
 
+class FriendsActivityWidget(Widget):
+    user_unique = True
+    login_required = True
+    
+    class Meta():
+        verbose_name = 'Friends Activity Widget'
+        verbose_name_plural = 'Friends Activity Widgets'
+    
+    def render_content(self, context, user_pk=None, *args, **kwargs):
+        request = context['request']
+
+        # if we have a user pk list activities for that user only,
+        # otherwise list activities for all friends
+        user = None
+        if user_pk:
+            user = get_object_or_404(User, pk = user_pk)
+            activity_events = ActivityEvent.objects.filter(user=user).order_by('-timestamp')
+        else:
+            friends = Friendship.objects.friends_for_user(request.user)
+            friends = [o["friend"] for o in friends]
+            activity_events = ActivityEvent.objects.filter(user__in=friends).order_by('-timestamp')
+    
+        # create pager
+        page_obj = utils.paging(activity_events, 'page', request, 10)
+        object_list = page_obj.object_list
+
+        return render_to_string("widgets/widgets/friends_activity.html", {
+            'user': user,
+            "object_list": object_list,
+            "page_obj": page_obj,
+            "show_avatar": not user,
+        }, context_instance=RequestContext(request))
+
+class FriendsFindWidget(Widget):
+    user_unique = True
+    login_required = True
+
+    class Meta():
+        verbose_name = 'Find Friends Widget'
+        verbose_name_plural = 'Find Friends Widgets'
+   
+    def render_content(self, context, *args, **kwargs):
+        request = context['request']
+
+        if request.GET.get('find'):
+            q = request.GET['find']
+            users = User.objects.filter(
+                Q(first_name__icontains=q) |
+                Q(last_name__icontains=q) |
+                Q(username__icontains=q)
+            ).exclude(pk=request.user.pk)
+        else:
+            users = []
+
+        # create pager
+        page_obj = utils.paging(users, 'page', request, 5)
+        users = page_obj.object_list
+
+        return render_to_string('widgets/widgets/friends_find.html', {
+            'users': users,
+            'page_obj': page_obj,
+        }, context_instance=RequestContext(request))
+
+class FriendsFacebookInviteWidget(Widget):
+    user_unique = True
+    login_required = True
+
+    class Meta():
+        verbose_name = 'Find Facebook Friends Widget'
+        verbose_name_plural = 'Find Facebook Friends Widgets'
+   
+    def render_content(self, context, *args, **kwargs):
+        request = context['request']
+
+        if request.method == "POST":
+            fb_ids = request.POST.getlist("ids")
+            for fb_id in fb_ids:
+                FacebookFriendInvite.objects.create(user=request.user,
+                    fb_user_id=fb_id)
+            return HttpResponseRedirect(reverse(invite))
+        return render_to_string(
+            "widgets/widgets/friends_facebook_invite.html", 
+            {}, 
+            context_instance=RequestContext(request)
+        )
+
 class FriendsSideNavWidget(Widget):
     class Meta():
         verbose_name = 'Friends Side Navigation Widget'
         verbose_name_plural = 'Friends Side Navigation Widgets'
     
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         items = [{
                 'title': 'My Friends',
                 'section': 'my',
@@ -294,7 +385,6 @@ class FriendsSideNavWidget(Widget):
             'active_section': context['request'].path.split('/')[3],
         }
         return render_to_string('widgets/widgets/friends_side_nav.html', context)
-
 
 class NewsCompetitionsEvents(Widget):
     """
@@ -360,7 +450,7 @@ class NewsCompetitionsEvents(Widget):
         queryset = queryset[:3]
         return queryset
 
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         """
         Renders the widget.
         """
@@ -395,7 +485,7 @@ class NowPlayingWidget(Widget):
 
         return valid_entry
 
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         # get the current on air show
         show_entry = self.get_public_on_air_entry(Show)
         show = show_entry.content.as_leaf_class() if show_entry else None
@@ -448,7 +538,7 @@ class OnAirWidget(Widget):
         entries = Entry.objects.permitted().by_content_type(content_type).upcoming().filter(content__is_public=True)
         return entries[0] if entries else None
 
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         """
         Renders the widget.
         Returns an empty string if no show is found.
@@ -492,7 +582,7 @@ class SlidingPromoWidget(Widget):
         verbose_name = 'Sliding Promo Widget'
         verbose_name_plural = 'Sliding Promo Widgets'
     
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         """
         Renders the sliding promotions widget. 
         Only public content will render.
@@ -536,7 +626,6 @@ class SlidingPromoWidgetSlot(ModelBase):
         verbose_name = 'Sliding Promo Widget Slot'
         verbose_name_plural = 'Sliding Promo Widget Slots'
 
-
 class StatusUpdates(Widget):
     """
     Renders status updates for DJ's and Friends.
@@ -571,7 +660,7 @@ class StatusUpdates(Widget):
 
         return friends_status_updates
         
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         """
         Renders the widget.
         """
@@ -599,7 +688,7 @@ class YourFriends(Widget):
     def get_ssi_url(self):
         return reverse('ssi_widget', kwargs={'slug': self.slug})
 
-    def render_content(self, context):
+    def render_content(self, context, *args, **kwargs):
         """
         Renders the widget.
         """
@@ -653,18 +742,18 @@ class LayoutTopLeftRight(Layout):
         
         return "%s for Unkown View" % self._meta.verbose_name
 
-    def render(self, request):
+    def render(self, request, *args, **kwargs):
         context = RequestContext(request)
         
         #build top widgets
         top_widgets = self.top_widgets.permitted().order_by('top_widgets_slots__position')
-        top_widgets = [widget.render(context) for widget in top_widgets]
+        top_widgets = [widget.render(context, *args, **kwargs) for widget in top_widgets]
         #build left widgets
         left_widgets = self.left_widgets.permitted().order_by('left_widgets_slots__position')
-        left_widgets = [widget.render(context) for widget in left_widgets]
+        left_widgets = [widget.render(context, *args, **kwargs) for widget in left_widgets]
         #build right widgets
         right_widgets = self.right_widgets.permitted().order_by('right_widgets_slots__position')
-        right_widgets = [widget.render(context) for widget in right_widgets]
+        right_widgets = [widget.render(context, *args, **kwargs) for widget in right_widgets]
 
         #widgets returning a redirect should cause the page to redirect
         for widget in top_widgets + left_widgets + right_widgets:
