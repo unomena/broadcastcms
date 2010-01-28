@@ -729,9 +729,9 @@ class NewMessageFormMultipleFriends(NewMessageFormMultiple):
         self.fields['to_user'].label = 'Recipient/s'
         self.fields['content'].label = 'Message'
         
-        # set field classes
-        self.fields['to_user'].widget = forms.SelectMultiple(attrs={'class':'province'})
-
+        # set error messages
+        self.fields['to_user'].error_messages['invalid_pk_value'] = u'"%s" is not a valid recipient. Please correct or remove and try again.'
+        
         # limit user options to friends
         if self.initial.get('to_user') is None:
             friend_pks = [object['friend'].pk for object in self.fields['to_user'].queryset.friends_for_user(kwargs['user'])]
