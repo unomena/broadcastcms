@@ -15,6 +15,7 @@ from django.template import RequestContext
 
 from facebookconnect.models import FacebookProfile
 from friends.models import Friendship
+from user_messages.models import Message
 
 from broadcastcms.activity.models import ActivityEvent
 from broadcastcms.base.models import ModelBase, ContentBase
@@ -28,6 +29,7 @@ from broadcastcms.radio.models import Song
 from broadcastcms.show.models import Credit, Show
 from broadcastcms.status.models import StatusUpdate
 from broadcastcms.lite import utils
+from broadcastcms.lite.forms import NewMessageFormMultipleFriends
         
 from utils import SSIContentResolver
 
@@ -115,6 +117,76 @@ class BannerWidget(Widget):
             'content': self.content.as_leaf_class(),
         }
         return render_to_string('widgets/widgets/banner.html', context)
+
+class CreateMessageWidget(Widget):
+    user_unique = True
+    login_required = True
+    
+    class Meta():
+        verbose_name = 'Create Message Widget'
+        verbose_name_plural = 'Create Message Widgets'
+    
+    def render_content(self, context, *args, **kwargs):
+        request = context['request']
+        form_class= NewMessageFormMultipleFriends
+        multiple=True
+        user_id=None
+        
+        if user_id is not None:
+            user_id = [int(user_id)]
+        elif 'to_user' in request.GET and request.GET['to_user'].isdigit():
+            to_users = request.POST['to_user']
+            user_id = map(int, request.GET.getlist('to_user'))
+        if not multiple and user_id:
+            user_id = user_id[0]
+        initial = {'to_user': user_id}
+        if request.method == 'POST':
+
+            """
+            Because of the way the js autobox works we can only send through usernames
+            as to_user values. So we need to convert posted usernames into valid user pks.
+            We do not convert invalid usernames but keep them as is to trigger failure 
+            during validation. Because we are altering the POST querydict in username to 
+            pk conversion, we have to reset POST to the original qd in case of validation errors.
+            """
+            original_qd = request.POST.__copy__()
+            
+            if request.POST.has_key('to_user'):
+                friend_pks = [friend['friend'].pk for friend in Friendship.objects.friends_for_user(request.user)]
+
+                to_users = request.POST.getlist('to_user')
+                qs = User.objects.filter(username__in=to_users, pk__in=friend_pks).order_by('username')
+
+                valid_pks = []
+                valid_usernames = []
+                for user in qs:
+                    valid_pks.append(user.pk)
+                    valid_usernames.append(user.username)
+                    
+                invalid_usernames = []
+                for username in to_users:
+                    if username not in valid_usernames:
+                        invalid_usernames.append(username)
+
+
+                to_users = [user.pk for user in qs] + invalid_usernames
+                new_qd = request.POST.__copy__()
+                new_qd.setlist('to_user', to_users)
+                request.POST = new_qd
+
+            form = form_class(request.POST, user=request.user, initial=initial)
+            if form.is_valid():
+                msg = form.save()
+                return HttpResponseRedirect(msg.get_absolute_url())
+            else:
+                form.data = original_qd
+                
+        else:
+            form = form_class(user=request.user, initial=initial)
+
+        return render_to_string('widgets/widgets/create_message.html', {
+            'form': form
+        }, context_instance=RequestContext(request))
 
 class EmbedWidget(Widget):
     code = models.TextField(help_text='The full HTML/Javascript code snippet to be embedded.')
@@ -386,6 +458,52 @@ class FriendsSideNavWidget(Widget):
         }
         return render_to_string('widgets/widgets/friends_side_nav.html', context)
 
+class HistoryWidget(Widget):
+    user_unique = True
+    login_required = True
+    
+    class Meta():
+        verbose_name = 'History Widget'
+        verbose_name_plural = 'History Widgets'
+    
+    def render_content(self, context, *args, **kwargs):
+        request = context['request']
+        
+        activity_events = ActivityEvent.objects.filter(user=request.user).order_by('-timestamp')
+    
+        # create pager
+        page_obj = utils.paging(activity_events, 'page', request, 10)
+        object_list = page_obj.object_list
+
+        return render_to_string("widgets/widgets/history.html", {
+            "object_list": object_list,
+            "page_obj": page_obj,
+            "show_avatar": False,
+        }, context_instance=RequestContext(request))
+
+class InboxWidget(Widget):
+    user_unique = True
+    login_required = True
+    
+    class Meta():
+        verbose_name = 'Inbox Widget'
+        verbose_name_plural = 'Inbox Widgets'
+    
+    def render_content(self, context, *args, **kwargs):
+        request = context['request']
+        user = request.user
+        object_list = Message.objects.filter(thread__users=request.user).exclude(sender=user).order_by('-sent_at')
+    
+        # create pager
+        page_obj = utils.paging(object_list, 'page', request, 5)
+        object_list = page_obj.object_list
+    
+        return render_to_string("widgets/widgets/messages.html", {
+            'object_list': object_list,
+            'view': 'render_listing_inbox',
+            'page_obj': page_obj,
+        }, context_instance=RequestContext(request))
+
 class NewsCompetitionsEvents(Widget):
     """
     Renders the latest news, competitions and events.
@@ -576,6 +694,29 @@ class OnAirWidget(Widget):
             return render_to_string('widgets/widgets/on_air.html', context)
         else:
             return ''
+
+class SentWidget(Widget):
+    user_unique = True
+    login_required = True
+    
+    class Meta():
+        verbose_name = 'Sent Widget'
+        verbose_name_plural = 'Sent Widgets'
+    
+    def render_content(self, context, *args, **kwargs):
+        request = context['request']
+        user = request.user
+        object_list = Message.objects.filter(sender=user).order_by('-sent_at')
+    
+        # create pager
+        page_obj = utils.paging(object_list, 'page', request, 5)
+        object_list = page_obj.object_list
+    
+        return render_to_string("widgets/widgets/messages.html", {
+            'object_list': object_list,
+            'view': 'render_listing_inbox',
+            'page_obj': page_obj,
+        }, context_instance=RequestContext(request))
 
 class SlidingPromoWidget(Widget):
     class Meta():
