@@ -1,0 +1,16 @@
+{% load desktop_inclusion_tags %}
+{% load public_tags %}
+
+<div class="social">
+    <div class="social_body">
+        {% if object_list %}
+            {% social_paging page_obj %}
+            
+            {% for object in object_list %}
+                {% call_view object render_listing %} 
+            {% endfor %}        
+        {% else %}
+	    	<h2 class="smaller no-bg">No entries found. Please check back later.</h2>
+        {% endif %}
+	</div>
+</div><!--/social-->

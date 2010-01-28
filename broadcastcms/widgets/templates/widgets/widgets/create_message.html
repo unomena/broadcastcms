@@ -1,0 +1,108 @@
+{% load desktop_inclusion_tags %}
+{% load friends_tags %}
+    
+<!--Autosuggest-->
+<link rel="stylesheet" type="text/css" href="/media/bcms/includes/jquery.ui.autobox.css" />
+<script type="text/javascript" src="/media/bcms/includes/jquery.templating.js"></script>
+<script type="text/javascript" src="/media/bcms/includes/jquery.ui.autobox.ext.js"></script>
+<script type="text/javascript" src="/media/bcms/includes/jquery.ui.autobox.js"></script>
+
+<script type="text/javascript">
+    $().ready(function() {
+        bindForm();
+           validateMessageCreate();
+   	});
+
+   
+    $(function() {
+        var list1 = [{% for user in form.to_user.field.queryset %}{text: '{{ user.username }}'},{% endfor %}];
+        var box =
+        $("input.autobox.1").autobox({
+            list: list1,
+            match: function(typed) {
+                this.typed = typed;
+                this.pre_match = this.text;
+                this.match = this.post_match = '';
+                if (!this.ajax && !typed || typed.length == 0) { return true; }
+                var match_at = this.text.search(new RegExp("\\b" + typed, "i"));
+                if (match_at != -1) {
+                    this.pre_match = this.text.slice(0,match_at);
+                    this.match = this.text.slice(match_at,match_at + typed.length);
+                    this.post_match = this.text.slice(match_at + typed.length);
+                    return true;
+                }
+                return false;
+            },
+            insertText: function(obj) { return obj.text },
+            templateText: "<li><%= pre_match %><span class='matching' ><%= match %></span><%= post_match %></li>"
+        });
+        {% for item in form.to_user.data %}
+            box[0].addBox('{{ item }}');
+        {% endfor %}
+    }); 
+</script>
+
+<div class="social">
+    {% account_messages_menu %}
+	<div class="social_body" id="new">
+	    <div class="page_form">
+		    <h2 class="smaller no-bg">Compose a new message using the form below.</h2>
+			<p class="thanks">Your message has been sent.</p>
+			<form id="frmMessage" action="#" method="post">
+                {% with form.to_user as field %}
+                    <div class="page_form_row">
+                        <label for="id_to_user">Recipient/s</label>
+                        <p class="text_input">
+                            <input id="id_to_user" type="text" class="autobox 1" name="to_user" />
+                        </p>
+                        {% if field.errors %}
+                            <p class="note error" for="{{ field.name }}" generated="true" style="display: inline;"><br /><br />{{ field.errors.0 }}</p>
+                        {% else %}
+                            <p class="note"><br /><br />(Start typing the name of your friends)</p>
+                        {% endif %}
+                    </div>
+                    <p class="clearfix"></p>
+                {% endwith %}
+                {% with form.subject as field %}
+        		    <div class="page_form_row">
+                        {{ field.label_tag }}
+		    			<p class="text_input">
+                            {{ field }}
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+		       	    	{% if field.help_text %}
+                            <p class="note">
+                                {{ field.help_text }}
+                            </p>
+                        {% endif %}
+			        </div>
+					<p class="clearfix"></p>
+                {% endwith %}
+                {% with form.content as field %}
+        		    <div class="page_form_row">
+                        {{ field.label_tag }}
+		    			<p class="text_area_short">
+                            {{ field }}
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+		        	    {% if field.help_text %}
+                            <p class="note">
+                                {{ field.help_text }}
+                            </p>
+                        {% endif %}
+			        </div>
+					<p class="clearfix"></p>
+                {% endwith %}
+				<div class="page_form_row no-pad">
+				    <p class="label">&nbsp;</p>
+					<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-send_message.jpg" name="submit" /></p>
+				</div>
+			</form>
+			<p class="clearfix"></p>
+		</div><!--/form-->
+	</div>
+</div><!--/social-->
