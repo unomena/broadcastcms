@@ -47,7 +47,7 @@ class Widget(SSIContentResolver, ModelBase):
         return self.title
         
     def get_ssi_url(self):
-        return reverse("ssi", kwargs={'slug': self.slug})
+        return reverse('ssi_widget', kwargs={'slug': self.slug})
 
 class AccountMenuWidget(Widget):
     class Meta():
@@ -636,9 +636,6 @@ class StatusUpdates(Widget):
         verbose_name = 'Status Updates Widget'
         verbose_name_plural = 'Status Updates Widgets'
     
-    def get_ssi_url(self):
-        return reverse('ssi_widget', kwargs={'slug': self.slug})
-
     def get_castmember_updates(self):
         """
         Gets 4 primary castmember status updates sorted by timestamp descending.
@@ -685,9 +682,6 @@ class YourFriends(Widget):
         verbose_name = 'Your Friends Widget'
         verbose_name_plural = 'Your Friends Widgets'
     
-    def get_ssi_url(self):
-        return reverse('ssi_widget', kwargs={'slug': self.slug})
-
     def render_content(self, context, *args, **kwargs):
         """
         Renders the widget.
