@@ -85,6 +85,7 @@ def resolve_pattern(request):
     from django.core import urlresolvers
     from django.core.urlresolvers import Resolver404
     from django.conf import settings
+    from django.utils.encoding import smart_str
     urlconf = getattr(request, "urlconf", settings.ROOT_URLCONF)
     self = urlresolvers.RegexURLResolver(r'^/', urlconf)
     path = request.path_info
@@ -114,7 +115,7 @@ def resolve_pattern(request):
     raise Resolver404, {'path' : path}
 
 @cache_for_nginx(60*1)
-def layout_view(request):
+def layout_view(request, *args, **kwargs):
     from broadcastcms.widgets.models import Layout
     pattern = resolve_pattern(request)
     layout = Layout.permitted.filter(view_name=pattern.name)
@@ -122,7 +123,7 @@ def layout_view(request):
         layout = layout[0]
     else:
         raise NotImplementedError("Layout not configured for view '%s'" % pattern.name)
-    return layout.as_leaf_class().render(request)
+    return layout.as_leaf_class().render(request, *args, **kwargs)
 
 def obj_render_wrapper(request, obj, context=None):
     """
