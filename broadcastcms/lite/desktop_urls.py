@@ -15,11 +15,6 @@ handler404 = 'broadcastcms.lite.desktop_views.handler404'
 handler500 = 'broadcastcms.lite.desktop_views.handler500'
 
 messages_urls = patterns('user_messages.views',
-    #url(r'^inbox/$', 'inbox',
-    #   {'template_name': 'desktop/content/account/messages/inbox.html'},
-    #    name='messages_inbox'),
-    url(r'^inbox/$', account_messages_inbox, name='messages_inbox'),
-    url(r'^sent/$', account_messages_sent, name='account_messages_sent'),
     url(r'^create/$', 'message_create',
         {'template_name': 'desktop/content/account/messages/create.html', 'form_class': NewMessageFormMultipleFriends, 'multiple': True},
         name='message_create'),
@@ -80,7 +75,11 @@ urlpatterns = patterns('',
     url(r'^account/friends/facebook/add/$',
         'broadcastcms.facebook_integration.views.add_facebook_friends',
         name='account_friends_facebook_add'),
-    url(r'^account/history/$', account_history, name='account_history'),
+    url(r'^account/history/$', layout_view, name='account_history'),
+
+    url(r'^account/messages/inbox/$', layout_view, name='messages_inbox'),
+    url(r'^account/messages/sent/$', layout_view, name='messages_sent'),
+    url(r'^account/messages/create/$', layout_view, name='message_create'),
     url(r'^account/messages/', include(messages_urls)),
     url(r'^account/status/', include('broadcastcms.status.urls')),
     
