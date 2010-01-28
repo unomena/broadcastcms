@@ -822,14 +822,14 @@ class AccountFriendsFindMenuNode(template.Node):
             },
         ]
 
-        if context['request'].fb_authenticated:
+        if request.facebook.check_session(request):
             items.append({
                 'title': 'Invite Facebook Friends',
                 'section': 'facebook',
                 'url': reverse('account_friends_facebook_invite'),
             })
 
-        section = request.path.split('/')[3]
+        section = request.path.split('/')[-2]
 
         context = {
             'items': items,
