@@ -1,0 +1,43 @@
+{% load desktop_inclusion_tags %}
+{% load friends_tags %}
+{% load public_tags %}
+
+    
+<div class="social">
+    {% account_friends_find_menu %}
+	<div class="social_body" id="find_people_you_know">
+		<div class="page_form">
+			<h2 class="smaller no-bg">Who are you looking for?</h2>
+			<form id="frmFindFriends" action="{% url account_friends_find %}" method="get" onsubmit="this.submit();return false;">
+				<div class="page_form_row">
+					<label for="find">Look for:</label>
+					<p class="text_input shift">
+                        <input type="text" name="find" id="find" value="{{ request.GET.find }}" class="required" />
+                    </p>
+					<p class="note">
+                        (You can search for nicknames, first names or surnames)
+                        <br />
+                    </p>
+				</div>
+				<p class="clearfix"></p>
+				<div class="page_form_row no-pad">
+				    <p class="label">&nbsp;</p>
+					<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-search.jpg" name="submit" /></p>
+				</div>
+			</form>
+			<p class="clearfix"></p>
+		</div><!--/form-->
+					
+        {% if users %}
+                
+            {% social_paging page_obj %}
+                
+            {% for user in users %}
+                {% call_view user render_listing %}
+            {% endfor %}
+        {% endif %}
+        {% if not users and request.GET.find %}
+		<h2 class="smaller no-bg">No users found matching '{{ request.GET.find }}'. Please try again.</h2>
+        {% endif %}
+    </div>
+</div><!--/social-->
