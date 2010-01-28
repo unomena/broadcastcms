@@ -789,7 +789,7 @@ class AccountMessagesMenuNode(template.Node):
             {
                 'title': 'Sent',
                 'section': 'sent',
-                'url': reverse('account_messages_sent'),
+                'url': reverse('messages_sent'),
             },
             {
                 'title': 'New Message',
