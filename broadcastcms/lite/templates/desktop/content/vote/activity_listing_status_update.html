@@ -3,7 +3,7 @@
 <div class="social_item">
     {% if show_avatar %}
         {% with activity.user as user %}
-            <a href="{% url account_friends_activity user.pk %}" style="float: right;">{% profile_image user.profile 35 35 %}</a>
+            <a href="{% url account_friends_activity user.pk %}" style="float: right;">{% profile_image user 35 35 %}</a>
         {% endwith %}
     {% endif %}
     <p class="user_activity">{{ forloop.counter }}. <a href="{{ content_url }}">{{ content.text }}</a> - {{ activity.timestamp|timesince }} ago</p>
