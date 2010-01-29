@@ -16,6 +16,8 @@ from django.template import RequestContext
 from facebookconnect.models import FacebookProfile
 from friends.models import Friendship
 from user_messages.models import Message
+from user_messages.forms import MessageReplyForm
+from user_messages.models import Thread
 
 from broadcastcms.activity.models import ActivityEvent
 from broadcastcms.base.models import ModelBase, ContentBase
@@ -504,6 +506,33 @@ class InboxWidget(Widget):
             'page_obj': page_obj,
         }, context_instance=RequestContext(request))
 
+class MessageWidget(Widget):
+    user_unique = True
+    login_required = True
+    
+    class Meta():
+        verbose_name = 'Message Widget'
+        verbose_name_plural = 'Message Widgets'
+    
+    def render_content(self, context, thread_id, *args, **kwargs):
+        request = context['request']
+        form_class = MessageReplyForm
+        qs = Thread.objects.filter(userthread__user=request.user).distinct()
+        thread = get_object_or_404(qs, pk=thread_id)
+        if request.method == 'POST':
+            form = form_class(request.POST, user=request.user, thread=thread)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(reverse('messages_inbox'))
+        else:
+            form = form_class(user=request.user, thread=thread)
+            thread.userthread_set.filter(user=request.user).update(unread=False)
+
+        return render_to_string('widgets/widgets/message.html', {
+            'thread': thread,
+            'form': form
+        }, context_instance=RequestContext(request))
+
 class NewsCompetitionsEvents(Widget):
     """
     Renders the latest news, competitions and events.
@@ -843,7 +872,6 @@ class YourFriends(Widget):
                 'friends_count': friends_count
             })
         return render_to_string('widgets/widgets/your_friends.html', context)
-
 
 class Layout(ModelBase):
     view_name = models.CharField(max_length=128, choices=VIEW_CHOICES)
