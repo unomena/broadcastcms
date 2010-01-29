@@ -117,6 +117,10 @@ class CalendarQuerySet(ModelBaseQuerySet):
     def upcoming(self):
         now = datetime.now()
         return self.range(now)
+    
+    def last(self):
+        now = datetime.now()
+        return self.filter(start__lt=now, end__lt=now).order_by('-start')
 
     def by_content_type(self, model):
         content_type = ContentType.objects.get_for_model(model)
@@ -177,6 +181,9 @@ class CalendarManager(ModelBaseManager):
 
     def upcoming(self):
         return self.get_query_set().upcoming()
+    
+    def last(self):
+        return self.get_query_set().last()
     
     def by_content_type(self, model):
         return self.get_query_set().by_content_type(model)
