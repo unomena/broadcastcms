@@ -41,23 +41,20 @@ class AccountLinksNode(SSIContentResolver, template.Node):
 
         # get user and profile objects
         user = getattr(request, 'user', None)
-        profile = None
-        if user:
-            if not user.is_anonymous():
-                profile = user.profile
+        if user.is_authenticated():
         
             # get unread message count
             messages = Thread.objects.unread(user).count()
             username = user.username
             limited_username = "%s..." % username[:10] if len(username) > 10 else username
        
-        context.update({
-            'user': user,
-            'limited_username': limited_username,
-            'profile': profile,
-            'fb_authenticated': request.facebook.check_session(request),
-            'messages': messages,
-        })
+            context.update({
+                'user': user,
+                'limited_username': limited_username,
+                'fb_authenticated': request.facebook.check_session(request),
+                'messages': messages,
+            })
+            
         return render_to_string('desktop/inclusion_tags/skeleton/account_links.html', context)
 
     def get_ssi_url(self):
