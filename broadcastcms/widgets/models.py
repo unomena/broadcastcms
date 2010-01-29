@@ -509,7 +509,6 @@ class InboxWidget(Widget):
         }, context_instance=RequestContext(request))
 
 class MessageWidget(Widget):
-    user_unique = True
     login_required = True
     
     class Meta():
