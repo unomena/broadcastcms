@@ -124,6 +124,7 @@ class BannerWidget(Widget):
 class CreateMessageWidget(Widget):
     user_unique = True
     login_required = True
+    receive_post = True
     
     class Meta():
         verbose_name = 'Create Message Widget'
