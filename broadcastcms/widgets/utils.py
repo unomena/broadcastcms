@@ -9,6 +9,7 @@ class SSIContentResolver(object):
     """
     user_unique = False
     login_required = False
+    receive_post = False
 
     def get_leaf(self):
         try:
@@ -20,6 +21,9 @@ class SSIContentResolver(object):
         """
         Returns either self.render_ssi or self.render_content based on self.user_unique 
         and settings.SSI_ENABLED.  self.render_content to be implimented by subclasses.
+
+        Return render_content in the case of the receive_post being true and the 
+        request being a post. (In other words don't render ssi for stuff expecting POSTS).
         """
         request = context['request']
         leaf = self.get_leaf()
@@ -30,7 +34,10 @@ class SSIContentResolver(object):
             return HttpResponseRedirect('%s?%s=%s' % tup)
 
         if leaf.user_unique and settings.SSI_ENABLED:
-            return leaf.render_ssi(context, *args, **kwargs)
+            if leaf.receive_post and request.method == 'POST':
+                return leaf.render_content(context, *args, **kwargs)
+            else:
+                return leaf.render_ssi(context, *args, **kwargs)
         else:
             return leaf.render_content(context, *args, **kwargs)
                 
