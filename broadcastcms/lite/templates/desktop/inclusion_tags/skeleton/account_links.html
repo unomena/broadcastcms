@@ -4,7 +4,7 @@
     {% if user.is_authenticated %}
         <p class="logged_avatar">
             <a href="{% url account_settings_image %}">
-                {% profile_image profile 35 35 %}
+                {% profile_image user 35 35 %}
             </a>
         </p>
         <p class="logged_info">

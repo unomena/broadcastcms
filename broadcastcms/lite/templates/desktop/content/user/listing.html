@@ -4,7 +4,7 @@
     <p class="user_actions"><a {% if action_href %}href="{{ action_href }}"{% endif %} id="user_{{ user.pk }}" class="{{ action_class }}">{{ action_text }}</a></p>
 	<p class="user_avatar">
         <a href="{% url account_friends_activity user.pk %}">
-            {% profile_image profile 50 50 %}
+            {% profile_image user 50 50 %}
         </a>
     </p>
 	<p class="user_date">Last Seen {{ user.last_login|date:"j F Y" }}</p>

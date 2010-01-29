@@ -9,11 +9,7 @@
 		<h2 class="smaller no-bg">{{ thread.subject }}</h2>
         <div class="thread_participants">
             {% for user in thread.users.distinct %}
-                <a>
-                    {% with user.profile as profile %}
-                        {% profile_image profile 35 35 %}
-                    {% endwith %}
-                </a>
+                <a>{% profile_image user 35 35 %}</a>
             {% endfor %}
         </div>
         {% for object in thread.messages.all.reverse %}
