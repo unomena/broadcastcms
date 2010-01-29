@@ -4,6 +4,6 @@
 {% score_for_object self.contentbase as score %}
 <div class="block">
     <p class="block_pic"><a href="{{ url }}"><img src="{% scaled_image_url self 188 104 %}" width="188" height="104" alt="" /></a></p>
-	<p class="block_name"><a href="{{ url }}" class="block_name_name">{{ self.title|truncatewords:"4" }}</a><a href="{{ url }}" class="block_name_amount">{{ self.images.permitted.count }} Photos</a></p>
+	<p class="block_name"><a href="{{ url }}" class="block_name_name">{{ short_title }}</a><a href="{{ url }}" class="block_name_amount">{{ self.images.permitted.count }} Photos</a></p>
 	<p class="block_meta"><span class="block_meta_date">{{ self.created|date:"j F Y" }}</span><span class="block_meta_likes">{{ score.score }} Likes</span><a href="{{ url }}#comments" class="block_meta_comments">{{ comment_count }} Comments</a></p>
 </div>

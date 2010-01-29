@@ -1697,8 +1697,12 @@ class EventViews(object):
     
 class GalleryViews(object):
     def render_block(self, context):
+        short_title = self.title[:16]
+        if short_title != self.title:
+            short_title += ' ...'
         context = {
             'self': self,
+            'short_title': short_title,
             'url': self.url(context),
         }
         return render_to_string('desktop/content/galleries/block.html', context)
