@@ -4,12 +4,12 @@
 {% score_for_object object as score %}
 <div class="update">
     <p class="update_avatar">
-        <a href="{% url account_friends_activity user.pk %}">
+        <a href="{% if castmember %}{% url shows_dj_blog castmember.slug %}{% else %}{% url account_friends_activity user.pk %}{% endif %}">
             {% profile_image user 50 50 %}
         </a>
     </p>
 	<p class="update_content">
-        <a href="{% url account_friends_activity user.pk %}">{{ user.username }}</a> 
+        <a href="{% if castmember %}{% url shows_dj_blog castmember.slug %}{% else %}{% url account_friends_activity user.pk %}{% endif %}">{{ user.username }}</a> 
 	    <span class="update_text">{{ object.urlize_text|safe }}</span>
 		<span class="update_meta">{{ object.timestamp|timesince }} Ago {% ifequal object.source 1 %} via Twitter {% endifequal %}| <a href="#" class="update_meta_like">{{ score.score }}</a></span>
 		<span class="update_btns">
