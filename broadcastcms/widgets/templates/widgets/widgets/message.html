@@ -1,0 +1,51 @@
+{% load desktop_inclusion_tags %}
+{% load public_tags %}
+{% load scaled_image_tags %}
+{% load template_tags %}
+
+<div class="social">
+    {% account_messages_menu %}
+	<div class="social_body">
+		<h2 class="smaller no-bg">{{ thread.subject }}</h2>
+        <div class="thread_participants">
+            {% for user in thread.users.distinct %}
+                <a>
+                    {% with user.profile as profile %}
+                        {% profile_image profile 35 35 %}
+                    {% endwith %}
+                </a>
+            {% endfor %}
+        </div>
+        {% for object in thread.messages.all.reverse %}
+            {% call_view object render_listing_thread %}
+        {% endfor %}
+		<div class="page_form">
+            <a id="reply"></a>
+			<h2 class="smaller no-bg">Reply using the form below.</h2>
+			<form id="frmMessage" action="{{ thread.get_absolute_url }}" method="post"u>
+                {% with form.content as field %}
+        		    <div class="page_form_row">
+                        <label for="id_content">Message: </label>
+		    			<p class="text_area_short">
+                            {{ field }}
+                            {% if field.errors %}
+                                <label class="error" for="{{ field.name }}" generated="true" style="display: inline;">{{ field.errors.0 }}</label>
+                            {% endif %}
+                        </p>
+		        	    {% if field.help_text %}
+                            <p class="note">
+                                {{ field.help_text }}
+                            </p>
+                        {% endif %}
+			        </div>
+					<p class="clearfix"></p>
+                {% endwith %}
+				<div class="page_form_row no-pad">
+				    <p class="label">&nbsp;</p>
+					<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-send_message.jpg" name="submit" /></p>
+				</div>
+			</form>
+			<p class="clearfix"></p>
+		</div><!--/form-->
+	</div>
+</div><!--/social-->
