@@ -1906,7 +1906,11 @@ class VoteViews(object):
 class CommentViews(object):
     def render_activity_listing(self, context, activity):
         content = self.content_object
-        content_url = content.url(context)
+        if content:
+            content_url = content.url(context)
+        else:
+            content_url = '#'
+
         context.update({
             'object': self,
             'activity': activity,
