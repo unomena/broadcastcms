@@ -2,6 +2,8 @@ import datetime
 
 from django import template
 from django.template.loader import render_to_string
+        
+from facebookconnect.models import FacebookProfile
 
 register = template.Library()
 
@@ -22,9 +24,19 @@ class ProfileImageNode(template.Node):
         self.height = height
     
     def render(self, context):
-        profile = self.obj.resolve(context)
+        user = self.obj.resolve(context)
+        user_profile = user.profile
+        facebook_profile = FacebookProfile.objects.filter(user=user)
+
+        use_facebook_picture = (facebook_profile and user_profile.use_facebook_picture)
+
+        facebook_id = None
+        if use_facebook_picture:
+            facebook_id = facebook_profile[0].facebook_id
+
         context = {
-            'profile': profile,
+            'facebook_id': facebook_id,
+            'user_profile': user_profile,
             'width': self.width,
             'height': self.height,
         }
