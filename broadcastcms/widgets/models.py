@@ -1,5 +1,6 @@
 from datetime import datetime
 import inspect, sys
+import random
 
 from django.conf import settings
 from django.contrib import admin
@@ -331,7 +332,7 @@ class FriendsWidget(Widget):
         friends = Friendship.objects.friends_for_user(request.user)
     
         # create pager
-        page_obj = utils.paging([friend['friend'] for friend in friends], 'page', request, 5)
+        page_obj = utils.paging([friend['friend'] for friend in friends], 'page', request, 6)
         friends = page_obj.object_list
 
         context = {
@@ -865,7 +866,13 @@ class YourFriends(Widget):
         if user.is_authenticated():
             friends = Friendship.objects.friends_for_user(user)
             friends_count = len(friends)
-            friends = [friend['friend'] for friend in friends][:10]
+
+            try:
+                friends = random.sample(friends, 10)
+            except ValueError:
+                pass
+                
+            friends = [friend['friend'] for friend in friends]
     
             context.update({
                 'friends': friends,
