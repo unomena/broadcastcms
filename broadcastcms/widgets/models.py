@@ -633,6 +633,13 @@ class NowPlayingWidget(Widget):
 
         return valid_entry
 
+    def get_public_last_entry(self, content_type):
+        """
+        Returns last public entry that has public content
+        """
+        entries = Entry.objects.permitted().by_content_type(content_type).last().filter(content__is_public=True)
+        return entries[0] if entries else None
+    
     def render_content(self, context, *args, **kwargs):
         # get the current on air show
         show_entry = self.get_public_on_air_entry(Show)
@@ -642,8 +649,10 @@ class NowPlayingWidget(Widget):
         primary_castmembers = show.primary_castmembers if show else None
         primary_castmember = primary_castmembers[0] if primary_castmembers else None
         
-        # get the current playing song and artist info
+        # get the current or last played song and artist info
         song_entry = self.get_public_on_air_entry(Song)
+        if not song_entry:
+            song_entry = self.get_public_last_entry(Song)
         song = song_entry.content.as_leaf_class() if song_entry else None
         artist = song.get_primary_artist() if song else None
         
@@ -685,6 +694,13 @@ class OnAirWidget(Widget):
         """
         entries = Entry.objects.permitted().by_content_type(content_type).upcoming().filter(content__is_public=True)
         return entries[0] if entries else None
+    
+    def get_public_last_entry(self, content_type):
+        """
+        Returns last public entry that has public content
+        """
+        entries = Entry.objects.permitted().by_content_type(content_type).last().filter(content__is_public=True)
+        return entries[0] if entries else None
 
     def render_content(self, context, *args, **kwargs):
         """
@@ -707,8 +723,10 @@ class OnAirWidget(Widget):
             # build the 'with' string linking to each castmembers blog
             with_str = " & ".join(['<a href="%s">%s</a>' % (castmember.url(), castmember.title) for castmember in primary_castmembers])
         
-            # get the current playing song and artist info
+            # get the current or last played song and artist info
             song_entry = self.get_public_on_air_entry(Song)
+            if not song_entry:
+                song_entry = self.get_public_last_entry(Song)
             song = song_entry.content.as_leaf_class() if song_entry else None
             artist = song.get_primary_artist() if song else None
 
