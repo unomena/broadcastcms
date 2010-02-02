@@ -414,21 +414,24 @@ class FriendsFacebookInviteWidget(Widget):
     login_required = True
 
     class Meta():
-        verbose_name = 'Find Facebook Friends Widget'
-        verbose_name_plural = 'Find Facebook Friends Widgets'
+        verbose_name = 'Invite Facebook Friends Widget'
+        verbose_name_plural = 'Invite Facebook Friends Widgets'
    
     def render_content(self, context, *args, **kwargs):
         request = context['request']
 
+        template_dict = {}
         if request.method == "POST":
             fb_ids = request.POST.getlist("ids")
             for fb_id in fb_ids:
                 FacebookFriendInvite.objects.create(user=request.user,
                     fb_user_id=fb_id)
-            return HttpResponseRedirect(reverse(invite))
+            template_dict.update({
+                'invited': True
+            })
         return render_to_string(
             "widgets/widgets/friends_facebook_invite.html", 
-            {}, 
+            template_dict, 
             context_instance=RequestContext(request)
         )
 
