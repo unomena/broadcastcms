@@ -47,6 +47,7 @@ urlpatterns = patterns('',
     (r'^facebook/', include('facebookconnect.urls')),
     
     url(r'comment-add/$', comment_add, name='comment_add'),
+    (r'^comments/', include('django.contrib.comments.urls')),
     
     url(r'^admin/(.*)', admin.site.root),
     
