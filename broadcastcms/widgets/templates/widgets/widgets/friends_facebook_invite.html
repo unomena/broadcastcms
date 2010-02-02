@@ -3,6 +3,9 @@
 <div class="social">
     {% account_friends_find_menu %}
 	<div class="social_body" id="find_people_you_know">
+        {% if invited %}
+	        <h2 class="smaller no-bg">Invites sent. Your friends should join the {{ site_name }} community soon.</h2>
+        {% else %}
         <div class="page_form">
             <fb:serverfbml>
                 <script type="text/fbml">
@@ -21,5 +24,6 @@
             </fb:serverfbml>
 	        <p class="clearfix"></p>
     	</div><!--/form-->
+        {% endif %}
     </div>
 </div><!--/social-->
