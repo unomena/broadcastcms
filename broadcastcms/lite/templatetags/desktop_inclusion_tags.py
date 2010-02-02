@@ -57,7 +57,7 @@ class AccountLinksNode(SSIContentResolver, template.Node):
             
         return render_to_string('desktop/inclusion_tags/skeleton/account_links.html', context)
 
-    def get_ssi_url(self):
+    def get_ssi_url(self, request):
         return reverse('ssi_account_links_node')
 
 @register.tag
@@ -514,7 +514,7 @@ def status_update(parser, token):
 class StatusUpdateNode(SSIContentResolver, template.Node):
     user_unique = True
     
-    def get_ssi_url(self):
+    def get_ssi_url(self, request):
         return reverse('ssi_status_update_node')
 
     def render_content(self, context):
