@@ -51,7 +51,7 @@ class Widget(SSIContentResolver, ModelBase):
     def __unicode__(self):
         return self.title
         
-    def get_ssi_url(self):
+    def get_ssi_url(self, request=None):
         return reverse('ssi_widget', kwargs={'slug': self.slug})
 
 class AccountMenuWidget(Widget):
@@ -62,7 +62,7 @@ class AccountMenuWidget(Widget):
         verbose_name = 'Account Menu Widget'
         verbose_name_plural = 'Account Menu Widgets'
    
-    def render_content(self, context, *args, **kwargs):
+    def render_content(self, context, section):
         from user_messages.models import Thread
         request = context['request']
         
@@ -93,16 +93,18 @@ class AccountMenuWidget(Widget):
                 'url': reverse('account_settings_details'),
             },
         ]
-        account_section = request.path.split('/')[2]
-       
         profile = request.user.profile
 
         context.update({
             'menu_items': menu_items,
-            'account_section': account_section,
+            'account_section': section,
             'profile': profile,
         })
         return render_to_string('widgets/widgets/account_menu.html', context)
+    
+    def get_ssi_url(self, request):
+        section = request.path.split('/')[2]
+        return reverse('ssi_account_menu_widget', kwargs={'slug': self.slug, 'section': section})
 
 class BannerWidget(Widget):
     width = models.IntegerField()
@@ -412,6 +414,7 @@ class FriendsFindWidget(Widget):
 class FriendsFacebookInviteWidget(Widget):
     user_unique = True
     login_required = True
+    receive_post = True
 
     class Meta():
         verbose_name = 'Invite Facebook Friends Widget'
