@@ -50,7 +50,7 @@ class SSIContentResolver(object):
         request = context['request']
        
         cache_key = request.META.get('MEMCACHED_KEY', request.get_full_path())
-        url = self.get_ssi_url()
+        url = self.get_ssi_url(request)
         try:
             url += '?%s' % cache_key.split('?')[1]
         except IndexError:
@@ -63,5 +63,5 @@ class SSIContentResolver(object):
     def render_content(self, context, *args, **kwargs):
         raise NotImplementedError("Should have implemented this")
     
-    def get_ssi_url(self):
+    def get_ssi_url(self, request):
         raise NotImplementedError("Should have implemented this")
