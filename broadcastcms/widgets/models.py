@@ -55,6 +55,9 @@ class Widget(SSIContentResolver, ModelBase):
         return reverse('ssi_widget', kwargs={'slug': self.slug})
 
 class AccountMenuWidget(Widget):
+    user_unique = True
+    login_required = True
+    
     class Meta():
         verbose_name = 'Account Menu Widget'
         verbose_name_plural = 'Account Menu Widgets'
