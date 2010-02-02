@@ -133,13 +133,13 @@ def obj_render_wrapper(request, obj, context=None):
         context = RequestContext(request, {})
     return HttpResponse(obj.render(context))
 
-def obj_render_content_wrapper(request, obj, context=None):
+def obj_render_content_wrapper(request, obj, context=None, *args, **kwargs):
     """
     Thin wrapper exposing an objects's render_content method as a view.
     """
     if not context:
         context = RequestContext(request, {})
-    return HttpResponse(obj.render_content(context))
+    return HttpResponse(obj.render_content(context, *args, **kwargs))
 
 @cache_for_nginx(60*1)
 def ssi_account_links_node(request):
@@ -156,13 +156,13 @@ def ssi_status_update_node(request):
     return obj_render_content_wrapper(request, StatusUpdateNode())
 
 @cache_for_nginx(60*1)
-def ssi_widget(request, slug):
+def ssi_widget(request, slug, *args, **kwargs):
     """
     Returns a widgets render_content response.
     """
     from broadcastcms.widgets.models import Widget
     widget = get_object_or_404(Widget, slug=slug).get_leaf()
-    return obj_render_content_wrapper(request, widget)
+    return obj_render_content_wrapper(request, widget, *args, **kwargs)
 
 @cache_for_nginx(60*10)
 def session_your_friends(request):
