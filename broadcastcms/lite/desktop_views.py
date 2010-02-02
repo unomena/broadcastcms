@@ -967,7 +967,7 @@ def comment_add(request):
         comment = comment,
         request = request
     )
-    # Ajx additions
+    # Ajax additions
     context = RequestContext(request, {})
     context.update({
         'instance': target
