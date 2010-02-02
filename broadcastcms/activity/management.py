@@ -14,10 +14,11 @@ from broadcastcms.status.models import StatusUpdate
 
 
 def record_comment(sender, comment, request, **kwargs):
-    ActivityEvent.objects.create(user=comment.user,
-        event_type=ActivityEvent.EVENT_COMMENT,
-        content_type=ContentType.objects.get_for_model(comment),
-        object_id=comment.pk)
+    if request.user.is_authenticated():
+        ActivityEvent.objects.create(user=comment.user,
+            event_type=ActivityEvent.EVENT_COMMENT,
+            content_type=ContentType.objects.get_for_model(comment),
+            object_id=comment.pk)
         
 comment_was_posted.connect(record_comment)
 
