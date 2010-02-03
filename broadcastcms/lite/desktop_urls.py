@@ -81,6 +81,11 @@ urlpatterns = patterns('',
     url(r'^account/messages/create/$', layout_view, name='message_create'),
     url(r'^account/messages/thread/(?P<thread_id>\d+)/$', layout_view, name='messages_thread_detail'),
     url(r'^account/messages/', include(messages_urls)),
+    
+    url(r'account/password-reset-done/$', 'django.contrib.auth.views.password_reset_done', {'template_name': 'desktop/modals/password_reset.html'}, name='password_reset_done'),
+    url(r'account/password-reset-confirm/(?P<uidb36>[\w-]+)/(?P<token>[\w-]+)$', layout_view, name='password_reset_confirm'),
+    url(r'account/password-reset-complete/$', layout_view, name='password_reset_complete'),
+    
     url(r'^account/status/', include('broadcastcms.status.urls')),
     
     url(r'^account/login/', account_login, name='account_login'),
@@ -109,7 +114,7 @@ urlpatterns = patterns('',
 
     url(r'modals/content/(?P<slug>[\w-]+)/$', modals_content, name='modals_content'),
     url(r'modals/login/$', modals_login, name='modals_login'),
-    url(r'modals/password_reset/$', modals_password_reset, name='modals_password_reset'),
+    url(r'modals/password-reset/$', 'django.contrib.auth.views.password_reset', {'template_name': 'desktop/modals/password_reset.html'}, name='modals_password_reset'),
     url(r'modals/register/$', modals_register, name='modals_register'),
 
     url(r'^podcasts/rss/$', podcasts_rss, name='podcasts_rss'),
@@ -133,6 +138,7 @@ urlpatterns = patterns('',
     url(r'validate/captcha/$',  validate_captcha,   name='validate_captcha'),
     url(r'validate/password/$', validate_password,  name='validate_password'),
     url(r'validate/password-confirm/$', validate_password_confirm,  name='validate_password_confirm'),
+    url(r'validate/password-reset/$', validate_password_reset,  name='validate_password_reset'),
     url(r'validate/username/$', validate_username,  name='validate_username'),
 
     url(r'voting/(?P<slug>[\w-]+)/$', xmlhttprequest_vote_on_object, {'model': ContentBase, 'slug_field': 'slug', 'direction': 'up'}, name='xmlhttprequest_vote_on_object'),
