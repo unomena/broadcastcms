@@ -8,6 +8,7 @@ from django.contrib import auth
 from django.contrib import comments
 from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.contrib.comments import signals
 from django.contrib.comments.models import Comment
@@ -800,6 +801,21 @@ def validate_password_confirm(request):
             else:
                 response = "'Error, please try again.'"
 
+        return HttpResponse(response)
+    
+    raise Http404
+
+def validate_password_reset(request):
+    if not request.is_ajax():
+        raise Http404
+
+    if request.method == "POST":
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            response = "true"
+        else:
+            response = "'Please enter a valid email address.'"
+        
         return HttpResponse(response)
     
     raise Http404
