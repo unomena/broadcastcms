@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.comments.forms import CommentForm
 from django.core.mail import EmailMessage, mail_managers
+from django.utils.safestring import mark_safe
 
 from friends.models import Friendship
 from user_messages.forms import NewMessageFormMultiple
@@ -152,7 +153,7 @@ class RegistrationForm(forms.Form):
     )
     accept_terms = forms.BooleanField(
         label='Legal Stuff:',
-        help_text='I agree to the website terms of use',
+        help_text=mark_safe('I agree to the website <a class="mb_link" href="/info/terms">terms of use.</a>'),
         widget=forms.CheckboxInput(attrs={'class':'required'}),
         error_messages={'required': 'Please accept our terms &amp; conditions to continue.'}
     )
