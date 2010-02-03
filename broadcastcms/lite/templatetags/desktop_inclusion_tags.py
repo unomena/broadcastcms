@@ -119,7 +119,7 @@ class MastfootNode(template.Node):
             {'title': 'News Updates', 'url': reverse('news')},
             {'title': 'Events Calendar', 'url': reverse('events')},
             {'title': 'Contact Us', 'url': reverse('contact')},
-            {'title': 'Dating', 'url': 'http://ghfm.datingbuzz.com/s/'},
+            {'title': 'Dating', 'url': 'http://ghfm.datingbuzz.com/s/', "target": "_blank"},
         ]
 
         # append additional dynamic navcard items
