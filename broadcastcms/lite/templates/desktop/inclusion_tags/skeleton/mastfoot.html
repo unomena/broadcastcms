@@ -10,7 +10,7 @@
     {% for column in sitemap_columns %}
         <ul>
             {% for item in column %}
-    	        <li><a href="{{ item.url }}">{{ item.title|safe }}</a></li>
+    	        <li><a href="{{ item.url }}" {% if item.target %}target="{{ item.target}}"{% endif %}>{{ item.title|safe }}</a></li>
             {% endfor %}
 	    </ul>
     {% endfor %}
