@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
 from django.contrib.auth.models import User
+from django.contrib.auth.views import password_reset_confirm
 from django.db import models
 from django.db.models.query import Q
 from django.http import HttpResponseRedirect
@@ -751,6 +752,32 @@ class OnAirWidget(Widget):
             return render_to_string('widgets/widgets/on_air.html', context)
         else:
             return ''
+
+class PasswordResetWidget(Widget):
+    receive_post = True
+    
+    class Meta():
+        verbose_name = 'Password Reset Widget'
+        verbose_name_plural = 'Password Reset Widgets'
+    
+    def render_content(self, context, *args, **kwargs):
+        kwargs.update({
+            'template_name': 'widgets/widgets/password_reset.html',
+            'post_reset_redirect': reverse('password_reset_complete'),
+        })
+        response = password_reset_confirm(context['request'], *args, **kwargs)
+        if isinstance(response, HttpResponseRedirect):
+            return response
+        else:
+            return response.content
+
+class PasswordResetCompleteWidget(Widget):
+    class Meta():
+        verbose_name = 'Password Reset Complete Widget'
+        verbose_name_plural = 'Password Reset Complete Widgets'
+    
+    def render_content(self, context, *args, **kwargs):
+        return render_to_string("widgets/widgets/password_reset_complete.html", context)
 
 class SentWidget(Widget):
     user_unique = True
