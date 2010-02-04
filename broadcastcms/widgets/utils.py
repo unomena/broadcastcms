@@ -51,14 +51,10 @@ class SSIContentResolver(object):
        
         cache_key = request.META.get('MEMCACHED_KEY', request.get_full_path())
         url = self.get_ssi_url(request)
-        if request.user.is_authenticated(): 
-            sid_tail = "sid=%s" % request.session.session_key
-        else:
-            sid_tail = "sid=anonymous"
         try:
-            url += '?%s&%s' % (cache_key.split('?')[1], sid_tail)
+            url += '?%s' % cache_key.split('?')[1]
         except IndexError:
-            url += '?%s' % sid_tail
+            pass
 
         # XXX: investigate why wait has to be set to true in order
         # for nginx to correctly fetch includes from cache.
