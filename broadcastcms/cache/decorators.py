@@ -51,20 +51,33 @@ def cache_context_processor(seconds, respect_path=False, respect_get=False, resp
         return wrap_f
     return wrap
 
-def get_nginx_key(request):
-    key = request.META.get('MEMCACHED_KEY', None)
-    
-    if not key:
-        key = request.get_full_path()
+"""
+def get_nginx_key(request, respect_session):
+    #key = request.get_full_path()
+    key = request.path_info
+    if respect_session:
         if request.user.is_authenticated(): 
-            sid_tail = "sid=%s" % request.session.session_key
+            key += '.%s' % request.session.session_key
         else:
-            sid_tail = "sid=anonymous"
-        try:
-            key += '?%s&%s' % (key.split('?')[1], sid_tail)
-        except IndexError:
-            key += '?%s' % sid_tail
-    
+            key += '.anonymous'
+    return key
+
+def cache_for_nginx(seconds, respect_session=False):
+    def wrap(f):
+        def wrap_f(request, *args, **kwargs):
+            key = get_nginx_key(request, respect_session)
+            cached_result = cache.get(key)
+            if not cached_result:
+                result = f(request, *args, **kwargs)
+                cache.set(key, result._get_content(), seconds)
+                #cache.set(key, key, seconds)
+            return f(request, *args, **kwargs)
+        return wrap_f
+    return wrap
+"""
+
+def get_nginx_key(request):
+    key = request.META.get('MEMCACHED_KEY', request.get_full_path())
     return key
 
 def cache_for_nginx(seconds):
