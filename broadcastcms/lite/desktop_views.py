@@ -1249,24 +1249,6 @@ def podcasts_rss(request):
     return rss_object_list(context, title, link, description, queryset)
 
 # Reviews
-def reviews(request, template_name='desktop/generic/object_listing_wide.html'):
-    reviews_label = Label.objects.get(title__iexact='reviews')
-    queryset=Post.permitted.filter(labels=reviews_label)
-    header = utils.ReviewsHeader(request, reviews_label)
-    queryset_modifiers = [header.page_menu.queryset_modifier,]
-    for queryset_modifier in queryset_modifiers:
-        queryset = queryset_modifier.updateQuery(queryset)
-
-    return list_detail.object_list(
-        request=request,
-        queryset=queryset,
-        template_name=template_name,
-        paginate_by=10,
-        extra_context={
-            'header': header,
-        },
-    )
-
 def reviews_content(request, slug, template_name='desktop/generic/object_detail.html'):
     queryset = ContentBase.permitted
     header = utils.ReviewsArticleHeader()
