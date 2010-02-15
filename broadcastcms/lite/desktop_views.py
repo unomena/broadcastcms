@@ -1264,23 +1264,6 @@ def reviews_content(request, slug, template_name='desktop/generic/object_detail.
     )
 
 # Shows
-class ShowsLineUp(object):
-    def __call__(self, request, template_name='desktop/generic/object_listing_block.html'):
-        queryset = Entry.objects.permitted().by_content_type(Show).order_by('start')
-        header = utils.ShowsHeader(request)
-        queryset_modifiers = [header.page_menu.queryset_modifier,]
-        for queryset_modifier in queryset_modifiers:
-            queryset = queryset_modifier.updateQuery(queryset)
-
-        return list_detail.object_list(
-            request=request,
-            queryset=queryset,
-            template_name=template_name,
-            extra_context={
-                'header': header,
-            },
-        )
-
 def shows_dj_appearances(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
     context = RequestContext(request, {})
