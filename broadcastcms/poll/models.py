@@ -1,8 +1,14 @@
+from datetime import datetime, timedelta
+
 from django.db import models
+
 from broadcastcms.base.models import ContentBase, ModelBase
+from broadcastcms.richtext.fields import RichTextField
 
 
 class Poll(ContentBase):
+    content = RichTextField()
+    
     class Meta:
         verbose_name = 'Poll'
         verbose_name_plural = 'Polls'
@@ -26,7 +32,11 @@ class Poll(ContentBase):
             voted_polls = voted_polls.split(',')
 
         voted_polls.append(str(self.id))
-        response.set_cookie('voted_polls', value=','.join(voted_polls))
+
+        expires = datetime.now() + timedelta(days=365)
+        expires = expires.strftime('%a, %d-%b-%Y %H:%M:%S GMT" ')
+
+        response.set_cookie('voted_polls', max_age='31536000', expires=expires, value=','.join(voted_polls))
         return response
 
     def voted(self, request):
