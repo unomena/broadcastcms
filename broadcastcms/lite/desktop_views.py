@@ -45,6 +45,7 @@ from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.label.models import Label
 from broadcastcms.lite.context_processors import determine_section
 from broadcastcms.podcast.models import PodcastStandalone
+from broadcastcms.poll.models import Poll
 from broadcastcms.post.models import Post
 from broadcastcms.radio.models import Song
 from broadcastcms.richtext.fields import RichTextField
@@ -200,6 +201,20 @@ def ajax_sign_out(request):
         auth.logout(request)
     
     return HttpResponse("")
+
+@ajax_required
+def ajax_poll_vote(request, slug):
+    "returns voted regardless of whether or not a vote was performed"
+    poll = get_object_or_404(Poll, slug=slug)
+    
+    response = HttpResponse("voted")
+    if not poll.voted(request):
+        option_id = request.POST.get('option_id', None)
+        poll.set_cookie(request, response)
+        poll.vote(option_id)
+        return response
+    
+    return response
    
 # RSS
 def rss_object_list(context, title, link, description, queryset):
@@ -1698,6 +1713,15 @@ class CastMemberViews(object):
     def url(self, context=None):
         return reverse('shows_dj_blog', kwargs={'slug': self.slug})
 
+class PollViews(object):
+    def render_article_body(self, context):
+        request = context['request']
+        context = {
+            'self': self,
+            'voted': self.voted(request),
+        }
+        return render_to_string('desktop/content/polls/article_body.html', context)
+
 class PostViews(object):
     def render_article_body(self, context):
         context = {
@@ -1909,6 +1933,7 @@ public.site.register(Entry, EntryViews)
 public.site.register(Event, EventViews)
 public.site.register(Gallery, GalleryViews)
 public.site.register(ImageBanner, ImageBannerViews)
+public.site.register(Poll, PollViews)
 public.site.register(Post, PostViews)
 public.site.register(PodcastStandalone, PodcastStandaloneViews)
 public.site.register(User, UserViews)
