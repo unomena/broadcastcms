@@ -120,7 +120,7 @@ urlpatterns = patterns('',
     url(r'^podcasts/rss/$', podcasts_rss, name='podcasts_rss'),
     
     url(r'reviews/(?P<slug>[\w-]+)/$', reviews_content, name='reviews_content'),
-    url(r'reviews/$', reviews, name='reviews'),
+    url(r'reviews/$', layout_view, name='reviews'),
     
     url(r'shows/line-up/$', ShowsLineUp(), name='shows_line_up'),
     url(r'shows/(?P<slug>[\w-]+)/blog/$', shows_dj_blog, name='shows_dj_blog'),
