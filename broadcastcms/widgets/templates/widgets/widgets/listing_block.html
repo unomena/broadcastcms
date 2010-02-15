@@ -1,0 +1,26 @@
+{% load desktop_inclusion_tags public_tags %}
+
+{% if header %}
+        {{ header.render }}
+{% endif %}
+{% if object_list %}
+    <div class="page_container">
+        {% for object in object_list %}
+            {% if forloop.counter0|divisibleby:"3" or forloop.first %}
+	            <div class="block_container">
+            {% endif %}
+                {% call_view object render_block %}
+            {% if forloop.counter|divisibleby:"3" or forloop.last %}
+                </div>
+            {% endif %}
+        {% endfor %}
+	</div><!--/container-->
+{% else %}
+    <div class="page_container rich">
+        <h3>This section does not currently have any content. Please check back later...</h3>
+        <p>Alternatively head on over to the <a href="{% url home %}">home page</a>. Or give us a piece of your mind by <a href="{% url contact %}">contacting us here</a>.</p>
+    </div>
+{% endif %}
+{% if is_paginated %}
+    {% paging page_obj %}
+{% endif %}
