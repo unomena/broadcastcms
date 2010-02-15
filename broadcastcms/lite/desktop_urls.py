@@ -28,6 +28,7 @@ messages_urls = patterns('user_messages.views',
 ajax_urls = patterns('',
     url(r'^sign-out/$', ajax_sign_out, name='ajax_sign_out'),
     url(r'^like-stamp/(?P<slug>[\w-]+)/$', ajax_likes_stamp, name='ajax_likes_stamp'),
+    url(r'^poll-vote/(?P<slug>[\w-]+)/$', ajax_poll_vote, name='ajax_poll_vote'),
 )
 
 ssi_urls = patterns('',
