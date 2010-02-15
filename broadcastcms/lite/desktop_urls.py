@@ -122,7 +122,7 @@ urlpatterns = patterns('',
     url(r'reviews/(?P<slug>[\w-]+)/$', reviews_content, name='reviews_content'),
     url(r'reviews/$', layout_view, name='reviews'),
     
-    url(r'shows/line-up/$', ShowsLineUp(), name='shows_line_up'),
+    url(r'shows/line-up/$', layout_view, name='shows_line_up'),
     url(r'shows/(?P<slug>[\w-]+)/blog/$', shows_dj_blog, name='shows_dj_blog'),
     url(r'shows/(?P<slug>[\w-]+)/podcasts/$', shows_dj_podcasts, name='shows_dj_podcasts'),
     url(r'shows/(?P<slug>[\w-]+)/podcasts/rss/$', shows_dj_podcasts_rss, name='shows_dj_podcasts_rss'),
