@@ -1,5 +1,8 @@
+{% load scaled_image_tags %}
+
 <div class="post_body rich">
     <p> 
+        <img src="{% scaled_image_url self 188 104 %}" />
         {% for entry in entries %}
             {% with entry.content.as_leaf_class.locations.permitted as locations %}
                 <span>{{ entry.start|date:"D j M Y" }} - {{ entry.end|date:"D j M Y" }}{% if locations %}&nbsp; : &nbsp;{% endif %}</span>

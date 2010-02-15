@@ -1,5 +1,8 @@
+{% load scaled_image_tags %}
+
 <div class="podcast_body info">
     <p>
+        <img src="{% scaled_image_url self 188 104 %}" />
         {{ self.content|safe }}
     </p>
 </div>
