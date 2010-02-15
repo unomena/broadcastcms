@@ -54,4 +54,8 @@ class StatusUpdate(models.Model):
             # Link hash tags
             urlized_text = re.sub(r'(\s+|\A)#([a-zA-Z0-9\-_]*)\b',r'\1<a href="http://search.twitter.com/search?q=%23\2">#\2</a>', urlized_text)
 
+        # add target blank to achor tags
+        split_text = urlized_text.split("href=")
+        urlized_text = 'target="_blank" href='.join(split_text)
+
         return mark_safe(urlized_text)
