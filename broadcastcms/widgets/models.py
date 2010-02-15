@@ -1,6 +1,7 @@
 from datetime import datetime
 import inspect, sys
 import random
+        
 
 from django.conf import settings
 from django.contrib import admin
@@ -14,6 +15,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
+from django.views.generic import list_detail
 
 from facebookconnect.models import FacebookProfile
 from friends.models import Friendship
@@ -29,6 +31,7 @@ from broadcastcms.event.models import Event
 from broadcastcms.label.models import Label
 from broadcastcms.lite.desktop_urls import urlpatterns
 from broadcastcms.lite.forms import FacebookRegistrationForm, LoginForm
+from broadcastcms.post.models import Post
 from broadcastcms.radio.models import Song
 from broadcastcms.show.models import Credit, Show
 from broadcastcms.status.models import StatusUpdate
@@ -517,6 +520,33 @@ class InboxWidget(Widget):
             'view': 'render_listing_inbox',
             'page_obj': page_obj,
         }, context_instance=RequestContext(request))
+
+class ReviewsListingWidget(Widget):
+    
+    class Meta():
+        verbose_name = 'Reviews Listing Widget'
+        verbose_name_plural = 'Reviews Listing Widgets'
+    
+    def render_content(self, context, *args, **kwargs):
+        request = context['request']
+        
+        reviews_label = Label.objects.get(title__iexact='reviews')
+        queryset=Post.permitted.filter(labels=reviews_label).order_by('-created')
+        header = utils.ReviewsHeader(request, reviews_label)
+        queryset_modifiers = [header.page_menu.queryset_modifier,]
+        for queryset_modifier in queryset_modifiers:
+            queryset = queryset_modifier.updateQuery(queryset)
+
+    
+        return list_detail.object_list(
+            request=request,
+            queryset=queryset,
+            template_name='widgets/widgets/listing_wide.html',
+            paginate_by=10,
+            extra_context={
+                'header': header,
+            },
+        ).content
 
 class MessageWidget(Widget):
     login_required = True
