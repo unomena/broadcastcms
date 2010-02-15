@@ -521,33 +521,6 @@ class InboxWidget(Widget):
             'page_obj': page_obj,
         }, context_instance=RequestContext(request))
 
-class ReviewsListingWidget(Widget):
-    
-    class Meta():
-        verbose_name = 'Reviews Listing Widget'
-        verbose_name_plural = 'Reviews Listing Widgets'
-    
-    def render_content(self, context, *args, **kwargs):
-        request = context['request']
-        
-        reviews_label = Label.objects.get(title__iexact='reviews')
-        queryset=Post.permitted.filter(labels=reviews_label).order_by('-created')
-        header = utils.ReviewsHeader(request, reviews_label)
-        queryset_modifiers = [header.page_menu.queryset_modifier,]
-        for queryset_modifier in queryset_modifiers:
-            queryset = queryset_modifier.updateQuery(queryset)
-
-    
-        return list_detail.object_list(
-            request=request,
-            queryset=queryset,
-            template_name='widgets/widgets/listing_wide.html',
-            paginate_by=10,
-            extra_context={
-                'header': header,
-            },
-        ).content
-
 class MessageWidget(Widget):
     login_required = True
     
@@ -809,6 +782,32 @@ class PasswordResetCompleteWidget(Widget):
     def render_content(self, context, *args, **kwargs):
         return render_to_string("widgets/widgets/password_reset_complete.html", context)
 
+class ReviewsListingWidget(Widget):
+    class Meta():
+        verbose_name = 'Reviews Listing Widget'
+        verbose_name_plural = 'Reviews Listing Widgets'
+    
+    def render_content(self, context, *args, **kwargs):
+        request = context['request']
+        
+        reviews_label = Label.objects.get(title__iexact='reviews')
+        queryset=Post.permitted.filter(labels=reviews_label).order_by('-created')
+        header = utils.ReviewsHeader(request, reviews_label)
+        queryset_modifiers = [header.page_menu.queryset_modifier,]
+        for queryset_modifier in queryset_modifiers:
+            queryset = queryset_modifier.updateQuery(queryset)
+
+    
+        return list_detail.object_list(
+            request=request,
+            queryset=queryset,
+            template_name='widgets/widgets/listing_wide.html',
+            paginate_by=10,
+            extra_context={
+                'header': header,
+            },
+        ).content
+
 class SentWidget(Widget):
     user_unique = True
     login_required = True
@@ -831,6 +830,29 @@ class SentWidget(Widget):
             'view': 'render_listing_inbox',
             'page_obj': page_obj,
         }, context_instance=RequestContext(request))
+
+class ShowsListingWidget(Widget):
+    class Meta():
+        verbose_name = 'Shows Listing Widget'
+        verbose_name_plural = 'Shows Listing Widgets'
+    
+    def render_content(self, context, *args, **kwargs):
+        request = context['request']
+        
+        queryset = Entry.objects.permitted().by_content_type(Show).week().order_by('start')
+        header = utils.ShowsHeader(request)
+        queryset_modifiers = [header.page_menu.queryset_modifier,]
+        for queryset_modifier in queryset_modifiers:
+            queryset = queryset_modifier.updateQuery(queryset)
+
+        return list_detail.object_list(
+            request=request,
+            queryset=queryset,
+            template_name='widgets/widgets/listing_block.html',
+            extra_context={
+                'header': header,
+            },
+        ).content
 
 class SlidingPromoWidget(Widget):
     class Meta():

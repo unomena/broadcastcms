@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from broadcastcms.base.admin import ModelBaseAdmin, ModelBaseTabularInline
 
-from models import AccountMenuWidget, BannerWidget, CreateMessageWidget, EmbedWidget, FacebookSetupWidget, FriendsWidget, FriendsActivityWidget, FriendsFindWidget, FriendsFacebookInviteWidget, FriendsSideNavWidget, HistoryWidget, InboxWidget, MessageWidget, NowPlayingWidget, NewsCompetitionsEvents, OnAirWidget, PasswordResetWidget, PasswordResetCompleteWidget, ReviewsListingWidget, SentWidget, SlidingPromoWidget, SlidingPromoWidgetSlot, StatusUpdates, YourFriends
+from models import AccountMenuWidget, BannerWidget, CreateMessageWidget, EmbedWidget, FacebookSetupWidget, FriendsWidget, FriendsActivityWidget, FriendsFindWidget, FriendsFacebookInviteWidget, FriendsSideNavWidget, HistoryWidget, InboxWidget, MessageWidget, NowPlayingWidget, NewsCompetitionsEvents, OnAirWidget, PasswordResetWidget, PasswordResetCompleteWidget, ReviewsListingWidget, SentWidget, ShowsListingWidget, SlidingPromoWidget, SlidingPromoWidgetSlot, StatusUpdates, YourFriends
 
 class SlidingPromoWidgetSlotInline(ModelBaseTabularInline):
     model = SlidingPromoWidgetSlot
@@ -41,6 +41,7 @@ admin.site.register(PasswordResetWidget)
 admin.site.register(PasswordResetCompleteWidget)
 admin.site.register(ReviewsListingWidget)
 admin.site.register(SentWidget)
+admin.site.register(ShowsListingWidget)
 admin.site.register(SlidingPromoWidget, SlidingPromoWidgetAdmin)
 admin.site.register(StatusUpdates)
 admin.site.register(YourFriends)
