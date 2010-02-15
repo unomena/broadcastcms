@@ -1,0 +1,33 @@
+{% load scaled_image_tags %}
+
+
+<div class="post_body">
+    <div class="post_body_half">
+        <img src="{% scaled_image_url self 292 151 %}" />
+		<div class="poll">
+		    <form id="frmPoll" action="{% url ajax_poll_vote self.slug %}" method="post" >
+    			<h4>{{ self.title }}</h4>
+                {% if not voted %}
+				    {% for option in self.options.permitted %}
+                        <p class="poll_answ"><input value="{{ option.id }}" id="poll" name="poll" type="radio"> {{ option.title }} </p>
+                    {% endfor %}
+				<label for="poll" id="pollwarning" class="error">Please select an answer</label>
+                {% endif %}
+				{% for option in self.options.permitted %}
+					<p class="poll_res" {% if voted %}style="display: block;"{% endif %}><span class="percentage">{{ option.percentage|floatformat:"0" }}%</span><span class="ques">{{ option.title }}</span></p>
+                {% endfor %}
+                {% if not voted %}
+    				<p class="poll_btn"><input src="/media/bcms/images/forms/btn-vote.jpg" name="submit" type="image"></p>
+	    			<p class="poll_btn"><a href="javascript: void(0);" class="polllink">View Results »</a></p>
+                {% endif %}
+			</form>
+		</div>
+	</div>
+	<div class="post_body_half rich">
+    <p>
+        {{ self.content|safe }}
+    </p>
+	</div>
+</div>
+
+
