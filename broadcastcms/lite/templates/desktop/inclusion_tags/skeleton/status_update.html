@@ -1,10 +1,15 @@
 <span class="auth_reload" src="{% url ssi_status_update_node %}">
     {% if request.user.is_authenticated %}
-        <div class="logged_status">
+        <div class="logged_status" style="display: none;">
             <form id="frmStatusUpdate" action="{% url status_update %}" method="post">
 	            <p class="status_update"><input type="text" name="status_update" value="Update your status here..." /></p>
         		<p class="status_update_btn"><input type="submit" name="submit" value="Update" /></p>
             </form>
         </div>
+        <script type="text/javascript">
+            $(function(){
+                $(".logged_status").css("display", "block");
+            });
+        </script>
     {% endif %}
 </span>
