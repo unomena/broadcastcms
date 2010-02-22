@@ -110,6 +110,10 @@ urlpatterns = patterns('',
     url(r'listen-live/$', listen_live, name='listen_live'),
     url(r'studio-cam/$', studio_cam, name='studio_cam'),
     
+    url(r'^podcasts/rss/$', podcasts_rss, name='podcasts_rss'),
+    url(r'^news/rss/$', news_rss, name='news_rss'),
+    url(r'^chart/rss/$', chart_rss, name='chart_rss'),
+
     url(r'news/$', news, name='news'),
     url(r'news/(?P<slug>[\w-]+)/$', news_content, name='news_content'),
 
@@ -118,8 +122,6 @@ urlpatterns = patterns('',
     url(r'modals/password-reset/$', 'django.contrib.auth.views.password_reset', {'template_name': 'desktop/modals/password_reset.html'}, name='modals_password_reset'),
     url(r'modals/register/$', modals_register, name='modals_register'),
 
-    url(r'^podcasts/rss/$', podcasts_rss, name='podcasts_rss'),
-    
     url(r'reviews/(?P<slug>[\w-]+)/$', reviews_content, name='reviews_content'),
     url(r'reviews/$', layout_view, name='reviews'),
     
