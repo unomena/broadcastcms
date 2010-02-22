@@ -217,7 +217,7 @@ def ajax_poll_vote(request, slug):
     return response
    
 # RSS
-def rss_object_list(context, title, link, description, queryset):
+def rss_enclosed_object_list(context, title, link, description, queryset):
     feed = feedgenerator.Rss201rev2Feed(
         title=title,
         link=link,
@@ -231,6 +231,57 @@ def rss_object_list(context, title, link, description, queryset):
             link="http://%s/%s" % (context['site_domain'], url),
             description=item.description,
             enclosure=feedgenerator.Enclosure("http://%s/media/%s" % (context['site_domain'], item.audio), str(item.audio.size), mimetypes.guess_type(item.audio.name)[0]),
+        )
+    return HttpResponse(feed.writeString('UTF-8'), mimetype="application/rss+xml")
+
+def rss_chart_object_list(context, chart, queryset):
+    path = reverse('chart')
+    link="http://%s%s" % (context['site_domain'], path)
+
+    feed = feedgenerator.Rss201rev2Feed(
+        title=chart.title,
+        link=link,
+        description=chart.description,
+        language=u"en")
+
+    for item in queryset:
+        from broadcastcms.radio.models import Artist, Song
+        
+        description = "%s." % item.current_position
+        try:
+            song = item.song
+        except Song.DoesNotExist:
+            song = None
+        
+        if song:
+            description += " %s" % song.title
+            try:
+                artist = song.artist.title
+            except Artist.DoesNotExist:
+                artist = None
+            
+            if artist:
+                description += " - %s" % artist.title
+
+        feed.add_item(
+            link=link,
+            title=item.song.title,
+            description=description,
+        )
+    return HttpResponse(feed.writeString('UTF-8'), mimetype="application/rss+xml")
+
+def rss_post_object_list(context, title, description, link, queryset):
+    feed = feedgenerator.Rss201rev2Feed(
+        title=title,
+        link=link,
+        description=description,
+        language=u"en")
+
+    for item in queryset:
+        feed.add_item(
+            link="http://%s%s" % (context['site_domain'], item.url(context)),
+            title=item.title,
+            description=item.content,
         )
     return HttpResponse(feed.writeString('UTF-8'), mimetype="application/rss+xml")
 
@@ -657,6 +708,12 @@ class ChartView(object):
                 'header': header,
             },
         )
+
+def chart_rss(request):
+    context = RequestContext(request, {})
+    queryset = ChartView().get_latest_chart_entries() 
+    chart = ChartView().get_latest_chart()
+    return rss_chart_object_list(context, chart, queryset)
 
 # Competitions
 
@@ -1241,6 +1298,18 @@ def news_content(request, slug, template_name='desktop/generic/object_detail.htm
         },
     )
 
+def news_rss(request):
+    context = RequestContext(request, {})
+    news_label = Label.objects.get(title__iexact='news')
+    queryset=Post.permitted.filter(labels=news_label).order_by('-created')[:20]
+    
+    title = "%s News" % context['site_name']
+    path = reverse('news')
+    link="http://%s%s" % (context['site_domain'], path)
+    description = "Latest news for %s." % context['site_name']
+
+    return rss_post_object_list(context, title, description, link, queryset)
+
 # Popups     
 def listen_live(request):
     context = RequestContext(request, {})
@@ -1268,7 +1337,7 @@ def podcasts_rss(request):
     link = reverse('home')
     description = "Latest podcasts for %s." % context['site_name']
     queryset = PodcastStandalone.permitted.order_by("-created")
-    return rss_object_list(context, title, link, description, queryset)
+    return rss_enclosed_object_list(context, title, link, description, queryset)
 
 # Reviews
 def reviews_content(request, slug, template_name='desktop/generic/object_detail.html'):
