@@ -628,11 +628,18 @@ class ChartView(object):
         if not charts:
             raise Http404
         else:
-            return charts[0]
+            chart = charts[0].as_leaf_class()
+            if chart.classname == 'AutoUpdateChart':
+                chart.update_entries()
+            return chart
 
     def get_latest_chart_entries(self):
+        """
+        Chart entries with current position of 0 are excluded. This allows for auto
+        charts to contain new and expiring entries.
+        """
         chart = self.get_latest_chart()
-        return chart.chartentries.permitted().order_by('current_position')
+        return chart.chartentries.permitted().exclude(current_position=0).order_by('current_position')
     
     def __call__(self, request, template_name='desktop/generic/object_listing_wide.html'):
         queryset=self.get_latest_chart_entries() 
