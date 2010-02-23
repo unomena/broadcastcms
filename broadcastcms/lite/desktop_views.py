@@ -1457,7 +1457,7 @@ def shows_dj_podcasts_rss(request, slug):
     title = "%s Podcasts" % context['site_name']
     link = reverse('shows_dj_podcasts', kwargs={'slug': castmember.slug})
     description = "Latest podcasts for %s." % castmember.title
-    return rss_object_list(context, title, link, description, queryset)
+    return rss_enclosed_object_list(context, title, link, description, queryset)
 
 def shows_dj_contact(request, slug):
     castmember = get_object_or_404(CastMember, slug=slug, is_public=True)
