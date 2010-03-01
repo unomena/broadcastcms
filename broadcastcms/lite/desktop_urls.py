@@ -112,6 +112,7 @@ urlpatterns = patterns('',
     
     url(r'^podcasts/rss/$', podcasts_rss, name='podcasts_rss'),
     url(r'^news/rss/$', news_rss, name='news_rss'),
+    url(r'^news/(?P<filter_label>[\w-]+)/rss/$', news_rss_by_label, name='news_rss_by_label'),
     url(r'^chart/rss/$', chart_rss, name='chart_rss'),
 
     url(r'news/$', news, name='news'),

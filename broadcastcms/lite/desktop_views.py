@@ -1298,17 +1298,26 @@ def news_content(request, slug, template_name='desktop/generic/object_detail.htm
         },
     )
 
-def news_rss(request):
+def news_rss_for_queryset(request, queryset):
     context = RequestContext(request, {})
-    news_label = Label.objects.get(title__iexact='news')
-    queryset=Post.permitted.filter(labels=news_label).order_by('-created')[:20]
-    
     title = "%s News" % context['site_name']
     path = reverse('news')
     link="http://%s%s" % (context['site_domain'], path)
     description = "Latest news for %s." % context['site_name']
 
     return rss_post_object_list(context, title, description, link, queryset)
+
+def news_rss(request):
+    news_label = Label.objects.get(title__iexact='news')
+    queryset=Post.permitted.filter(labels=news_label).order_by('-created')[:20]
+    return news_rss_for_queryset(request, queryset)
+
+def news_rss_by_label(request, filter_label):
+    news_label = Label.objects.get(title__iexact='news')
+    filter_label = get_object_or_404(Label, title__iexact=filter_label)
+    filter_label = filter_label
+    queryset=Post.permitted.filter(labels=news_label).filter(labels=filter_label).order_by('-created')[:20]
+    return news_rss_for_queryset(request, queryset)
 
 # Popups     
 def listen_live(request):
