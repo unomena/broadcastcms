@@ -3,10 +3,6 @@
 <div class="promo">
     <span class="controller_span">
         <div id="controller">
-    	    <div class="jFlowControl">
-	    	    <a href="javascript: void(0);" class="promo_on"> Good Hope FM DJ Champs</a>
-	    		<p class="promo_detail">Win your own show on Good Hope FM</p>
-		    </div>
             {% for item in items %}
     	        <div class="jFlowControl">
 	    	        <a href="javascript: void(0);" class="promo_on">{{ item.title }}</a>
@@ -15,14 +11,6 @@
             {% endfor %}
 	    </div>
     	<div id="slides">
-	            <div>
-			        <p id="radio_champs_content"></p>
-                    <script type="text/javascript" src="/media/bcms/includes/swfobject.js"></script>
-                    <script type="text/javascript">
-                        swfobject.embedSWF("/media/bcms/flash/radio_champs.swf", "radio_champs_content", "414", "260", "9.0.0");
-                    </script>
-				    <p class="btn"><a href="{{ item.url }}">View Details</a></p>
-    			</div>
             {% for item in items %}
 	            <div>
 			        <p><img src="{% scaled_image_url item.content 414 260 %}" width="414" height="260" alt="" /></p>
