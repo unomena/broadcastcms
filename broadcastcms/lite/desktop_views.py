@@ -166,6 +166,17 @@ def ssi_widget(request, slug, *args, **kwargs):
     widget = get_object_or_404(Widget, slug=slug).get_leaf()
     return obj_render_content_wrapper(request, widget, *args, **kwargs)
 
+def ssi_comments_node(request, slug):
+    """
+    Exposes the COmmentsNode widget as a view.
+    """
+    instance = get_object_or_404(ContentBase, slug=slug)
+    context = RequestContext(request, {})
+    context.update({
+        'instance': instance.as_leaf_class(),
+    })
+    return HttpResponse(CommentsNode('instance').render(context))
+
 @cache_for_nginx(60*10)
 def session_your_friends(request):
     """
@@ -179,6 +190,7 @@ def session_status_updates(request):
     Exposes the StatusUpdates widget as a view.
     """
     return obj_render_content_wrapper(request, StatusUpdates())
+
     
 @ajax_required
 def ajax_likes_stamp(request, slug):
@@ -215,7 +227,7 @@ def ajax_poll_vote(request, slug):
         return response
     
     return response
-   
+
 # RSS
 def rss_enclosed_object_list(context, title, link, description, queryset):
     feed = feedgenerator.Rss201rev2Feed(
