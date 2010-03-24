@@ -8,22 +8,23 @@
     {% if user.is_authenticated %}
         <span class="ps_like"><a id="like_link" href="{{ vote_url }}">I Like</a></span>
         <script type="text/javascript">
-                $(function() {
-                    submit_facebook_vote = function() {
-                        {% if user.profile.facebook_id and user.profile.publish_facebook_likes %}
-                            Facebook.publish_stream({
-                                auto_publish: true,
-                                user_message: "liked something on {{ site_name }}",
-                                attachment: {
-                                    name: $('.post_head h3').text(),
-                                    href: window.location.toString(),
-                                    description: "{{ user }} liked this."
-                                }
-                            });
-                        {% endif %}
-                    };
-                });
-        </script>
+            $(function() {
+                submit_facebook_vote = function() {
+                    {% if request.user.facebook_profile %}
+                    FB.Connect.streamPublish(
+                        user_message="liked something on {{ site_name }}",
+                        attachment={
+                            name: $('.post_head h3').text(),
+                            href: window.location.toString(),
+                            description: "{{ user }} liked this."
+                        },null, null, null, null,
+                        auto_publish=true
+                    );
+                    {% endif %}
+                };
+            });
+</script>
+
     {% else %}
         <span class="ps_like"><a class="thickbox" href="{% url modals_login %}?height=370&width=540">Log in</a></span>
     {% endif %}
