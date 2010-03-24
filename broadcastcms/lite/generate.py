@@ -739,7 +739,52 @@ def create_admin_friends():
         })
 
     return friends + profiles
-    
+   
+def create_views_and_widgets():
+    objects = []
+    objects.append({
+        "model": "widgets.LayoutTopLeftRightTopLeftSlot",
+        "fields": {
+            "layout": {
+                "model": "widgets.LayoutTopLeftRight",
+                "fields": {
+                    "view_name": "home",
+                    "is_public": True,
+                },
+            },
+            "widget": {
+                "model": "widgets.SlidingPromoWidget",
+                "fields" : {
+                    "title": "Sliding Promo Widget",
+                    "is_public": True,
+                },
+            },
+            "position": "1",
+        },
+    })
+    objects.append({
+        "model": "widgets.LayoutTopLeftRightTopLeftSlot",
+        "fields": {
+            "layout": {
+                "model": "widgets.LayoutTopLeftRight",
+                "fields": {
+                    "view_name": "facebook_setup",
+                    "is_public": True,
+                    "background": True,
+                },
+            },
+            "widget": {
+                "model": "widgets.FacebookSetupWidget",
+                "fields" : {
+                    "title": "Facebook Setup Widget",
+                    "is_public": True,
+                },
+            },
+            "position": "1",
+        },
+    })
+    return objects
+
 def generate():
     choice = raw_input('Do you want to clear and sync the db? Warning: All data will be lost! y/n: ').lower()
     if choice == 'y':
@@ -771,5 +816,6 @@ def generate():
     objects += create_settings()
     objects += create_admin_friends()
     objects += create_status_updates()
+    objects += create_views_and_widgets()
     
     load_json(objects)
