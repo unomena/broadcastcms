@@ -39,10 +39,12 @@ class CompetitionAdmin(ContentBaseAdmin):
     
     inlines = (
         OptionInline, 
-        CompetitionEntryInline,
         WinnerInline, 
     )
     save_on_top = True
 
+class CompetitionEntryAdmin(admin.ModelAdmin):
+    list_filter = ('competition',)
 
 admin.site.register(Competition, CompetitionAdmin)
+admin.site.register(CompetitionEntry, CompetitionEntryAdmin)
