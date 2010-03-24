@@ -618,6 +618,7 @@ class LikesStampNode(template.Node):
             'instance': instance,
             'vote_url': vote_url,
             'site_name': site_name,
+            'request': context['request'],
         }
         return render_to_string('desktop/inclusion_tags/misc/likes_stamp.html', context)
 
