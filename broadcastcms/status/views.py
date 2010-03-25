@@ -15,7 +15,7 @@ def update(request):
         StatusUpdate.objects.create(user=request.user, text=text,
             source=StatusUpdate.SITE_SOURCE)
         if request.is_ajax():
-            return HttpResponse(json.dumps({"updated": True, "text": truncate_words(text, 6)}),
+            return HttpResponse(json.dumps({"updated": True, "text": text, "truncated_text": truncate_words(text, 6)}),
                 mimetype="application/json")
 
     raise Http404
