@@ -763,6 +763,26 @@ def create_views_and_widgets():
         },
     })
     objects.append({
+        "model": "widgets.LayoutTopLeftRightTopRightSlot",
+        "fields": {
+            "layout": {
+                "model": "widgets.LayoutTopLeftRight",
+                "fields": {
+                    "view_name": "home",
+                    "is_public": True,
+                },
+            },
+            "widget": {
+                "model": "widgets.StatusUpdates",
+                "fields" : {
+                    "title": "Status Updates Widget",
+                    "is_public": True,
+                },
+            },
+            "position": "1",
+        },
+    })
+    objects.append({
         "model": "widgets.LayoutTopLeftRightTopLeftSlot",
         "fields": {
             "layout": {
