@@ -10,6 +10,19 @@
             $(function(){
                 $(".logged_status").css("display", "block");
             });
+        submit_facebook_update = function(text) {
+            {% if request.user.facebook_profile %}
+            FB.Connect.streamPublish(
+                user_message="updated their status on {{ site_name }}",
+                attachment={
+                    name: "{{ site_name }}",
+                    href: "http://{{ site_domain }}{% url home %}",
+                    description: text
+                },null, null, null, null,
+                auto_publish=true
+            );
+            {% endif %}
+        };
         </script>
     {% endif %}
 </span>
