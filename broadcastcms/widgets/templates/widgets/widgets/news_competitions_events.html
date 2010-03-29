@@ -53,8 +53,18 @@
     <span id="on_the_ball_content"></span>
     <script type="text/javascript" src="/media/bcms/includes/swfobject.js"></script>
     <script type="text/javascript">
-        swfobject.embedSWF("/media/bcms/flash/countdown.swf", "on_the_ball_content", "310", "190", "9.0.0");
+        $(function () {
+            var flashvars = {};
+            var params = {
+                wmode: "transparent"
+            };
+            var attributes = { 
+                wmode: "transparent"
+            };
+            swfobject.embedSWF("/media/bcms/flash/countdown.swf", "on_the_ball_content", "310", "190", "9.0.0", "expressInstall.swf", flashvars, params, attributes);
+        });
     </script>
+
 </div><!--/Updates-->
 
 <div class="updates align-right events yellow">
