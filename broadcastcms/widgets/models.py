@@ -585,6 +585,7 @@ class NewsCompetitionsEvents(Widget):
         """
         news_labels = Label.objects.filter(title__iexact="news")
         queryset = ContentBase.permitted.filter(labels__in=news_labels).order_by("-created")[:18]
+        queryset = [item.as_leaf_class() for item in queryset]
         return self.Panel(queryset, 6)
 
     @property
