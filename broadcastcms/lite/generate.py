@@ -788,6 +788,26 @@ def create_views_and_widgets():
             "layout": {
                 "model": "widgets.LayoutTopLeftRight",
                 "fields": {
+                    "view_name": "home",
+                    "is_public": True,
+                },
+            },
+            "widget": {
+                "model": "widgets.NewsCompetitionsEvents",
+                "fields" : {
+                    "title": "News Competitions Events Widget",
+                    "is_public": True,
+                },
+            },
+            "position": "1",
+        },
+    })
+    objects.append({
+        "model": "widgets.LayoutTopLeftRightTopLeftSlot",
+        "fields": {
+            "layout": {
+                "model": "widgets.LayoutTopLeftRight",
+                "fields": {
                     "view_name": "facebook_setup",
                     "is_public": True,
                     "background": True,
