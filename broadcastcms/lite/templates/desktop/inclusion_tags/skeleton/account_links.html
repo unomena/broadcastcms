@@ -20,4 +20,11 @@
         	<span class="logged_links"><a href="{% url modals_login %}?height=370&amp;width=540" class="thickbox">Sign in</a> | <a href="{% url modals_register %}?height=630&amp;width=515" class="thickbox">Sign up</a></span>
         </p>
     {% endif %}
+
+    <script type="text/javascript">
+    /* only display links when js is ready */
+    $(document).ready(function() {
+        $(".logged_links").css('display', 'inline');
+    });
+    </script>
 </span>
