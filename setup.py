@@ -29,7 +29,7 @@ setup(
         'user-messages==0.1-dev1',
         'whoosh==0.3.5',
         'windmill==1.3',
-
+        'django-tinymce==1.5',
     ],
     include_package_data=True,
 )
