@@ -739,9 +739,36 @@ def create_admin_friends():
         })
 
     return friends + profiles
-   
+
+def create_promos():
+    objects = []
+    for i in range(1, 4):
+        objects.append({
+            "model": "widgets.SlidingPromoWidgetSlot",
+            "fields": {
+                "title": "Promo Widget Slot %s" % i
+                "widget": {
+                    "model": "widgets.SlidingPromoWidget",
+                    "fields" : {
+                        "title": "Sliding Promo Widget",
+                    }
+                },
+                "content": {
+                    "model": "post.post",
+                    "fields" : {
+                        "title": "Post %s Title" % i,
+                    }
+                },
+            },
+        })
+
+    return objects
+
+
 def create_views_and_widgets():
     objects = []
+
+    # home
     objects.append({
         "model": "widgets.LayoutTopLeftRightTopLeftSlot",
         "fields": {
@@ -802,6 +829,8 @@ def create_views_and_widgets():
             "position": "1",
         },
     })
+    
+    # facebook setup
     objects.append({
         "model": "widgets.LayoutTopLeftRightTopLeftSlot",
         "fields": {
@@ -857,5 +886,6 @@ def generate():
     objects += create_admin_friends()
     objects += create_status_updates()
     objects += create_views_and_widgets()
+    objects += create_promos()
     
     load_json(objects)
