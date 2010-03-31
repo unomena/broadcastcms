@@ -15,10 +15,8 @@ setup(
     install_requires = [
         'django-debug-toolbar==0.8.0',
         'Django_FacebookConnect==0.2',
-        'django-filebrowser==3.0',
         'django-friends==0.2alpha',
         'django-haystack',
-        'django-tinymce==1.5',
         'django-voting==0.1-pre',
         'mysql-python==1.2.3c1',
         'pexpect==2.4',
