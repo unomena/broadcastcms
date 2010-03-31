@@ -215,10 +215,3 @@ AUTHENTICATION_BACKENDS = (
     'facebookconnect.models.FacebookBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
-
-TINYMCE_JS_URL = MEDIA_URL + "bcms/includes/tiny_mce/tiny_mce.js"
-TINYMCE_JS_ROOT = MEDIA_URL + "bcms/includes/tiny_mce"
-TINYMCE_DEFAULT_CONFIG = {
-    'theme': "advanced",
-}
-
