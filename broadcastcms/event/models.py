@@ -2,7 +2,8 @@ from django.db import models
 from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.show.models import CastMember
 from broadcastcms.calendar.managers import CalendarManager
-from broadcastcms.richtext.fields import RichTextField
+
+from ckeditor.fields import RichTextField
 
 
 class Province(ModelBase):

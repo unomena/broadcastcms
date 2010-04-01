@@ -5,7 +5,8 @@ from django.db import models
 from broadcastcms.base.models import ModelBase, ContentBase
 from broadcastcms.calendar.managers import CalendarManager
 from broadcastcms.label.models import Label
-from broadcastcms.richtext.fields import RichTextField
+
+from ckeditor.fields import RichTextField
 
 
 class CastMember(ContentBase):

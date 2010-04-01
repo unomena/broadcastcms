@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.db import models
 
 from broadcastcms.base.models import ContentBase, ModelBase
-from broadcastcms.richtext.fields import RichTextField
+from ckeditor.fields import RichTextField
 
 
 class Poll(ContentBase):

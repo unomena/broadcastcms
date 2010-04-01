@@ -48,12 +48,13 @@ from broadcastcms.podcast.models import PodcastStandalone
 from broadcastcms.poll.models import Poll
 from broadcastcms.post.models import Post
 from broadcastcms.radio.models import Song
-from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.scaledimage.fields import get_image_scales
 from broadcastcms.show.models import Show, CastMember, Credit
 from broadcastcms.status.models import StatusUpdate
 from broadcastcms.utils import mail_user
 from broadcastcms.utils.decorators import ajax_required
+
+from ckeditor.fields import RichTextField
 
 from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode

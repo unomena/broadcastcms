@@ -14,7 +14,7 @@ from django.db.models.fields.related import ForeignKey
 from django.db.models.fields.related import ManyToManyField
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from broadcastcms.richtext.fields import RichTextField
+from ckeditor.fields import RichTextField
 from broadcastcms.scaledimage.fields import ScaledImageField
 
 SCRIPT_PATH = os.path.dirname( os.path.realpath( __file__ ) )

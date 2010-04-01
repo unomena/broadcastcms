@@ -9,8 +9,9 @@ from broadcastcms.label.models import Label
 from broadcastcms.integration.mailinglists import PMailer
 from broadcastcms.post.models import Post
 from broadcastcms.promo.models import PromoWidget
-from broadcastcms.richtext.fields import RichTextField
 from broadcastcms.scaledimage import ScaledImageField
+
+from ckeditor.fields import RichTextField
 
 def get_update_choices():
     choices = []

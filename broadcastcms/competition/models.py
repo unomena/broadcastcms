@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 
 from broadcastcms.base.models import ModelBase, ContentBase
 from broadcastcms.base.managers import ModelBaseManager
-from broadcastcms.richtext.fields import RichTextField
+
+from ckeditor.fields import RichTextField
 
 
 class Competition(ContentBase):
