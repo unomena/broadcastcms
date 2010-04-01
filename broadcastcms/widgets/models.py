@@ -846,13 +846,34 @@ class ShowsListingWidget(Widget):
         for queryset_modifier in queryset_modifiers:
             queryset = queryset_modifier.updateQuery(queryset)
 
+
+        extra_context={
+            'header': header,
+        }
+        
+        # sort items with breakfast show first, with preceding entries appended to the end
+        # get breakfast show label
+        bs_labels = Label.objects.filter(title__iexact='breakfast show')
+        # get breakfast show entries
+        if bs_labels:
+            bs_entries = queryset.filter(content__labels__in=bs_labels)
+        else:
+            bs_entries = None
+
+        # regard the first entry in bs_entries as the valid breakfast show entry
+        # if we have a breakfast show override object list with the new ordering
+        if bs_entries:
+            bs_entry = bs_entries[0]
+            qs_list = [item for item in queryset]
+            bs_index = qs_list.index(bs_entry)
+            object_list = qs_list[bs_index:] + qs_list[:bs_index]
+            extra_context['object_list'] = object_list
+
         return list_detail.object_list(
             request=request,
             queryset=queryset,
             template_name='widgets/widgets/listing_block.html',
-            extra_context={
-                'header': header,
-            },
+            extra_context=extra_context
         ).content
 
 class SlidingPromoWidget(Widget):
