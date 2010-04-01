@@ -109,6 +109,7 @@ INSTALLED_APPS = (
     'friends',
     'user_messages',
     'facebookconnect',
+    'ckeditor',
 
     'broadcastcms.banner',
     'broadcastcms.base',
