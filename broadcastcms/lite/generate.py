@@ -746,7 +746,7 @@ def create_promos():
         objects.append({
             "model": "widgets.SlidingPromoWidgetSlot",
             "fields": {
-                "title": "Promo Widget Slot %s" % i
+                "title": "Promo Widget Slot %s" % i,
                 "widget": {
                     "model": "widgets.SlidingPromoWidget",
                     "fields" : {
