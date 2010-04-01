@@ -1,8 +1,9 @@
 from django.db import models
 from broadcastcms.base.models import ContentBase
+from ckeditor.fields import RichTextField
 
 class Post(ContentBase):
-    content = models.TextField()
+    content = RichTextField()
 
     class Meta():
         verbose_name = 'Post'
