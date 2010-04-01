@@ -54,6 +54,8 @@ urlpatterns = patterns('',
     
     url(r'^admin/(.*)', admin.site.root),
     
+    (r'^ckeditor/', include('ckeditor.urls')),    
+    
     url(r'^ajax/', include(ajax_urls)),
     
     url(r'^ssi/', include(ssi_urls)),
