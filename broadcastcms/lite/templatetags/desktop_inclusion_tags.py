@@ -121,6 +121,7 @@ class MastfootNode(template.Node):
             'terms_or_privacy': (terms or privacy),
             'sitemap_columns': sitemap_columns,
             'mobile_url': mobile_url,
+            'site_name': context['site_name'],
         }
         return render_to_string('desktop/inclusion_tags/skeleton/mastfoot.html', context)
 
