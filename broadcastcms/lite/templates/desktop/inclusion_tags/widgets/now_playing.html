@@ -1,7 +1,7 @@
 {% load scaled_image_tags %}
 
 <div class="box">
-    <h1>Now Playing &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+    <h1>On Air &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
 	<div class="box_show_info">
 	    {% if primary_castmember %}<p class="bsi_thumb"><img src="{% scaled_image_url primary_castmember 81 81 %}" width="81" height="81" alt="" /></p>{% endif %}
 		<p class="bsi_time">On Air: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</p>
