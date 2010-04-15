@@ -58,6 +58,7 @@ def clear_and_sync():
     child.sendline('drop schema %s;' % db_name)
     child.expect('mysql> ')
     child.sendline('create schema %s;' % db_name)
+    child.expect('mysql> ')
 
     # Sync db
     child = pexpect.spawn('%s syncdb' % sys.argv[0])
