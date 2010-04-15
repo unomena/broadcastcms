@@ -1,8 +1,8 @@
 <div class="logo bottom_logo"><a href="{% url home %}"></a></div>
 	
 <div class="legal">
-    <p>&copy; {% now "Y" %} Powered by <a href="http://www.praekelt.com/" target="_blank">Praekelt Digital</a>.</p>
-	<p>All rights reserved.{% if mobile_url %}<a href="{{ mobile_url }}">View mobile version</a>{% endif %}</p>
+    <p>&copy; {% now "Y" %} {{ site_name }}. All rights reserved.{% if mobile_url %}<a href="{{ mobile_url }}">View mobile version</a>{% endif %}</p>
+	<p>Powered by <a href="http://www.praekelt.com/" target="_blank">Praekelt Digital</a>.</p>
 	{% if terms_or_privacy %}<p>Please read our {% if terms %}<a href="{% url info_content "terms" %}">Terms and Conditions</a>{% endif %}{% if terms_and_privacy %} and {% endif %}{% if privacy %}<a href="{% url info_content "privacy" %}">Privacy Policy</a></p>{% endif %}{% endif %}
 </div>
 	
