@@ -954,7 +954,7 @@ class ContentBaseViews(object):
         
         def handle_chart(self):
             if self.classname in ['Chart',]:
-                return reverse('chart', kwargs={'slug': self.slug})
+                return reverse('chart')
         
         def handle_events(self):
             if self.classname in ['Event',]:
