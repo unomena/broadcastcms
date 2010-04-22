@@ -733,9 +733,14 @@ class OnAirWidget(Widget):
             # get the primary castmember for the current on air show
             primary_castmembers = show.primary_castmembers
             primary_castmember = primary_castmembers[0] if primary_castmembers else None
-            
+
+            with_castmembers = []
+            for castmember in primary_castmembers:
+                if castmember.title.lower() not in show.title.lower():
+                    with_castmembers.append(castmember)
+                    
             # build the 'with' string linking to each castmembers blog
-            with_str = " & ".join(['<a href="%s">%s</a>' % (castmember.url(), castmember.title) for castmember in primary_castmembers])
+            with_str = " & ".join(['<a href="%s">%s</a>' % (castmember.url(), castmember.title) for castmember in with_castmembers])
         
             # get the current or last played song and artist info
             song_entry = self.get_public_on_air_entry(Song)
