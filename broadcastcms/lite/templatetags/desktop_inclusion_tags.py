@@ -13,7 +13,7 @@ from broadcastcms.calendar.models import Entry
 from broadcastcms.competition.models import Competition
 from broadcastcms.event.models import Event
 from broadcastcms.label.models import Label
-from broadcastcms.show.models import Credit, Show
+from broadcastcms.show.models import CastMember, Credit, Show
 from broadcastcms.base.models import ContentBase, ModelBase
 from broadcastcms.radio.models import Song
 from broadcastcms.cache.decorators import cache_view_function
@@ -892,7 +892,10 @@ class NowPlayingNode(OnAirNode):
        
         # get the primary castmember for the current on air show
         primary_castmembers = show.primary_castmembers if show else None
-        primary_castmember = primary_castmembers[0] if primary_castmembers else None
+        try:
+            primary_castmember = primary_castmembers.get() if primary_castmembers else None
+        except CastMember.DoesNotExist: 
+            primary_castmember = None
         
         # get the current playing song and artist info
         song_entry = self.get_public_on_air_entry(Song)
