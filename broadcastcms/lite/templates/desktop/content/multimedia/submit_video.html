@@ -1,0 +1,33 @@
+{% extends "desktop/generic/base_generic.html" %}
+{% load public_tags %}
+
+{% block generic %}
+    <div class="page_form">
+            <h2 class="smaller">Hi {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}, send us your video using the form below.</h2>
+            <form id="frmSubmitMediaFallback" action="{{ request.path }}" method="post">
+				<div class="page_form_row">
+					<label for="title">Title:</label>
+					<p class="text_input shift">{{ form.title }}{% if form.errors.title %}{% for error in form.errors.title %}<label for="id_title" class="error" style="display:inline">{{ error }}</label>{% endfor %}{% endif %}</p>
+				</div>
+				<div class="page_form_row">
+					<label for="tell_us_more">Tell us More:</label>
+					<p class="text_input shift">{{ form.tell_us_more }}{% if form.errors.tell_us_more %}{% for error in form.errors.tell_us_more %}<label for="id_tell_us_more" class="error" style="display:inline">{{ error }}</label>{% endfor %}{% endif %}</p>
+				</div>
+				<div class="page_form_row">
+					<label for="embed_code">Embed Code:</label>
+					<p class="text_input shift">{{ form.embed_code }}{% if form.errors.embed_code %}{% for error in form.errors.embed_code %}<label for="id_embed_code" class="error" style="display:inline">{{ error }}</label>{% endfor %}{% endif %}</p>
+					<p class="note">This can be a URL from video sites like YouTube or Zoopy, or the raw Embed-tag from any video/flash site. (ie. http://www.youtube.com/watch?v=8mVEGfH4s5g)</p>
+
+				</div>
+				<div class="page_form_row">
+					<label for="legal">Legal Stuff:</label>
+					<p class="checkbox">{{ form.permission_check }} &nbsp; The video I'm submitting is mine or I have permission to use it{% if form.errors.permission_check %}{% for error in form.errors.permission_check %}<label for="id_permission_check" class="error" style="display:inline">{{ error }}</label>{% endfor %}{% endif %}</p>
+					<p class="clearfix"></p>
+				</div>
+				<div class="page_form_row">
+					<p class="label">&nbsp;</p>
+					<p class="btn"><input type="image" src="/media/bcms/images/forms/btn-save.jpg" name="submit" /></p>
+				</div>
+            </form>
+    </div>
+{% endblock %}

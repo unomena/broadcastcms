@@ -1,5 +1,5 @@
 <div class="page_menu">
-    <h2>{{ object.title }}</h2>
+    <h2>{% if object.verbose_title %}{{ object.verbose_title }}{% else %}{{ object.title }}{% endif %}</h2>
 	<ul>
         {% for item in object.items %}
 	        <li {% ifequal item object.active_item %}class="on"{% endifequal %}><span class="pm_left"></span><a href="{{ item.url }}">{{ item.title }}</a><span class="pm_right"></span></li>

@@ -70,7 +70,7 @@
 <div class="updates align-right events yellow">
     <h1>Competitions</h1>
     {% for object in competitions %}
-        {% if forloop.first %}
+        {% if object.featured %}
             <div class="chunk_item">
                 <div class="chunk_body_first">
                     <p class="upd_pic"><a href="{% call_view object url %}"><img src="{% scaled_image_url object 150 84 %}" width="150" height="84" alt="" /></a></p>
@@ -95,7 +95,7 @@
 <div class="updates align-right events blue">
     <h1>Events</h1>
     {% for object in events %}
-        {% if forloop.first %}
+        {% if object.featured %}
             <div class="chunk_item">
                 <div class="chunk_body_first">
                     <p class="upd_pic"><a href="{% call_view object url %}"><img src="{% scaled_image_url object 150 84 %}" width="150" height="84" alt="" /></a></p>

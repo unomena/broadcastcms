@@ -1,0 +1,70 @@
+{% extends "desktop/generic/base_generic.html" %}
+{% load public_tags %}
+
+{% block generic %}
+    <div class="page_form">
+            <h2 class="smaller">Hi {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}, send us your pictures using the form below.</h2>
+            <form id="frmSubmitMediaFallback" action="{{ request.path }}" method="post" enctype="multipart/form-data">
+                <div class="page_form_row">
+                    <label for="title">Title:</label>
+                    <p class="text_input shift">{{ form.title }}{% if form.errors.title %}{% for error in form.errors.title %}<label for="id_title" class="error" style="display:inline">{{ error }}</label>{% endfor %}{% endif %}</p>
+                </div>
+                <div class="page_form_row">
+
+                    <label for="tell_us_more">Tell us More:</label>
+                    <p class="text_input shift">{{ form.tell_us_more }}{% if form.errors.tell_us_more %}{% for error in form.errors.tell_us_more %}<label for="id_tell_us_more" class="error" style="display:inline">{{ error }}</label>{% endfor %}{% endif %}</p>
+                </div>
+                <!-- {{ form.file1 }} -->
+                {% for img_field in form.file_fields %}
+                    <div class="page_form_row" id="file_field_row{{ forloop.counter }}">
+                        <label for="id_file{{ forloop.counter }}">{% if forloop.first %}File(s):{% else %}&nbsp;{% endif %}</label>
+                        <p class="text_input no_bg"><input type="file" name="file{{ forloop.counter }}" id="id_file{{ forloop.counter }}" class="required submit_file no-bord" /></p>
+                    </div>
+                {% endfor %}
+                <div class="page_form_row">
+                    <label for="add_more_link">&nbsp;</label>
+                    <a href="#" id="add_more_link" class="add_more">+ Add Another File</a>
+                </div>
+                <script type="text/javascript">
+                <!--
+                jQuery(function() {
+                    // hide all of the file fields
+                    for (var i=2;i<={{ form.file_fields|length }};i++) {
+                        if (!jQuery('#id_file'+i).attr('value')) {
+                            jQuery('#file_field_row'+i).css('display', 'none');
+                        }
+                    }
+                    // add an onclick event
+                    jQuery('#add_more_link').click(function() {
+                        var added = false;
+                        for (var i=2;i<={{ form.file_fields|length }};i++) {
+                            if (jQuery('#file_field_row'+i).css('display') == 'none') {
+                                jQuery('#file_field_row'+i).css('display', 'inline');
+                                added = true;
+                                break;
+                            }
+                        }
+                        if (!added) {
+                            window.alert("Sorry, unfortunately you cannot add more than {{ form.file_fields|length }} pictures at a time.");
+                        }
+                        return false;
+                    });
+                });
+                -->
+                </script>
+                <div class="page_form_row">
+                    <label for="legal">Legal Stuff:</label>
+                    <p class="checkbox">{{ form.permission_check }} &nbsp; The picture(s) I'm submitting are mine or I have permission to use them{% if form.errors.permission_check %}{% for error in form.errors.permission_check %}<label for="id_permission_check" class="error" style="display:inline">{{ error }}</label>{% endfor %}{% endif %}</p>
+
+                    <label for="legal">&nbsp;</label>
+                    <p class="checkbox">{{ form.ghfm_use_check }} &nbsp; Good Hope FM may use my pictures for online use{% if form.errors.ghfm_use_check %}{% for error in form.errors.ghfm_use_check %}<label for="id_ghfm_use_check" class="error" style="display:inline">{{ error }}</label>{% endfor %}{% endif %}</p>
+                    <p class="clearfix"></p>
+                </div>
+                <div class="page_form_row">
+                    <p class="label">&nbsp;</p>
+                    <p class="btn"><input type="image" src="/media/bcms/images/forms/btn-save.jpg" name="submit" /></p>
+
+                </div>
+            </form>
+    </div>
+{% endblock %}

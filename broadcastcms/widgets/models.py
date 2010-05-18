@@ -591,15 +591,21 @@ class NewsCompetitionsEvents(Widget):
     @property
     def competitions(self):
         """
-        Returns queryset containing 3 competitions.
+        Returns queryset containing 2 competitions.
         """
-        queryset = Competition.permitted.order_by("-created")[:3]
-        return queryset
+        queryset = Competition.permitted.order_by("-created")[:2]
+        ret = []
+        i = 0
+        for item in queryset:
+            item.featured = (i < 2)
+            i += 1
+            ret.append(item)
+        return ret
     
     @property
     def events(self):
         """
-        Returns queryset containing 3 upcomming events.
+        Returns queryset containing 2 upcoming events.
         """
         queryset = []
         entries = Entry.objects.permitted().upcoming().by_content_type(Event).order_by('start')
@@ -609,8 +615,14 @@ class NewsCompetitionsEvents(Widget):
                 if content not in queryset:
                     queryset.append(content)
 
-        queryset = queryset[:3]
-        return queryset
+        queryset = queryset[:2]
+        ret = []
+        i = 0
+        for item in queryset:
+            item.featured = (i < 2)
+            i += 1
+            ret.append(item)
+        return ret
 
     def render_content(self, context, *args, **kwargs):
         """

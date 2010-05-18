@@ -16,6 +16,7 @@ from broadcastcms.competition.models import CompetitionEntry
 from broadcastcms.event.models import Province
 from broadcastcms.fields import formfields
 from broadcastcms.integration.captchas import ReCaptcha
+from broadcastcms.gallery.models import Gallery, GalleryImage
 
 from models import Settings
 
@@ -738,3 +739,85 @@ class NewMessageFormMultipleFriends(NewMessageFormMultiple):
             friend_pks = [object['friend'].pk for object in self.fields['to_user'].queryset.friends_for_user(kwargs['user'])]
             qs = User.objects.filter(pk__in=friend_pks).order_by('username')
             self.fields['to_user'].queryset = qs
+
+
+
+class SubmitPicturesForm(forms.Form):
+    """
+    Multimedia page pictures submission form.
+    """
+    
+    title = forms.CharField(max_length=200)
+    tell_us_more = forms.CharField(max_length=200, label="Tell us More", required=False)
+    file1 = forms.ImageField()
+    file2 = forms.ImageField(required=False)
+    file3 = forms.ImageField(required=False)
+    file4 = forms.ImageField(required=False)
+    file5 = forms.ImageField(required=False)
+    file6 = forms.ImageField(required=False)
+    file7 = forms.ImageField(required=False)
+    file8 = forms.ImageField(required=False)
+    file9 = forms.ImageField(required=False)
+    file10 = forms.ImageField(required=False)
+    permission_check = forms.BooleanField(required=True)
+    ghfm_use_check = forms.BooleanField(required=True)
+    
+    file_fields = []
+    
+    
+    def __init__(self, *args, **kwargs):
+        super(SubmitPicturesForm, self).__init__(*args, **kwargs)
+        self.file_fields = []
+        field_count = 1
+        done = False
+        # get all of the file fields
+        while not done:
+            try:
+                self.file_fields.append(self.fields['file%d' % field_count])
+                field_count += 1
+            except:
+                done = True
+        
+        
+    def save(self, request):
+        data = self.cleaned_data
+        # create a gallery
+        gallery = Gallery(title=data['title'], description=data['tell_us_more'],
+            image=data['file1'], owner=request.user)
+        gallery.save()
+        
+        # add the images to the gallery
+        for i in range(1, len(self.file_fields)+1):
+            cur_file = data['file%d' % i]
+            if cur_file:
+                img = GalleryImage(gallery=gallery, title=str(cur_file), description=str(cur_file), image=cur_file, owner=request.user)
+                img.save()
+                
+        return True
+    
+    
+    
+    
+class SubmitVideoForm(forms.Form):
+    """
+    Multimedia page video submission form.
+    """
+    
+    title = forms.CharField(max_length=200)
+    tell_us_more = forms.CharField(max_length=200, label="Tell us More")
+    embed_code = forms.CharField(max_length=1024)
+    permission_check = forms.BooleanField(required=True)
+    
+
+    def clean_embed_code(self):
+        code = self.cleaned_data['embed_code']
+        youtube_full_regex = r'<object width="(?P<width>\d+)" height="(?P<height>\d+)"><param name="movie" value="(?P<url>http.://.*youtube\.com/v/[a-zA-Z0-9&=_]*)"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="(?P<embedurl>http.://.*youtube\.com/v/[a-zA-Z0-9&=_]*)" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="(?P<embedwidth>\d+)" height="(?P<embedheight>\d+)"></embed></object>'
+        youtube_partial_regex = r'(?P<url>http.://.*youtube\.com/v/[a-zA-Z0-9&=_]*)'
+        # TODO: RegEx to validate embed code for YouTube and Zoopy
+        # TODO: perhaps get thumbnails here? then we can show errors if they occur
+        return code
+    
+    
+    def save(self):
+        # TODO: add functionality here to create video entry
+        return True

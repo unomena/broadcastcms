@@ -105,8 +105,12 @@ urlpatterns = patterns('',
     url(r'events/$', events, name='events'),
     url(r'events/(?P<slug>[\w-]+)/$', events_content, name='events_content'),
     
-    url(r'galleries/$', galleries, name='galleries'),
-    url(r'galleries/(?P<slug>[\w-]+)/$', galleries_content, name='galleries_content'),
+    url(r'multimedia/$', galleries, name='galleries'),
+    url(r'multimedia/submit/$', multimedia_submit, name='multimedia_submit'),
+    url(r'multimedia/submit-photos/$', multimedia_submit_photos, name='multimedia_submit_photos'),
+    url(r'multimedia/submit-video/$', multimedia_submit_video, name='multimedia_submit_video'),
+    url(r'multimedia/thanks/$', multimedia_submit_thanks, name='multimedia_submit_thanks'),
+    url(r'multimedia/(?P<slug>[\w-]+)/$', galleries_content, name='galleries_content'),
    
     url(r'info/(?P<section>[\w-]+)/$', info_content, name='info_content'),
     

@@ -56,7 +56,7 @@ from broadcastcms.utils.decorators import ajax_required
 
 from ckeditor.fields import RichTextField
 
-from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm
+from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm, SubmitPicturesForm, SubmitVideoForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
 import utils
 
@@ -926,20 +926,22 @@ def validate_captcha(request):
     raise Http404
 
 # Galleries
-def galleries(request, template_name='desktop/generic/object_listing_block.html'):
-    queryset=Gallery.permitted.all()
+def galleries(request, template_name='desktop/content/multimedia/object_listing_block.html'):
+    queryset=ContentBase.permitted.filter(classname__in=['Video','Gallery']).order_by('-created')
     header = utils.GalleriesHeader(request)
-    queryset_modifiers = [header.page_menu.queryset_modifier,]
+    queryset_modifiers = [header.page_menu.queryset_modifier, header.page_menu.subitem_queryset_modifier]
     for queryset_modifier in queryset_modifiers:
         queryset = queryset_modifier.updateQuery(queryset)
 
     return list_detail.object_list(
         request=request,
-        queryset=queryset,
+        queryset=queryset,  # always show latest first
         template_name=template_name,
         paginate_by=15,
         extra_context={
             'header': header,
+            'section': 'galleries',
+            'page_title': header.page_title,
         },
     )
 
@@ -953,9 +955,86 @@ def galleries_content(request, slug, template_name='desktop/generic/object_detai
         slug=slug,
         template_name=template_name,
         extra_context={
-            'header': header,
+            'header' : header,
+            'section': 'galleries',
+            'page_title': header.page_title,
         },
     )
+
+
+def multimedia_submit(request):
+    """
+    Displays the media submission form. Not yet used.
+    """
+    
+    context = RequestContext(request, {})
+    return render_to_response('desktop/modals/submit_media.html', context)
+    
+
+@login_required
+def multimedia_submit_thanks(request):
+    """
+    Just shows a thank you page.
+    """
+    
+    header = utils.MultimediaThanksHeader()
+    context = RequestContext(request, {
+        'page_title': 'Thank You',
+        'header': header,
+    })
+    
+    return render_to_response('desktop/content/multimedia/submit_thanks.html', context)
+
+
+@login_required
+def multimedia_submit_photos(request):
+    """
+    Displays the photo submission form, but a static version.
+    """
+    
+    header = utils.SubmitMultimediaHeader(request)
+    context = RequestContext(request, {
+        'page_title': header.page_title,
+        'header': header,
+    })
+    
+    if request.method == 'POST':
+        form = SubmitPicturesForm(request.POST, request.FILES)
+        if form.is_valid():
+            if form.save(request):
+                return HttpResponseRedirect(reverse('multimedia_submit_thanks'))
+    else:
+        form = SubmitPicturesForm()
+    
+    context['form'] = form
+    
+    return render_to_response('desktop/content/multimedia/submit_photos.html', context)
+    
+    
+@login_required
+def multimedia_submit_video(request):
+    """
+    Displays the video submission form, but a static version.
+    """
+    
+    header = utils.SubmitMultimediaHeader(request)
+    context = RequestContext(request, {
+        'page_title': header.page_title,
+        'header': header,
+    })
+    
+    if request.method == 'POST':
+        form = SubmitVideoForm(request.POST, request.FILES)
+        if form.is_valid():
+            if form.save(request):
+                return HttpResponseRedirect(reverse('multimedia_submit_thanks'))
+    else:
+        form = SubmitVideoForm()
+    
+    context['form'] = form
+    
+    return render_to_response('desktop/content/multimedia/submit_video.html', context)
+    
 
 # Misc
 
@@ -1788,7 +1867,8 @@ class EventViews(object):
             'location': location,
         }
         return render_to_string('desktop/content/events/listing.html', context)
-    
+
+
 class GalleryViews(object):
     def render_block(self, context):
         short_title = self.title[:16]

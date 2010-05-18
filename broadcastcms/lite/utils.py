@@ -140,6 +140,32 @@ class LabeledQuerysetModifier(QuerysetModifier):
 
     def updateQuery(self, queryset):
         return queryset.filter(labels=self.label)
+        
+        
+# Queryset Modifiers for Multimedia page
+class MediaQuerysetModifier(QuerysetModifier):
+    def __init__(self, get_value):
+        self.filter_classes = ['Video', 'Gallery']
+        if get_value == 'videos':
+            self.filter_classes = ['Video', ]
+        elif get_value == 'galleries':
+            self.filter_classes = ['Gallery', ]
+            
+        super(QuerysetModifier, self).__init__(get_value)
+            
+        
+    def updateQuery(self, queryset):
+        return queryset.filter(classname__in=self.filter_classes)
+
+
+class MediaSubQuerysetModifier(QuerysetModifier):
+    def updateQuery(self, queryset):
+        if self.get_value == 'goodhope':
+            return queryset.filter(owner__is_staff=True)
+        elif self.get_value == 'globalcitizens':
+            return queryset.filter(owner__is_staff=False)
+        # unmodified
+        return queryset
 
 
 class PageMenu(object):
@@ -330,6 +356,102 @@ class OrderPageMenu(PageMenu):
         }
     ]
 
+
+class ComplexPageMenu(PageMenu):
+    def __init__(self, request):
+        super(ComplexPageMenu, self).__init__(request)
+        
+        # get the currently active item
+        active_item = self.active_item
+        if active_item:
+            # run through all possible sub-items
+            for i in range(0, len(self.subitems)):
+                self.subitems[i]['url'] = '%s&%s=%s' % (active_item['url'], self.subitems_request_key, self.subitems[i]['get_value'])
+                
+    
+    @property
+    def active_subitem(self):
+        get_value = str(self.request.GET.get(self.subitems_request_key, ''))
+        # if there is a sub-item specified
+        if get_value:
+            # search for the active sub-item
+            for item in self.subitems:
+                if get_value == item['get_value']:
+                    return item
+        
+        # return the first available (default) sub-item
+        return self.subitems[0]
+    
+    
+    @property
+    def subitem_queryset_modifier(self):
+        active_subitem = self.active_subitem
+        if active_subitem:
+            return active_subitem['queryset_modifier'](active_subitem['get_value'])
+        else:
+            return None
+        
+
+
+class MultimediaPageMenu(ComplexPageMenu):
+    request_key = 'media'
+    items = [
+        {
+            'title'            : 'All Media',
+            'get_value'        : 'all',
+            'queryset_modifier': MediaQuerysetModifier,
+        },
+        {
+            'title'            : 'Videos',
+            'get_value'        : 'videos',
+            'queryset_modifier': MediaQuerysetModifier,
+        },
+        {
+            'title'            : 'Photo Galleries',
+            'get_value'        : 'galleries',
+            'queryset_modifier': MediaQuerysetModifier,
+        },
+    ]
+    
+    subitems_request_key = 'filter'
+    subitems = [
+        {
+            'title'            : 'All',
+            'get_value'        : 'all',
+            'queryset_modifier': MediaSubQuerysetModifier,
+        },
+        {
+            'title'            : 'Good Hope FM',
+            'get_value'        : 'goodhope',
+            'queryset_modifier': MediaSubQuerysetModifier,
+        },
+        {
+            'title'            : 'Global Citizens',
+            'get_value'        : 'globalcitizens',
+            'queryset_modifier': MediaSubQuerysetModifier,
+        },
+    ]
+
+
+
+class SubmitMultimediaPageMenu(PageMenu):
+    verbose_title = 'I would like to submit the following:'
+    
+    items = [
+        {
+            'title': 'Pictures',
+            'path' : '/multimedia/submit-photos/',
+            'verbose_title': 'I would like to submit the following:',
+        },
+        {
+            'title': 'Videos',
+            'path' : '/multimedia/submit-video/',
+            'verbose_title': 'I would like to submit the following:',
+        }
+    ]
+
+    
+
 class LabelPageMenu(PageMenu):
     request_key = 'label'
     
@@ -440,13 +562,27 @@ class CompetitionHeader(CompetitionsHeader):
 
 
 class GalleriesHeader(Header):
-    page_title = 'Galleries'
+    page_title = 'Multimedia'
     
     def __init__(self, request):
-        self.page_menu = OrderPageMenu(request)
+        self.page_menu = MultimediaPageMenu(request)
 
 
 class GalleryHeader(GalleriesHeader):
+    def __init__(self):
+        self.page_menu = None
+        
+        
+class SubmitMultimediaHeader(Header):
+    page_title = 'Send us your Pictures &amp; Videos'
+    
+    def __init__(self, request):
+        self.page_menu = SubmitMultimediaPageMenu(request)
+        
+    
+class MultimediaThanksHeader(Header):
+    page_title = 'Thank You'
+    
     def __init__(self):
         self.page_menu = None
 

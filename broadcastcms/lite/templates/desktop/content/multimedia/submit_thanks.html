@@ -1,0 +1,8 @@
+{% extends "desktop/generic/base_generic.html" %}
+{% load public_tags %}
+
+{% block generic %}
+    <div class="page_form">
+        <h2 class="smaller">Thank you for connecting with us {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}. All uploads subject to approval.</h2>
+    </div><!--/form-->
+{% endblock %}

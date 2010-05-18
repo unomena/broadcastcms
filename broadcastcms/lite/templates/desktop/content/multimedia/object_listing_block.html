@@ -1,0 +1,28 @@
+{% extends "desktop/generic/base_generic.html" %}
+{% load public_tags %}
+
+{% block generic %}
+    <div class="page_container">
+        <ul class="sub_menu">
+            {% for item in header.page_menu.subitems %}
+                <li{% ifequal item header.page_menu.active_subitem %} class="on"{% endifequal %}><span class="sm_left"></span><a href="{{ item.url }}">{{ item.title }}</a><span class="sm_right"></span></li>
+            {% endfor %}
+            <li class="align-right sm_share"><a href="submit-photos/" id="media-submit-link">Send us your photos &amp; videos +</a></li>
+            <script type="text/javascript">
+                /*jQuery(function() {
+                    $("#media-submit-link").attr('href', "submit/?height=700&width=500");
+                });*/
+            </script>
+        </ul>
+        
+        {% for object in object_list %}
+            {% if forloop.counter0|divisibleby:"3" or forloop.first %}
+	            <div class="block_container">
+            {% endif %}
+                {% call_view object.as_leaf_class render_block %}
+            {% if forloop.counter|divisibleby:"3" or forloop.last %}
+                </div>
+            {% endif %}
+        {% endfor %}
+	</div><!--/container-->
+{% endblock %}

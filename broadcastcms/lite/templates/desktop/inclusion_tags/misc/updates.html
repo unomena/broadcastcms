@@ -18,7 +18,7 @@
                     {% for panel in panels %}        
     		            <div class="panel" id="panel{{ forloop.counter }}">
                             {% for object in panel %}
-                                {% if forloop.first %}
+                                {% if object.featured %}
                                     {% call_view object render_updates_featured %}
                                 {% else %}
                                     {% call_view object render_updates %}

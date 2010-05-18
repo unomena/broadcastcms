@@ -72,6 +72,7 @@ class MastheadNode(template.Node):
         Site section links are highlighted when on appropriate section.
         """
         section = context['section']
+        print section
         items = [
             {'title': 'Home', 'url': reverse('home'), 'current': section == 'home'},
             {'title': 'Shows', 'url': reverse('shows_line_up'), 'current': section == 'shows'},
@@ -79,7 +80,7 @@ class MastheadNode(template.Node):
             {'title': 'Win', 'url': reverse('competitions'), 'current': section == 'competitions'},
             {'title': 'News', 'url': reverse('news'), 'current': section == 'news'},
             {'title': 'Events', 'url': reverse('events'), 'current': section == 'events'},
-            {'title': 'Galleries', 'url': reverse('galleries'), 'current': section == 'galleries'},
+            {'title': 'Multimedia', 'url': reverse('galleries'), 'current': section == 'galleries'},
             {'title': 'Reviews', 'url': reverse('reviews'), 'current': section == 'reviews'},
         ]
    
@@ -120,7 +121,15 @@ class MastfootNode(template.Node):
             {'title': 'Events Calendar', 'url': reverse('events')},
             {'title': 'Contact Us', 'url': reverse('contact')},
             {'title': 'Dating', 'url': 'http://ghfm.datingbuzz.com/s/', "target": "_blank"},
+            {'title': 'Careers', 'url': 'http://careers.5fm.co.za/jobs/jobs_listing?station=6828519cd8635fda7e316a4f7e96a29b', 'target': '_blank'},
         ]
+        #~ sitemap_items = [
+            #~ {'title': 'About the SABC', 'url': reverse('home')},
+            #~ {'title': 'Jobs', 'url': reverse('home')},
+            #~ {'title': 'Advertise', 'url': reverse('info_content', kwargs={'section': 'advertise'})},
+            #~ {'title': 'Contact Us', 'url': reverse('home')},
+            #~ {'title': 'Terms of Use', 'url': reverse('home')},
+        #~ ]
 
         # append additional dynamic navcard items
         if about: sitemap_items.append({'title': "About Us", 'url': reverse('info_content', kwargs={'section': "about"})})
@@ -421,7 +430,7 @@ class UpdatesNode(template.Node):
 
         return panels
 
-    @cache_view_function(10*60, respect_path=True, respect_self_attrs=['heading',])
+    #@cache_view_function(10*60, respect_path=True, respect_self_attrs=['heading',])
     def render(self, context):
         panels = self.build_panels()
         context = {
@@ -892,10 +901,7 @@ class NowPlayingNode(OnAirNode):
        
         # get the primary castmember for the current on air show
         primary_castmembers = show.primary_castmembers if show else None
-        try:
-            primary_castmember = primary_castmembers.get() if primary_castmembers else None
-        except CastMember.DoesNotExist: 
-            primary_castmember = None
+        primary_castmember = primary_castmembers[0] if primary_castmembers else None
         
         # get the current playing song and artist info
         song_entry = self.get_public_on_air_entry(Song)
