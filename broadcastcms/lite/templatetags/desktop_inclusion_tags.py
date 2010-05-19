@@ -72,7 +72,6 @@ class MastheadNode(template.Node):
         Site section links are highlighted when on appropriate section.
         """
         section = context['section']
-        print section
         items = [
             {'title': 'Home', 'url': reverse('home'), 'current': section == 'home'},
             {'title': 'Shows', 'url': reverse('shows_line_up'), 'current': section == 'shows'},
@@ -80,7 +79,7 @@ class MastheadNode(template.Node):
             {'title': 'Win', 'url': reverse('competitions'), 'current': section == 'competitions'},
             {'title': 'News', 'url': reverse('news'), 'current': section == 'news'},
             {'title': 'Events', 'url': reverse('events'), 'current': section == 'events'},
-            {'title': 'Multimedia', 'url': reverse('galleries'), 'current': section == 'galleries'},
+            {'title': 'Multimedia', 'url': reverse('galleries'), 'current': section == 'multimedia'},
             {'title': 'Reviews', 'url': reverse('reviews'), 'current': section == 'reviews'},
         ]
    

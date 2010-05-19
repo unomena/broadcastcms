@@ -132,6 +132,7 @@ INSTALLED_APPS = (
     'broadcastcms.lite',
     'broadcastcms.utils',
     'broadcastcms.widgets',
+    'broadcastcms.video',
 )
 
 ABSOLUTE_URL_OVERRIDES = {

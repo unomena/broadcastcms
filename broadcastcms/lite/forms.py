@@ -1,5 +1,6 @@
 from datetime import datetime
 import threading
+import re
 
 from django import forms
 from django.contrib.auth.models import User
@@ -17,6 +18,8 @@ from broadcastcms.event.models import Province
 from broadcastcms.fields import formfields
 from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.gallery.models import Gallery, GalleryImage
+from broadcastcms.video.models import Video
+from broadcastcms.video import thumbnails
 
 from models import Settings
 
@@ -807,17 +810,74 @@ class SubmitVideoForm(forms.Form):
     tell_us_more = forms.CharField(max_length=200, label="Tell us More")
     embed_code = forms.CharField(max_length=1024)
     permission_check = forms.BooleanField(required=True)
+
+
+    # Regular expressions for parsing embed code
+    # YouTube embeds
+    youtube_full_regex = r'\s*<object\s+width="(?P<width1>\d+)"\s+height="(?P<height1>\d+)">\s*<param\s+name="movie"\s+value="(?P<url1>(?P<protocol1>(http|https))://(?P<subdomain1>[a-z]+)\.youtube\.(?P<domain1>[a-z]+)/v/(?P<videocode1>[a-zA-Z0-9]*)[a-zA-Z0-9&=_]*)">\s*</param>\s*<param\s+name="allowFullScreen"\s+value="true">\s*</param>\s*<param\s+name="allowscriptaccess"\s+value="always">\s*</param>\s*<embed\s+src="(?P<url2>(?P<protocol2>(http|https))://(?P<subdomain2>[a-z]+)\.youtube\.(?P<domain2>[a-z]+)/v/(?P<videocode2>[a-zA-Z0-9]*)[a-zA-Z0-9&=_]*)"\s+type="application/x-shockwave-flash"\s+allowscriptaccess="always"\s+allowfullscreen="true"\s+width="(?P<width2>\d+)"\s+height="(?P<height2>\d+)">\s*</embed>\s*</object>\s*'
+    youtube_partial_regex = r'\s*(?P<protocol>(http|https))://(?P<subdomain>[a-zA-Z0-9\.]*)\.youtube\.(?P<domain>[a-z]+)/watch\?v=(?P<videolink>[a-zA-Z0-9&=_]*)\s*'
+    # Zoopy embeds
+    zoopy_full_regex = r'\s*<object\s+classid="clsid:(?P<clsid>[a-zA-Z0-9-]*)"\s+codebase="http://macromedia.com/cabs/swflash.cab#version=(?P<flashversion>[0-9,]*)"\s+id="zoopy-video-(?P<zoopyid1>\d+)"\s+width="(?P<width1>\d+)"\s+height="(?P<height1>\d+)">\s*<param\s+name="movie"\s+value="http://media.z2.zoopy.com/video-offsite.swf"\s*/>\s*<param\s+name="flashvars"\s+value="id=(?P<zoopyid2>\d+)"\s*/>\s*<param\s+name="quality"\s+value="high"\s*/>\s*<param\s+name="bgcolor"\s+value="#(?P<bgcolor1>\d+)"\s*/>\s*<param\s+name="allowscriptaccess"\s+value="always"\s*/>\s*<param\s+name="allowfullscreen"\s+value="true"\s*/>\s*<param\s+name="wmode"\s+value="opaque"\s*/>\s*<embed\s+src="http://media.z2.zoopy.com/video-offsite.swf"\s+allowfullscreen="true"\s+flashvars="id=(?P<zoopyid3>\d+)"\s+bgcolor="#(?P<bgcolor2>\d+)"\s+width="(?P<width2>\d+)"\s+height="(?P<height2>\d+)"\s+type="application/x-shockwave-flash"\s+allowscriptaccess="always"\s+wmode="opaque">\s*</embed>\s*</object>\s*'
     
+    # can either be 'y' for YouTube or 'z' for Zoopy
+    video_type = None
+    # video details
+    video_id = None
+    # default video width and height
+    video_width = 480
+    video_height = 385
+
+
 
     def clean_embed_code(self):
+        """
+        Checks the embed code to see whether it's a YouTube or Zoopy video.
+        
+        TODO: check video dimensions and resize by aspect ratio if necessary.
+        """
+        
         code = self.cleaned_data['embed_code']
-        youtube_full_regex = r'<object width="(?P<width>\d+)" height="(?P<height>\d+)"><param name="movie" value="(?P<url>http.://.*youtube\.com/v/[a-zA-Z0-9&=_]*)"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="(?P<embedurl>http.://.*youtube\.com/v/[a-zA-Z0-9&=_]*)" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="(?P<embedwidth>\d+)" height="(?P<embedheight>\d+)"></embed></object>'
-        youtube_partial_regex = r'(?P<url>http.://.*youtube\.com/v/[a-zA-Z0-9&=_]*)'
-        # TODO: RegEx to validate embed code for YouTube and Zoopy
-        # TODO: perhaps get thumbnails here? then we can show errors if they occur
+        
+        # check which embed code it is
+        youtube_full = re.compile(self.youtube_full_regex)
+        m = youtube_full.match(code)
+        if not m:
+            youtube_partial = re.compile(self.youtube_partial_regex)
+            m = youtube_partial.match(code)
+            # if it's a partial YouTube link
+            if m:
+                # make it a full one
+                code = '<object width="%(width)s" height="%(height)s"><param name="movie" value="%(protocol)s://%(subdomain)s.youtube.%(domain)s/v/%(videolink)s&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="%(protocol)s://%(subdomain)s.youtube.%(domain)s/v/%(videolink)s&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="%(width)s" height="%(height)s"></embed></object>' % {
+                        'width': self.video_width, 'height': self.video_height, 'videolink': m.group('videolink'), 'domain': m.group('domain'), 'subdomain': m.group('subdomain'), 'protocol': m.group('protocol'),
+                    }
+                self.video_id = m.group('videolink')
+                self.video_type = 'y'
+            else:
+                # check if it's a Zoopy embed
+                zoopy_full = re.compile(self.zoopy_full_regex)
+                m = zoopy_full.match(code)
+                if not m:
+                    raise forms.ValidationError('Invalid embed code.')
+                else:
+                    self.video_type = 'z'
+                    self.video_id = m.group('zoopyid1')
+        else:
+            self.video_type = 'y'
+            self.video_id = m.group('videocode1')
+            
         return code
     
     
-    def save(self):
-        # TODO: add functionality here to create video entry
+    def save(self, request):
+        data = self.cleaned_data
+        # check which type of video it is
+        if self.video_type == 'y':
+            # get the thumbnail from YouTube
+            thumbnail = thumbnails.get_youtube_thumbnail(self.video_id)
+        else:
+            # get the thumbnail from Zoopy
+            thumbnail = thumbnails.get_zoopy_thumbnail(self.video_id)
+        # create the video
+        video = Video(code=data['embed_code'], title=data['title'], description=data['tell_us_more'], image=thumbnail, owner=request.user)
+        video.save()
         return True

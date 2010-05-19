@@ -4,6 +4,7 @@
 
 from django.db import models
 from broadcastcms.base.models import ContentBase
+#~ from django.contrib import admin
 
 
 class Video(ContentBase):
@@ -13,3 +14,6 @@ class Video(ContentBase):
     
     code = models.TextField(blank=True, null=True)
     """The HTML code to embed in the template to render the video."""
+
+
+#~ admin.site.register(Video)

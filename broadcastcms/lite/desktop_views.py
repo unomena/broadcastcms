@@ -940,7 +940,7 @@ def galleries(request, template_name='desktop/content/multimedia/object_listing_
         paginate_by=15,
         extra_context={
             'header': header,
-            'section': 'galleries',
+            'section': 'multimedia',
             'page_title': header.page_title,
         },
     )
@@ -956,7 +956,7 @@ def galleries_content(request, slug, template_name='desktop/generic/object_detai
         template_name=template_name,
         extra_context={
             'header' : header,
-            'section': 'galleries',
+            'section': 'multimedia',
             'page_title': header.page_title,
         },
     )
@@ -981,6 +981,7 @@ def multimedia_submit_thanks(request):
     context = RequestContext(request, {
         'page_title': 'Thank You',
         'header': header,
+        'section': 'multimedia',
     })
     
     return render_to_response('desktop/content/multimedia/submit_thanks.html', context)
@@ -996,6 +997,7 @@ def multimedia_submit_photos(request):
     context = RequestContext(request, {
         'page_title': header.page_title,
         'header': header,
+        'section': 'multimedia',
     })
     
     if request.method == 'POST':
@@ -1021,6 +1023,7 @@ def multimedia_submit_video(request):
     context = RequestContext(request, {
         'page_title': header.page_title,
         'header': header,
+        'section': 'galleries',
     })
     
     if request.method == 'POST':
@@ -1723,7 +1726,7 @@ class ContentBaseViews(object):
         section_handlers = [
             ('home', handle_home),
             ('shows', handle_shows),
-            ('galleries', handle_galleries),
+            ('multimedia', handle_galleries),
             ('competitions', handle_competitions),
             ('events', handle_events),
             ('chart', handle_chart),

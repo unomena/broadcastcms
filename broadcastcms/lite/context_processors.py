@@ -3,7 +3,7 @@ from django.contrib.sites.models import Site
 from broadcastcms.cache.decorators import cache_context_processor
 from broadcastcms.lite.models import Settings
 
-SITE_SECTIONS = ['home', 'shows', 'chart', 'competitions', 'news', 'events', 'galleries', 'reviews',]
+SITE_SECTIONS = ['home', 'shows', 'chart', 'competitions', 'news', 'events', 'multimedia', 'reviews',]
 
 @cache_context_processor(10*60)
 def settings(request):
