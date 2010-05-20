@@ -66,10 +66,13 @@ class AccountMenuWidget(Widget):
         verbose_name = 'Account Menu Widget'
         verbose_name_plural = 'Account Menu Widgets'
    
-    def render_content(self, context, section):
+    def render_content(self, context, section=None, *args, **kwargs):
         from user_messages.models import Thread
         request = context['request']
         
+        if not section:
+            section = request.path.split('/')[2]
+
         messages = Thread.objects.unread(request.user).count()
         msg = "Messages"
         if messages:
