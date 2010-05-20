@@ -8,6 +8,7 @@ from django.contrib.sites.models import Site
 from django.contrib.comments.forms import CommentForm
 from django.core.mail import EmailMessage, mail_managers
 from django.utils.safestring import mark_safe
+from django.template.loader import render_to_string
 
 from friends.models import Friendship
 from user_messages.forms import NewMessageFormMultiple
@@ -745,6 +746,44 @@ class NewMessageFormMultipleFriends(NewMessageFormMultiple):
 
 
 
+#------------------------------------------------------------------------------
+def get_contact_recipients():
+    """
+    Returns the contact e-mail recipients.
+    """
+    
+    recipients = []
+    
+    settings = Settings.objects.all()
+    if settings:
+        contact_email_recipients = settings[0].contact_email_recipients
+        if contact_email_recipients:
+            split_recipients = [recipient.replace('\r', '') for recipient in contact_email_recipients.split('\n')]
+            for recipient in split_recipients:
+                if recipient:
+                    recipients.append(recipient)
+
+    if not recipients:
+        mail_managers('Error: No email address specified', 'Users are trying to contact %s for which no contact email recipients are specified.' % site_name, fail_silently=False)
+    
+    return recipients
+    
+    
+
+#------------------------------------------------------------------------------
+def threaded_mail(subject, message, from_address, recipients):
+    """
+    Starts a separate thread to send an e-mail.
+    """
+    
+    mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
+    t = threading.Thread(target=mail.send, kwargs={'fail_silently': False})
+    t.setDaemon(True)
+    t.start()
+
+
+
+#------------------------------------------------------------------------------
 class SubmitPicturesForm(forms.Form):
     """
     Multimedia page pictures submission form.
@@ -768,6 +807,7 @@ class SubmitPicturesForm(forms.Form):
     file_fields = []
     
     
+    #------------------------------------------------------------------------------
     def __init__(self, *args, **kwargs):
         super(SubmitPicturesForm, self).__init__(*args, **kwargs)
         self.file_fields = []
@@ -782,6 +822,7 @@ class SubmitPicturesForm(forms.Form):
                 done = True
         
         
+    #------------------------------------------------------------------------------
     def save(self, request):
         data = self.cleaned_data
         # create a gallery
@@ -789,18 +830,49 @@ class SubmitPicturesForm(forms.Form):
             image=data['file1'], owner=request.user)
         gallery.save()
         
-        # add the images to the gallery
-        for i in range(1, len(self.file_fields)+1):
-            cur_file = data['file%d' % i]
-            if cur_file:
-                img = GalleryImage(gallery=gallery, title=str(cur_file), description=str(cur_file), image=cur_file, owner=request.user)
-                img.save()
-                
+        try:
+            # add the images to the gallery
+            for i in range(1, len(self.file_fields)+1):
+                cur_file = data['file%d' % i]
+                if cur_file:
+                    img = GalleryImage(gallery=gallery, title=str(cur_file), description=str(cur_file), image=cur_file, owner=request.user)
+                    img.save()
+        except:
+            return False
+        
+        # notify someone
+        recipients = get_contact_recipients()
+        threaded_mail('New user-generated content: pictures', render_to_string('desktop/mailers/new_ugc_pictures.html', {
+                'host': 'http://%s' % request.META['HTTP_HOST'], 'user': request.user,
+                'gallery': gallery,
+            }), '%s <%s>' % (request.user if not request.user.first_name and not request.user.last_name else request.user.get_full_name(), request.user.email),
+            recipients)
+        
         return True
     
     
     
+#------------------------------------------------------------------------------
+def calculate_height(orig_width, orig_height, new_width, default=0):
+    """
+    Calculates the new height given the original width and height (i.e. aspect ratio) and new width.
+    """
     
+    height = default
+    
+    try:
+        # get the video's aspect ratio
+        aspect_ratio = float(orig_width)/float(orig_height)
+        # set the video's height
+        height = int(float(new_width)/aspect_ratio)
+    except:
+        pass
+    
+    return height
+    
+    
+
+#------------------------------------------------------------------------------
 class SubmitVideoForm(forms.Form):
     """
     Multimedia page video submission form.
@@ -819,21 +891,23 @@ class SubmitVideoForm(forms.Form):
     # Zoopy embeds
     zoopy_full_regex = r'\s*<object\s+classid="clsid:(?P<clsid>[a-zA-Z0-9-]*)"\s+codebase="http://macromedia.com/cabs/swflash.cab#version=(?P<flashversion>[0-9,]*)"\s+id="zoopy-video-(?P<zoopyid1>\d+)"\s+width="(?P<width1>\d+)"\s+height="(?P<height1>\d+)">\s*<param\s+name="movie"\s+value="http://media.z2.zoopy.com/video-offsite.swf"\s*/>\s*<param\s+name="flashvars"\s+value="id=(?P<zoopyid2>\d+)"\s*/>\s*<param\s+name="quality"\s+value="high"\s*/>\s*<param\s+name="bgcolor"\s+value="#(?P<bgcolor1>\d+)"\s*/>\s*<param\s+name="allowscriptaccess"\s+value="always"\s*/>\s*<param\s+name="allowfullscreen"\s+value="true"\s*/>\s*<param\s+name="wmode"\s+value="opaque"\s*/>\s*<embed\s+src="http://media.z2.zoopy.com/video-offsite.swf"\s+allowfullscreen="true"\s+flashvars="id=(?P<zoopyid3>\d+)"\s+bgcolor="#(?P<bgcolor2>\d+)"\s+width="(?P<width2>\d+)"\s+height="(?P<height2>\d+)"\s+type="application/x-shockwave-flash"\s+allowscriptaccess="always"\s+wmode="opaque">\s*</embed>\s*</object>\s*'
     
+    # full embed codes
+    youtube_code = '<object width="%(width)s" height="%(height)s"><param name="movie" value="%(protocol)s://%(subdomain)s.youtube.%(domain)s/v/%(videolink)s&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="%(protocol)s://%(subdomain)s.youtube.%(domain)s/v/%(videolink)s&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="%(width)s" height="%(height)s"></embed></object>'
+    zoopy_code   = '<object classid="clsid:%(clsid)s" codebase="http://macromedia.com/cabs/swflash.cab#version=%(flashversion)s" id="zoopy-video-%(zoopyid)s" width="%(width)s" height="%(height)s"><param name="movie" value="http://media.z2.zoopy.com/video-offsite.swf" /><param name="flashvars" value="id=%(zoopyid)s" /><param name="quality" value="high" /><param name="bgcolor" value="#%(bgcolor)s" /><param name="allowscriptaccess" value="always" /><param name="allowfullscreen" value="true" /><param name="wmode" value="opaque" /><embed src="http://media.z2.zoopy.com/video-offsite.swf" allowfullscreen="true" flashvars="id=%(zoopyid)s" bgcolor="#%(bgcolor)s" width="%(width)s" height="%(height)s" type="application/x-shockwave-flash" allowscriptaccess="always" wmode="opaque"></embed></object>'
+    
     # can either be 'y' for YouTube or 'z' for Zoopy
     video_type = None
     # video details
     video_id = None
     # default video width and height
-    video_width = 480
-    video_height = 385
+    video_width = 600
+    video_height = 480
 
 
-
+    #------------------------------------------------------------------------------
     def clean_embed_code(self):
         """
         Checks the embed code to see whether it's a YouTube or Zoopy video.
-        
-        TODO: check video dimensions and resize by aspect ratio if necessary.
         """
         
         code = self.cleaned_data['embed_code']
@@ -847,8 +921,9 @@ class SubmitVideoForm(forms.Form):
             # if it's a partial YouTube link
             if m:
                 # make it a full one
-                code = '<object width="%(width)s" height="%(height)s"><param name="movie" value="%(protocol)s://%(subdomain)s.youtube.%(domain)s/v/%(videolink)s&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="%(protocol)s://%(subdomain)s.youtube.%(domain)s/v/%(videolink)s&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="%(width)s" height="%(height)s"></embed></object>' % {
-                        'width': self.video_width, 'height': self.video_height, 'videolink': m.group('videolink'), 'domain': m.group('domain'), 'subdomain': m.group('subdomain'), 'protocol': m.group('protocol'),
+                code = self.youtube_code % {
+                        'width': self.video_width, 'height': self.video_height, 'videolink': m.group('videolink'),
+                        'domain': m.group('domain'), 'subdomain': m.group('subdomain'), 'protocol': m.group('protocol'),
                     }
                 self.video_id = m.group('videolink')
                 self.video_type = 'y'
@@ -857,17 +932,31 @@ class SubmitVideoForm(forms.Form):
                 zoopy_full = re.compile(self.zoopy_full_regex)
                 m = zoopy_full.match(code)
                 if not m:
+                    threaded_mail('Invalid embed code specified on GHFM site', 'A user entered the following embed code:\n\n%s' % code, 'GoodHopeFM site <goodhopefmmailbox@gmail.com>',
+                        ['thane@praekelt.com'])
                     raise forms.ValidationError('Invalid embed code.')
                 else:
                     self.video_type = 'z'
                     self.video_id = m.group('zoopyid1')
+                    self.video_height = calculate_height(m.group('width1'), m.group('height1'), self.video_width, self.video_height)
+                    code = self.zoopy_code % {
+                            'width': self.video_width, 'height': self.video_height, 'clsid': m.group('clsid'),
+                            'flashversion': m.group('flashversion'), 'zoopyid': m.group('zoopyid1'),
+                            'bgcolor': m.group('bgcolor1'),
+                        }
         else:
             self.video_type = 'y'
             self.video_id = m.group('videocode1')
+            self.video_height = calculate_height(m.group('width1'), m.group('height1'), self.video_width, self.video_height)
+            code = self.youtube_code % {
+                    'width': self.video_width, 'height': self.video_height, 'videolink': m.group('videocode1'),
+                    'domain': m.group('domain1'), 'subdomain': m.group('subdomain1'), 'protocol': m.group('protocol1'),
+                }
             
         return code
     
     
+    #------------------------------------------------------------------------------
     def save(self, request):
         data = self.cleaned_data
         # check which type of video it is
@@ -880,4 +969,13 @@ class SubmitVideoForm(forms.Form):
         # create the video
         video = Video(code=data['embed_code'], title=data['title'], description=data['tell_us_more'], image=thumbnail, owner=request.user)
         video.save()
+        
+        # notify someone
+        recipients = get_contact_recipients()
+        threaded_mail('New user-generated content: video', render_to_string('desktop/mailers/new_ugc_video.html', {
+                'host': 'http://%s' % request.META['HTTP_HOST'], 'user': request.user,
+                'video': video,
+            }), '%s <%s>' % (request.user if not request.user.first_name and not request.user.last_name else request.user.get_full_name(), request.user.email),
+            recipients)
+        
         return True

@@ -41,6 +41,7 @@ from broadcastcms.chart.models import Chart, ChartEntry
 from broadcastcms.competition.models import Competition
 from broadcastcms.event.models import Event, Appearance
 from broadcastcms.gallery.models import Gallery
+from broadcastcms.video.models import Video
 from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.label.models import Label
 from broadcastcms.lite.context_processors import determine_section
@@ -962,6 +963,23 @@ def galleries_content(request, slug, template_name='desktop/generic/object_detai
     )
 
 
+def video_content(request, slug, template_name='desktop/generic/object_detail.html'):
+    queryset = Video.permitted
+    header = utils.GalleryHeader()
+    
+    return list_detail.object_detail(
+        request=request,
+        queryset=queryset,
+        slug=slug,
+        template_name=template_name,
+        extra_context={
+            'header' : header,
+            'section': 'multimedia',
+            'page_title': header.page_title,
+        },
+    )
+
+
 def multimedia_submit(request):
     """
     Displays the media submission form. Not yet used.
@@ -1704,6 +1722,8 @@ class ContentBaseViews(object):
         def handle_galleries(self):
             if self.classname in ['Gallery',]:
                 return reverse('galleries_content', kwargs={'slug': self.slug})
+            if self.classname in ['Video',]:
+                return reverse('video_content', kwargs={'slug': self.slug})
         
         def handle_competitions(self):
             if self.classname in ['Competition',]:
@@ -1889,6 +1909,26 @@ class GalleryViews(object):
             'self': self,
         }
         return render_to_string('desktop/content/galleries/article_body.html', context)
+        
+
+class VideoViews(object):
+    def render_block(self, context):
+        short_title = self.title[:16]
+        if short_title != self.title:
+            short_title += ' ...'
+        context = {
+            'self': self,
+            'short_title': short_title,
+            'url': self.url(context),
+        }
+        return render_to_string('desktop/content/galleries/block.html', context)
+    
+    def render_article_body(self, context):
+        context = {
+            'self': self,
+        }
+        return render_to_string('desktop/content/galleries/article_body.html', context)
+    
 
 class CastMemberViews(object):
     def url(self, context=None):
@@ -2113,6 +2153,7 @@ public.site.register(Competition, CompetitionViews)
 public.site.register(Entry, EntryViews)
 public.site.register(Event, EventViews)
 public.site.register(Gallery, GalleryViews)
+public.site.register(Video, VideoViews)
 public.site.register(ImageBanner, ImageBannerViews)
 public.site.register(Poll, PollViews)
 public.site.register(Post, PostViews)

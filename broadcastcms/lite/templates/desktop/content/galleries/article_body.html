@@ -1,16 +1,20 @@
 {% load scaled_image_tags %}
 
 <div class="post_body">
-    <div id="gallery">
-	    <div id="slideshow" class="slideshow"></div>
-	</div>
-	<div id="thumbs" class="thumb_carousel">
-	    <p class="thumbs_prev"></p>
-		<ul class="thumbs">
-            {% for image in self.images.permitted %}
-    		    <li><a class="thumb" href="{{ image.image.url }}"><img src="{% scaled_image_url image 80 53 %}" width="80" height="53" /></a></li>
-            {% endfor %}
-		</ul>
-		<p class="thumbs_next"></p>
-	</div>
+    {% ifequal self.classname "Video" %}
+        {{ self.code|safe }}
+    {% else %}
+        <div id="gallery">
+            <div id="slideshow" class="slideshow"></div>
+        </div>
+        <div id="thumbs" class="thumb_carousel">
+            <p class="thumbs_prev"></p>
+            <ul class="thumbs">
+                {% for image in self.images.permitted %}
+                    <li><a class="thumb" href="{{ image.image.url }}"><img src="{% scaled_image_url image 80 53 %}" width="80" height="53" /></a></li>
+                {% endfor %}
+            </ul>
+            <p class="thumbs_next"></p>
+        </div>
+    {% endifequal %}
 </div>
