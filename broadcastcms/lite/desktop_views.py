@@ -1,6 +1,10 @@
 from datetime import date, datetime, timedelta
 import calendar
 import mimetypes
+try:
+    import json
+except:
+    import simplejson as json
 
 from django import template
 from django.conf import settings
@@ -57,7 +61,7 @@ from broadcastcms.utils.decorators import ajax_required
 
 from ckeditor.fields import RichTextField
 
-from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm, SubmitPicturesForm, SubmitVideoForm
+from forms import make_competition_form, make_contact_form, LoginForm, ProfileForm, ProfilePictureForm, ProfileSubscriptionsForm, RegistrationForm, _BaseCastmemberContactForm, SubmitPicturesForm, SubmitVideoForm, NewsletterSignupForm
 from templatetags.desktop_inclusion_tags import AccountLinksNode, CommentsNode, StatusUpdateNode, HomeFriendsNode, HomeStatusUpdatesNode, LikesStampNode
 import utils
 
@@ -1055,9 +1059,31 @@ def multimedia_submit_video(request):
     context['form'] = form
     
     return render_to_response('desktop/content/multimedia/submit_video.html', context)
-    
+
+
 
 # Misc
+
+def newsletter_subscribe(request):
+    """
+    Handles newsletter subscription - AJAX response.
+    """
+    
+    response = {
+        'status' : 'error',
+        'message': 'Please enter a valid e-mail address and mobile number',
+    }
+    
+    if request.method == 'POST':
+        form = NewsletterSignupForm(request.POST)
+        if form.is_valid():
+            if form.save():
+                response = {'status': 'success', 'message': 'Thank you for signing up!'}
+            else:
+                response = {'status': 'error', 'message': 'An internal error has occurred - please contact the administrator'}
+    
+    return HttpResponse(json.dumps(response))
+
 
 def contact(request):
     context = RequestContext(request, {})

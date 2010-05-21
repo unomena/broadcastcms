@@ -294,3 +294,28 @@ class UserProfile(models.Model):
 
 # Create User profile property which gets or creates an empty profile for the given user
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
+
+
+class UserNewsletterSignup(models.Model):
+    """
+    A class for tracking newsletter signups for users with no user profile.
+    """
+    
+    email = models.EmailField()
+    mobile = models.CharField(max_length=30, blank=True, null=True)
+    
+    def save(self, *args, **kwargs):
+        settings = Settings.objects.all()
+        # sign the user up for the newsletter
+        if settings:
+            settings = settings[0]
+            list_id = settings.pmailer_list_id
+            form_id = settings.pmailer_form_id
+            email = self.email
+            # make sure we've got all the details
+            if email and list_id and form_id:
+                pmailer = PMailer(list_id=list_id, form_id=form_id, email=email)
+                pmailer.subscribe()
+
+        super(UserNewsletterSignup, self).save(*args, **kwargs)
+

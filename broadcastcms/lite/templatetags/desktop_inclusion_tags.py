@@ -1028,3 +1028,13 @@ class SocialUpdatesNode(template.Node):
             })
         
         return render_to_string('desktop/inclusion_tags/widgets/dj_social_updates.html', context)
+
+
+@register.tag
+def social_slidein(parser, token):
+    return SocialSlideInNode()
+    
+
+class SocialSlideInNode(template.Node):
+    def render(self, context):
+        return render_to_string('desktop/inclusion_tags/misc/social_slidein.html', context)

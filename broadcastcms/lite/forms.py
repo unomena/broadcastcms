@@ -21,6 +21,7 @@ from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.gallery.models import Gallery, GalleryImage
 from broadcastcms.video.models import Video
 from broadcastcms.video import thumbnails
+from broadcastcms.lite.models import UserNewsletterSignup
 
 from models import Settings
 
@@ -979,3 +980,58 @@ class SubmitVideoForm(forms.Form):
             recipients)
         
         return True
+
+
+
+#------------------------------------------------------------------------------
+class NewsletterSignupForm(forms.Form):
+    """
+    Newsletter signup from the social slide-in sidebar.
+    """
+    
+    email = forms.EmailField()
+    mobile = forms.CharField(max_length=30, required=False)
+
+
+    #------------------------------------------------------------------------------
+    def clean_mobile(self):
+        """
+        Strips the mobile number of any unnecessary rubbish, attempting, as best it
+        can, to leave it in the form 27821234567
+        """
+        
+        mobile = self.cleaned_data['mobile']
+        # strip any whitespace
+        mobile = ''.join(mobile.split(' '))
+        # strip any optional zeroes
+        mobile = ''.join(mobile.split('(0)'))
+        # strip any plus signs
+        mobile = ''.join(mobile.split('+'))
+        # strip any minus signs
+        mobile = ''.join(mobile.split('-'))
+        # if it starts with a zero, assume it's South African
+        if mobile[:2] in ['07', '08']:
+            mobile = '27'+mobile[1:]
+        # check that it's purely numeric
+        p = re.compile(r'\d+')
+        m = p.match(mobile)
+        if not m:
+            raise forms.ValidationError('Invalid mobile number')
+        
+        return mobile
+        
+    
+    #------------------------------------------------------------------------------
+    def save(self):
+        """
+        Regardless of whether or not the user already has an account, the user's
+        e-mail address and mobile number are stored.
+        """
+        
+        data = self.cleaned_data
+        signup = UserNewsletterSignup(email=data['email'], mobile=data['mobile'])
+        signup.save()
+        
+        # TODO: build in some error checking?
+        return True
+        

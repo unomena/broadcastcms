@@ -1,8 +1,15 @@
 {% load desktop_inclusion_tags %}
 {% load public_tags %}
+{% load template_tags %}
 
 <div class="social">
     <div class="social_body">
+        <div class="friend_profile">
+            <span class="avatar">
+                {% profile_image user 50 50 %}
+            </span>
+            <h2>{{ user }}'s Activities</h2>
+        </div>
         {% if object_list %}
             {% social_paging page_obj %}
             

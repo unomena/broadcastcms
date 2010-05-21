@@ -147,6 +147,8 @@ urlpatterns = patterns('',
 
     url(r'search-results/$', search_results, name='search_results'),
     
+    url(r'subscribe-newsletter/$', newsletter_subscribe, name='newsletter_subscribe'),
+    
     url(r'validate/captcha/$',  validate_captcha,   name='validate_captcha'),
     url(r'validate/password/$', validate_password,  name='validate_password'),
     url(r'validate/password-confirm/$', validate_password_confirm,  name='validate_password_confirm'),
