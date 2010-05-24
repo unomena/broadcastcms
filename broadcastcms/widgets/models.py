@@ -37,6 +37,8 @@ from broadcastcms.show.models import Credit, Show
 from broadcastcms.status.models import StatusUpdate
 from broadcastcms.lite import utils
 from broadcastcms.lite.forms import NewMessageFormMultipleFriends
+from broadcastcms.video.models import Video
+from broadcastcms.gallery.models import Gallery
         
 from utils import SSIContentResolver
 
@@ -72,7 +74,7 @@ class AccountMenuWidget(Widget):
         
         if not section:
             section = request.path.split('/')[2]
-
+                
         messages = Thread.objects.unread(request.user).count()
         msg = "Messages"
         if messages:
@@ -584,12 +586,20 @@ class NewsCompetitionsEvents(Widget):
     @property
     def news_panel(self):
         """
-        Returns queryset containing 3 items labeled 'News'.
+        Returns queryset containing 4 items labeled 'News'.
         """
         news_labels = Label.objects.filter(title__iexact="news")
-        queryset = ContentBase.permitted.filter(labels__in=news_labels).order_by("-created")[:18]
+        queryset = ContentBase.permitted.filter(labels__in=news_labels).order_by("-created")[:4]
         queryset = [item.as_leaf_class() for item in queryset]
-        return self.Panel(queryset, 6)
+            
+        ret = []
+        i = 0
+        for item in queryset:
+            item.featured = (i < 3)
+            i += 1
+            ret.append(item)
+            
+        return self.Panel(ret, 6)
 
     @property
     def competitions(self):
@@ -626,6 +636,31 @@ class NewsCompetitionsEvents(Widget):
             i += 1
             ret.append(item)
         return ret
+        
+    @property
+    def videos(self):
+        """
+        Returns a set of videos to be displayed on the home page.
+        """
+        
+        queryset = Video.permitted.order_by('-created')[:10]
+        return queryset
+        
+    @property
+    def galleries(self):
+        """
+        Returns a set of galleries to be displayed in the "Photos" block on the home page.
+        """
+        
+        queryset = Gallery.permitted.order_by('-created')[:3]
+        ret = []
+        i = 0
+        for item in queryset:
+            item.featured = (i < 1)
+            i += 1
+            ret.append(item)
+        return ret
+        
 
     def render_content(self, context, *args, **kwargs):
         """
@@ -635,8 +670,12 @@ class NewsCompetitionsEvents(Widget):
             'news_panel': self.news_panel,
             'competitions': self.competitions,
             'events': self.events,
+            'videos': self.videos,
+            'galleries': self.galleries,
         }
         return render_to_string('widgets/widgets/news_competitions_events.html', context)
+
+
 
 class NowPlayingWidget(Widget):
     class Meta():
