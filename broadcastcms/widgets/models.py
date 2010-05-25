@@ -656,7 +656,7 @@ class NewsCompetitionsEvents(Widget):
         ret = []
         i = 0
         for item in queryset:
-            item.featured = (i < 1)
+            item.featured = (i < 3)
             i += 1
             ret.append(item)
         return ret
