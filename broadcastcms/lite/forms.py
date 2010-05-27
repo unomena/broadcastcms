@@ -968,7 +968,8 @@ class SubmitVideoForm(forms.Form):
             # get the thumbnail from Zoopy
             thumbnail = thumbnails.get_zoopy_thumbnail(self.video_id)
         # create the video
-        video = Video(code=data['embed_code'], title=data['title'], description=data['tell_us_more'], image=thumbnail, owner=request.user)
+        video = Video(code=data['embed_code'], video_type=self.video_type, video_id=self.video_id, title=data['title'],
+            description=data['tell_us_more'], image=thumbnail, owner=request.user)
         video.save()
         
         # notify someone

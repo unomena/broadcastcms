@@ -92,60 +92,62 @@
 	<p class="updates_more"><a href="{% url competitions %}">View all Competitions</a></p>
 </div><!--/Updates-->
 
-<div class="updates global green multi">
-    <h1>Videos &amp; Galleries</h1>
-    <ul class="multi_nav">
+{% if videos %}
+    <div class="updates global green multi">
+        <h1>Videos &amp; Galleries</h1>
+        <ul class="multi_nav">
 
-    <li class="multi_vids"><a href="javascript: void();" rel="#multi_vids">Videos</a></li>
-    <li class="multi_pics"><a href="javascript: void();" rel="#multi_pics">Photos</a></li>
-    </ul>
-    <div class="multi_content" id="multi_vids">
-        <div class="video_large">
-            <a href="javascript: void(0);"><img src="{% scaled_image_url videos.0 292 151 %}" width="282" height="157" alt="{{ videos.0.title }}" title="{{ videos.0.title }}" /></a>
-            <a class="type_video" href="/multimedia/video/{{ videos.0.slug }}/" title="{{ videos.0.title }}"></a>
-        </div>
-        <div class="video_carousel">
-
-            <a href="javascript: void(0);" class="video_prev"></a>
-            <div class="video_cupboard">
-
-            <ul>
-            {% for video in videos %}
-                <li><a class="thumb" href="{% scaled_image_url video 292 151 %}" alt="/multimedia/video/{{ video.slug }}/" title="{{ video.title }}"><img src="{% scaled_image_url video 150 84 %}" width="78" height="43" alt="{{ video.title }}" title="{{ video.title }}" /></a></li>
-            {% endfor %}
-
-            </ul>
+        <li class="multi_vids"><a href="javascript: void();" rel="#multi_vids">Videos</a></li>
+        <li class="multi_pics"><a href="javascript: void();" rel="#multi_pics">Photos</a></li>
+        </ul>
+        <div class="multi_content" id="multi_vids">
+            <div class="video_large">
+                <a href="javascript: void(0);"><img src="{% scaled_image_url videos.0 292 151 %}" width="282" height="157" alt="{{ videos.0.title }}" title="{{ videos.0.title }}" /></a>
+                <a class="type_video" href="/multimedia/video/{{ videos.0.slug }}/" title="{{ videos.0.title }}"></a>
             </div>
-            <a href="javascript: void(0);" class="video_next"></a>
+            <div class="video_carousel">
+
+                <a href="javascript: void(0);" class="video_prev"></a>
+                <div class="video_cupboard">
+
+                <ul>
+                {% for video in videos %}
+                    <li><a class="thumb" href="{% scaled_image_url video 292 151 %}" alt="/multimedia/video/{{ video.slug }}/" title="{{ video.title }}"><img src="{% scaled_image_url video 150 84 %}" width="78" height="43" alt="{{ video.title }}" title="{{ video.title }}" /></a></li>
+                {% endfor %}
+
+                </ul>
+                </div>
+                <a href="javascript: void(0);" class="video_next"></a>
+            </div>
+            <p class="updates_more"><a href="/multimedia/?media=videos">View All Videos</a></p>
+            <p class="clearfix"></p>
         </div>
-        <p class="updates_more"><a href="/multimedia/?media=videos">View All Videos</a></p>
-        <p class="clearfix"></p>
-    </div>
-    <div class="multi_content" id="multi_pics">
-        {% for gallery in galleries %}
-            {% get_comment_count for gallery as comment_count %}
-            {% score_for_object gallery.contentbase as score %}
-            {% if gallery.featured %}
-                <div class="chunk_item">
-                    <div class="chunk_body_first">
-                        <p class="upd_pic"><a href="/multimedia/{{ gallery.slug }}/#comments"><img src="{% scaled_image_url gallery 150 84 %}" width="150" height="84" alt="" /></a></p>
-                        <p class="upd_cat"><span class="upd_catname"><a href="#">&nbsp;</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="/multimedia/{{ gallery.slug }}/#comments">{{ comment_count }} Comments</a></span></p>
-                        <h2><a href="/multimedia/{{ gallery.slug }}/">{{ gallery.title }}</a></h2>
+        <div class="multi_content" id="multi_pics">
+            {% for gallery in galleries %}
+                {% get_comment_count for gallery as comment_count %}
+                {% score_for_object gallery.contentbase as score %}
+                {% if gallery.featured %}
+                    <div class="chunk_item">
+                        <div class="chunk_body_first">
+                            <p class="upd_pic"><a href="/multimedia/{{ gallery.slug }}/#comments"><img src="{% scaled_image_url gallery 150 84 %}" width="150" height="84" alt="" /></a></p>
+                            <p class="upd_cat"><span class="upd_catname"><a href="#">&nbsp;</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="/multimedia/{{ gallery.slug }}/#comments">{{ comment_count }} Comments</a></span></p>
+                            <h2><a href="/multimedia/{{ gallery.slug }}/">{{ gallery.title }}</a></h2>
+                        </div>
                     </div>
-                </div>
-            {% else %}
-                <div class="chunk_item">
-                    <div class="chunk_body">
-                        <p class="upd_cat"><span class="upd_catname"><a href="#">&nbsp;</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="/multimedia/{{ gallery.slug }}/#comments">{{ comment_count }} Comments</a></span></p>
-                        <h2><a href="/multimedia/{{ gallery.slug }}/">{{ gallery.title }}</a></h2>
+                {% else %}
+                    <div class="chunk_item">
+                        <div class="chunk_body">
+                            <p class="upd_cat"><span class="upd_catname"><a href="#">&nbsp;</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="/multimedia/{{ gallery.slug }}/#comments">{{ comment_count }} Comments</a></span></p>
+                            <h2><a href="/multimedia/{{ gallery.slug }}/">{{ gallery.title }}</a></h2>
+                        </div>
                     </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-        <p class="updates_more"><a href="/multimedia/?media=galleries">View All Photo Galleries</a></p>
-        <p class="clearfix"></p>
-    </div>
-</div><!--/Updates-->
+                {% endif %}
+            {% endfor %}
+            <p class="updates_more"><a href="/multimedia/?media=galleries">View All Photo Galleries</a></p>
+            <p class="clearfix"></p>
+        </div>
+    </div><!--/Updates-->
+{% endif %}
 
 
 <div class="updates align-right events blue">
