@@ -21,7 +21,10 @@ from broadcastcms.integration.captchas import ReCaptcha
 from broadcastcms.gallery.models import Gallery, GalleryImage
 from broadcastcms.video.models import Video
 from broadcastcms.video import thumbnails
+from broadcastcms.video import constants as video_constants
+from broadcastcms.video.utils import calculate_height
 from broadcastcms.lite.models import UserNewsletterSignup
+from broadcastcms.lite.utils import threaded_mail
 
 from models import Settings
 
@@ -768,19 +771,6 @@ def get_contact_recipients():
         mail_managers('Error: No email address specified', 'Users are trying to contact %s for which no contact email recipients are specified.' % site_name, fail_silently=False)
     
     return recipients
-    
-    
-
-#------------------------------------------------------------------------------
-def threaded_mail(subject, message, from_address, recipients):
-    """
-    Starts a separate thread to send an e-mail.
-    """
-    
-    mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
-    t = threading.Thread(target=mail.send, kwargs={'fail_silently': False})
-    t.setDaemon(True)
-    t.start()
 
 
 
@@ -852,26 +842,6 @@ class SubmitPicturesForm(forms.Form):
         return True
     
     
-    
-#------------------------------------------------------------------------------
-def calculate_height(orig_width, orig_height, new_width, default=0):
-    """
-    Calculates the new height given the original width and height (i.e. aspect ratio) and new width.
-    """
-    
-    height = default
-    
-    try:
-        # get the video's aspect ratio
-        aspect_ratio = float(orig_width)/float(orig_height)
-        # set the video's height
-        height = int(float(new_width)/aspect_ratio)
-    except:
-        pass
-    
-    return height
-    
-    
 
 #------------------------------------------------------------------------------
 class SubmitVideoForm(forms.Form):
@@ -883,26 +853,14 @@ class SubmitVideoForm(forms.Form):
     tell_us_more = forms.CharField(max_length=200, label="Tell us More")
     embed_code = forms.CharField(max_length=1024)
     permission_check = forms.BooleanField(required=True)
-
-
-    # Regular expressions for parsing embed code
-    # YouTube embeds
-    youtube_full_regex = r'\s*<object\s+width="(?P<width1>\d+)"\s+height="(?P<height1>\d+)">\s*<param\s+name="movie"\s+value="(?P<url1>(?P<protocol1>(http|https))://(?P<subdomain1>[a-z]+)\.youtube\.(?P<domain1>[a-z]+)/v/(?P<videocode1>[a-zA-Z0-9]*)[a-zA-Z0-9&=_]*)">\s*</param>\s*<param\s+name="allowFullScreen"\s+value="true">\s*</param>\s*<param\s+name="allowscriptaccess"\s+value="always">\s*</param>\s*<embed\s+src="(?P<url2>(?P<protocol2>(http|https))://(?P<subdomain2>[a-z]+)\.youtube\.(?P<domain2>[a-z]+)/v/(?P<videocode2>[a-zA-Z0-9]*)[a-zA-Z0-9&=_]*)"\s+type="application/x-shockwave-flash"\s+allowscriptaccess="always"\s+allowfullscreen="true"\s+width="(?P<width2>\d+)"\s+height="(?P<height2>\d+)">\s*</embed>\s*</object>\s*'
-    youtube_partial_regex = r'\s*(?P<protocol>(http|https))://(?P<subdomain>[a-zA-Z0-9\.]*)\.youtube\.(?P<domain>[a-z]+)/watch\?v=(?P<videolink>[a-zA-Z0-9&=_]*)\s*'
-    # Zoopy embeds
-    zoopy_full_regex = r'\s*<object\s+classid="clsid:(?P<clsid>[a-zA-Z0-9-]*)"\s+codebase="http://macromedia.com/cabs/swflash.cab#version=(?P<flashversion>[0-9,]*)"\s+id="zoopy-video-(?P<zoopyid1>\d+)"\s+width="(?P<width1>\d+)"\s+height="(?P<height1>\d+)">\s*<param\s+name="movie"\s+value="http://media.z2.zoopy.com/video-offsite.swf"\s*/>\s*<param\s+name="flashvars"\s+value="id=(?P<zoopyid2>\d+)"\s*/>\s*<param\s+name="quality"\s+value="high"\s*/>\s*<param\s+name="bgcolor"\s+value="#(?P<bgcolor1>\d+)"\s*/>\s*<param\s+name="allowscriptaccess"\s+value="always"\s*/>\s*<param\s+name="allowfullscreen"\s+value="true"\s*/>\s*<param\s+name="wmode"\s+value="opaque"\s*/>\s*<embed\s+src="http://media.z2.zoopy.com/video-offsite.swf"\s+allowfullscreen="true"\s+flashvars="id=(?P<zoopyid3>\d+)"\s+bgcolor="#(?P<bgcolor2>\d+)"\s+width="(?P<width2>\d+)"\s+height="(?P<height2>\d+)"\s+type="application/x-shockwave-flash"\s+allowscriptaccess="always"\s+wmode="opaque">\s*</embed>\s*</object>\s*'
-    
-    # full embed codes
-    youtube_code = '<object width="%(width)s" height="%(height)s"><param name="movie" value="%(protocol)s://%(subdomain)s.youtube.%(domain)s/v/%(videolink)s&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="%(protocol)s://%(subdomain)s.youtube.%(domain)s/v/%(videolink)s&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="%(width)s" height="%(height)s"></embed></object>'
-    zoopy_code   = '<object classid="clsid:%(clsid)s" codebase="http://macromedia.com/cabs/swflash.cab#version=%(flashversion)s" id="zoopy-video-%(zoopyid)s" width="%(width)s" height="%(height)s"><param name="movie" value="http://media.z2.zoopy.com/video-offsite.swf" /><param name="flashvars" value="id=%(zoopyid)s" /><param name="quality" value="high" /><param name="bgcolor" value="#%(bgcolor)s" /><param name="allowscriptaccess" value="always" /><param name="allowfullscreen" value="true" /><param name="wmode" value="opaque" /><embed src="http://media.z2.zoopy.com/video-offsite.swf" allowfullscreen="true" flashvars="id=%(zoopyid)s" bgcolor="#%(bgcolor)s" width="%(width)s" height="%(height)s" type="application/x-shockwave-flash" allowscriptaccess="always" wmode="opaque"></embed></object>'
     
     # can either be 'y' for YouTube or 'z' for Zoopy
     video_type = None
     # video details
     video_id = None
     # default video width and height
-    video_width = 600
-    video_height = 480
+    video_width = video_constants.DEFAULT_VIDEO_WIDTH
+    video_height = video_constants.DEFAULT_VIDEO_HEIGHT
 
 
     #------------------------------------------------------------------------------
@@ -914,15 +872,15 @@ class SubmitVideoForm(forms.Form):
         code = self.cleaned_data['embed_code']
         
         # check which embed code it is
-        youtube_full = re.compile(self.youtube_full_regex)
+        youtube_full = re.compile(video_constants.YOUTUBE_FULL_REGEX)
         m = youtube_full.match(code)
         if not m:
-            youtube_partial = re.compile(self.youtube_partial_regex)
+            youtube_partial = re.compile(video_constants.YOUTUBE_PARTIAL_REGEX)
             m = youtube_partial.match(code)
             # if it's a partial YouTube link
             if m:
                 # make it a full one
-                code = self.youtube_code % {
+                code = video_constants.YOUTUBE_EMBED_CODE % {
                         'width': self.video_width, 'height': self.video_height, 'videolink': m.group('videolink'),
                         'domain': m.group('domain'), 'subdomain': m.group('subdomain'), 'protocol': m.group('protocol'),
                     }
@@ -930,7 +888,7 @@ class SubmitVideoForm(forms.Form):
                 self.video_type = 'y'
             else:
                 # check if it's a Zoopy embed
-                zoopy_full = re.compile(self.zoopy_full_regex)
+                zoopy_full = re.compile(video_constants.ZOOPY_FULL_REGEX)
                 m = zoopy_full.match(code)
                 if not m:
                     threaded_mail('Invalid embed code specified on GHFM site', 'A user entered the following embed code:\n\n%s' % code, 'GoodHopeFM site <goodhopefmmailbox@gmail.com>',
@@ -940,7 +898,7 @@ class SubmitVideoForm(forms.Form):
                     self.video_type = 'z'
                     self.video_id = m.group('zoopyid1')
                     self.video_height = calculate_height(m.group('width1'), m.group('height1'), self.video_width, self.video_height)
-                    code = self.zoopy_code % {
+                    code = video_constants.ZOOPY_EMBED_CODE % {
                             'width': self.video_width, 'height': self.video_height, 'clsid': m.group('clsid'),
                             'flashversion': m.group('flashversion'), 'zoopyid': m.group('zoopyid1'),
                             'bgcolor': m.group('bgcolor1'),
@@ -949,7 +907,7 @@ class SubmitVideoForm(forms.Form):
             self.video_type = 'y'
             self.video_id = m.group('videocode1')
             self.video_height = calculate_height(m.group('width1'), m.group('height1'), self.video_width, self.video_height)
-            code = self.youtube_code % {
+            code = video_constants.YOUTUBE_EMBED_CODE % {
                     'width': self.video_width, 'height': self.video_height, 'videolink': m.group('videocode1'),
                     'domain': m.group('domain1'), 'subdomain': m.group('subdomain1'), 'protocol': m.group('protocol1'),
                 }

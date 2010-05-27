@@ -4,6 +4,7 @@ from datetime import date, datetime
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
+from django.core.mail import EmailMessage, mail_managers
     
 from voting.models import Vote
             
@@ -612,3 +613,26 @@ class ShowsHeader(Header):
     
     def __init__(self, request):
         self.page_menu = EntryWeekPageMenu(request)
+
+
+#------------------------------------------------------------------------------
+def threaded_mail(subject, message, from_address, recipients):
+    """
+    Starts a separate thread to send an e-mail.
+    """
+    
+    mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
+    t = threading.Thread(target=mail.send, kwargs={'fail_silently': False})
+    t.setDaemon(True)
+    t.start()
+
+
+#------------------------------------------------------------------------------
+def non_threaded_mail(subject, message, from_address, recipients):
+    """
+    Sends a mail in the current thread.
+    """
+    
+    mail = EmailMessage(subject, message, from_address, recipients, headers={'From': from_address, 'Reply-To': from_address})
+    mail.send(fail_silently=False)
+    
