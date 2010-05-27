@@ -2,7 +2,7 @@
 {% load desktop_inclusion_tags %}
 
 {% block title %}
-    <h1 class="uber">Studio Cam &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+    <h1 class="uber">Web Cams &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
 {% endblock %}
 
 {% block uber_body %}
@@ -14,7 +14,7 @@
 	        <p class="thumbs_prev"></p>
     		<ul class="thumbs">
                 {% for url in urls %}
-    	    	    <li><a class="thumb" href="{{ url }}"><img src="{{ url }}" width="80" height="53" /></a></li>
+    	    	    <li><a class="thumb" href="{{ url }}?random={{ random }}"><img id="thubmnail{{ forloop.counter0 }}" src="{{ url }}" width="80" height="53" /></a></li>
                 {% endfor %}
     		</ul>
 	    	<p class="thumbs_next"></p>
@@ -24,4 +24,26 @@
 	<div class="uber_right">
 	    {% popup_updates %}
 	</div>
+    
+    <script type="text/javascript">
+    <!--
+    // auto refresh for web cam pictures and thumbnails
+    jQuery(function() {
+        var thumbnailCount = {{ urls|length }};
+        var thumbnailURLs = [{% for url in urls %}'{{ url }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+        
+        $(this).everyTime('20s', function() {
+            for (var i=0;i<thumbnailCount;i++) {
+                $('#thumbnail'+i).attr('src', thumbnailURLs[i]+'?random='+Math.round(Math.random()*1000));
+            }
+            
+            var curImage = $('#slideshow img').attr('src');
+            var qpos = curImage.search(/\?/);
+            if (qpos > -1)
+                curImage = curImage.slice(0, qpos);
+            $('#slideshow img').attr('src', curImage+'?random='+Math.round(Math.random()*1000));
+        });
+    });
+    -->
+    </script>
 {% endblock %}

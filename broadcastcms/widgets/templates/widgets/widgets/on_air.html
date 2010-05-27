@@ -21,7 +21,7 @@
             <li class="shows"><a href="{% url shows_line_up %}">Show Lineup</a></li>
         {% endif %}
 		{% if settings.studio_cam_urls %}
-            <li class="studio_cam"><a href="javascript: openCam({% url studio_cam %});">Studio Cam</a></li>
+            <li class="studio_cam"><a href="javascript: openCam({% url studio_cam %});">Web Cams</a></li>
         {% else %}
             <li class="news"><a href="{% url news %}">News</a></li>
         {% endif %}

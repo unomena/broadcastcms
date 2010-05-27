@@ -5,6 +5,8 @@ try:
     import json
 except:
     import simplejson as json
+    
+import random
 
 from django import template
 from django.conf import settings
@@ -1472,8 +1474,11 @@ def studio_cam(request):
     else:
         urls = []
 
+    random.seed()
+
     context.update({
         'urls': urls,
+        'random': random.randint(0, 1000),
     })
 
     return render_to_response('desktop/popups/studio_cam.html', context)
