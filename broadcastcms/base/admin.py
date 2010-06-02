@@ -46,7 +46,8 @@ def restrict_fieldsets(request, fieldsets):
 
 
 class ModelBaseInlineModelAdmin(InlineModelAdmin):
-        
+       
+    """ 
     def get_fieldsets(self, request, obj=None):
         "Hook for specifying fieldsets."
         if self.declared_fieldsets:
@@ -55,6 +56,7 @@ class ModelBaseInlineModelAdmin(InlineModelAdmin):
             form = self.get_formset(request).form
             fieldsets = [(None, {'fields': form.base_fields.keys()})]
         return restrict_fieldsets(request, fieldsets)
+    """
 
 
 class ModelBaseStackedInline(ModelBaseInlineModelAdmin, admin.StackedInline):
@@ -91,6 +93,7 @@ class ModelBaseAdmin(admin.ModelAdmin):
         }),
     )
 
+    """
     def get_fieldsets(self, request, obj=None):
         "Hook for specifying fieldsets."
         if self.declared_fieldsets:
@@ -99,7 +102,7 @@ class ModelBaseAdmin(admin.ModelAdmin):
             form = self.get_form(request, obj)
             fieldsets = [(None, {'fields': form.base_fields.keys()})]
         return restrict_fieldsets(request, fieldsets)
-    
+    """
 
 class ContentBaseAdminForm(ModelBaseAdminForm):
 
