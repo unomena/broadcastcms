@@ -102,8 +102,7 @@
         </ul>
         <div class="multi_content" id="multi_vids">
             <div class="video_large">
-                <a href="javascript: void(0);"><img src="{% scaled_image_url videos.0 292 151 %}" width="282" height="157" alt="{{ videos.0.title }}" title="{{ videos.0.title }}" /></a>
-                <a class="type_video" href="/multimedia/video/{{ videos.0.slug }}/" title="{{ videos.0.title }}"></a>
+                {{ videos.0.resized_embed_code|safe }}
             </div>
             <div class="video_carousel">
 
@@ -112,7 +111,7 @@
 
                 <ul>
                 {% for video in videos %}
-                    <li><a class="thumb" href="{% scaled_image_url video 292 151 %}" alt="/multimedia/video/{{ video.slug }}/" title="{{ video.title }}"><img src="{% scaled_image_url video 150 84 %}" width="78" height="43" alt="{{ video.title }}" title="{{ video.title }}" /></a></li>
+                    <li><a class="thumb" href="{% scaled_image_url video 292 151 %}" alt="{{ video.resized_embed_code }}" title="{{ video.title }}"><img src="{% scaled_image_url video 150 84 %}" width="78" height="43" alt="{{ video.title }}" title="{{ video.title }}" /></a></li>
                 {% endfor %}
 
                 </ul>

@@ -647,7 +647,9 @@ class NewsCompetitionsEvents(Widget):
         queryset = Video.permitted.order_by('-created')[:10]
         ret = []
         # run through the videos, resizing them
-        
+        for video in queryset:
+            video.resized_embed_code = resize_embed_code(video.code, 282)
+            ret.append(video)
         return queryset
         
     @property

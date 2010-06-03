@@ -40,13 +40,21 @@ def resize_embed_code(code, width, height=None):
     youtube = re.compile(YOUTUBE_FULL_REGEX)
     m = youtube.match(code)
     if m:
-        return code
+        return YOUTUBE_EMBED_CODE % {
+                'width': width, 'height': height if height else calculate_height(m.group('width1'), m.group('height1'), width),
+                'videolink': m.group('videocode1'), 'domain': m.group('domain1'),
+                'subdomain': m.group('subdomain1'), 'protocol': m.group('protocol1'),
+            }
     else:
         # check if it's a Zoopy embed
         zoopy = re.compile(ZOOPY_FULL_REGEX)
         m = zoopy.match(code)
         if m:
-            return code
+            return ZOOPY_EMBED_CODE % {
+                    'width': width, 'height': height if height else calculate_height(m.group('width1'), m.group('height1'), width),
+                    'clsid': m.group('clsid'), 'flashversion': m.group('flashversion'), 'zoopyid': m.group('zoopyid1'),
+                    'bgcolor': m.group('bgcolor1'),
+                }
 
     # error
     return None
