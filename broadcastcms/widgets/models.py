@@ -39,6 +39,7 @@ from broadcastcms.lite import utils
 from broadcastcms.lite.forms import NewMessageFormMultipleFriends
 from broadcastcms.video.models import Video
 from broadcastcms.gallery.models import Gallery
+from broadcastcms.video.utils import resize_embed_code
         
 from utils import SSIContentResolver
 
@@ -595,7 +596,7 @@ class NewsCompetitionsEvents(Widget):
         ret = []
         i = 0
         for item in queryset:
-            item.featured = (i < 1)
+            item.featured = (i < 3)
             i += 1
             ret.append(item)
             
@@ -644,6 +645,9 @@ class NewsCompetitionsEvents(Widget):
         """
         
         queryset = Video.permitted.order_by('-created')[:10]
+        ret = []
+        # run through the videos, resizing them
+        
         return queryset
         
     @property
