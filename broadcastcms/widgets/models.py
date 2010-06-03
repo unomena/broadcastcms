@@ -1007,7 +1007,7 @@ class StatusUpdates(Widget):
         """
         credits = Credit.objects.filter(role='1', show__in=Show.permitted.all).select_related('castmember')
         castmember_owners = [credit.castmember.owner for credit in credits]
-        return StatusUpdate.objects.filter(user__in=castmember_owners).select_related('user').order_by('-timestamp')[:4]
+        return StatusUpdate.objects.filter(user__in=castmember_owners).select_related('user').order_by('-timestamp')[:5]
 
     def get_friends_updates(self, user):
         """
@@ -1017,7 +1017,7 @@ class StatusUpdates(Widget):
         if user.is_authenticated():
             friends = Friendship.objects.friends_for_user(user)
             friends = [friend['friend'] for friend in friends]
-            friends_status_updates = StatusUpdate.objects.filter(user__in=friends).select_related('user').order_by('-timestamp')[:4]
+            friends_status_updates = StatusUpdate.objects.filter(user__in=friends).select_related('user').order_by('-timestamp')[:5]
 
         return friends_status_updates
         

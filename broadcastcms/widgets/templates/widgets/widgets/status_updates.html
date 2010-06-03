@@ -4,14 +4,16 @@
     {% if castmember_updates or friends_updates %}
         <div class="updates global green">
             <h1>Update Stream</h1>
-        	<ul class="global_updates_nav">
-                {% if castmember_updates %}
-    	            <li class="dj_updates"><a href="#" rel="#dj_updates">DJ's</a></li>
-                {% endif %}
-                {% if friends_updates %}
-        	    	<li class="friend_updates"><a href="#" rel="#friend_updates">Your Friends</a></li>
-                {% endif %}
-    	    </ul>
+            {% if request.user.is_authenticated %}
+                <ul class="global_updates_nav">
+                    {% if castmember_updates %}
+                        <li class="dj_updates"><a href="#" rel="#dj_updates">DJ's</a></li>
+                    {% endif %}
+                    {% if friends_updates %}
+                        <li class="friend_updates"><a href="#" rel="#friend_updates">Your Friends</a></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
             {% if castmember_updates %}
             	<div class="global_updates" id="dj_updates">
                     {% for update in castmember_updates %}
