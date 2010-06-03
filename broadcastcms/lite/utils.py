@@ -494,11 +494,14 @@ class LabelPageMenu(PageMenu):
             
 
 class Header(object):
+    page_title_link = None
+    
     @property
     def render_context(self):
         return {
             'page_title': self.page_title,
             'page_menu': self.page_menu,
+            'page_title_link': reverse(self.page_title_link) if self.page_title_link else None,
         }
         
     def render(self):
@@ -554,6 +557,7 @@ class ChartHeader(Header):
 
 class CompetitionsHeader(Header):
     page_title = 'Win' 
+    
     def __init__(self, request): 
         self.page_menu = CompetitionsPageMenu(request)
 
@@ -565,12 +569,15 @@ class CompetitionHeader(CompetitionsHeader):
 
 class GalleriesHeader(Header):
     page_title = 'Multimedia'
+    page_title_link = 'galleries'
     
     def __init__(self, request):
         self.page_menu = MultimediaPageMenu(request)
 
 
 class GalleryHeader(GalleriesHeader):
+    page_title_link = 'galleries'
+    
     def __init__(self):
         self.page_menu = None
         

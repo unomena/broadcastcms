@@ -1,5 +1,9 @@
 <div class="page_head">
-    <h1>{{ page_title|safe }} &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+    {% if page_title_link %}
+        <a href="{{ page_title_link }}"><h1>{{ page_title|safe }} &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1></a>
+    {% else %}
+        <h1>{{ page_title|safe }} &nbsp;<img src="/media/bcms/images/arrow-title_light.gif" width="9" height="8" alt="" /></h1>
+    {% endif %}
     {% if page_menu %}
         {{ page_menu.render }}
     {% endif %}
