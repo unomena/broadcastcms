@@ -130,14 +130,15 @@
                     <div class="chunk_item">
                         <div class="chunk_body_first">
                             <p class="upd_pic"><a href="/multimedia/{{ gallery.slug }}/#comments"><img src="{% scaled_image_url gallery 150 84 %}" width="150" height="84" alt="" /></a></p>
-                            <p class="upd_cat"><span class="upd_catname"><a href="#">&nbsp;</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="/multimedia/{{ gallery.slug }}/#comments">{{ comment_count }} Comments</a></span></p>
+                            <p class="upd_cat"><span class="upd_catname"><a>{{ gallery.created|date:"d M Y" }}</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="/multimedia/{{ gallery.slug }}/#comments">{{ comment_count }} Comments</a></span></p>
                             <h2><a href="/multimedia/{{ gallery.slug }}/">{{ gallery.title }}</a></h2>
                         </div>
                     </div>
                 {% else %}
                     <div class="chunk_item">
                         <div class="chunk_body">
-                            <p class="upd_cat"><span class="upd_catname"><a href="#">&nbsp;</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="/multimedia/{{ gallery.slug }}/#comments">{{ comment_count }} Comments</a></span></p>
+                            <p class="upd_pic"><a href="/multimedia/{{ gallery.slug }}/#comments"><img src="{% scaled_image_url gallery 107 60 %}" width="107" height="60" alt="" /></a></p>
+                            <p class="upd_cat"><span class="upd_catname"><a href="/multimedia/{{ gallery.slug }}/">{{ gallery.created|date:"d M Y" }}</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="/multimedia/{{ gallery.slug }}/#comments">{{ comment_count }} Comments</a></span></p>
                             <h2><a href="/multimedia/{{ gallery.slug }}/">{{ gallery.title }}</a></h2>
                         </div>
                     </div>

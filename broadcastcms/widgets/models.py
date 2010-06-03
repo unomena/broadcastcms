@@ -586,16 +586,16 @@ class NewsCompetitionsEvents(Widget):
     @property
     def news_panel(self):
         """
-        Returns queryset containing 4 items labeled 'News'.
+        Returns queryset containing 3 items labeled 'News'.
         """
         news_labels = Label.objects.filter(title__iexact="news")
-        queryset = ContentBase.permitted.filter(labels__in=news_labels).order_by("-created")[:4]
+        queryset = ContentBase.permitted.filter(labels__in=news_labels).order_by("-created")[:3]
         queryset = [item.as_leaf_class() for item in queryset]
             
         ret = []
         i = 0
         for item in queryset:
-            item.featured = (i < 3)
+            item.featured = (i < 1)
             i += 1
             ret.append(item)
             
@@ -656,7 +656,7 @@ class NewsCompetitionsEvents(Widget):
         ret = []
         i = 0
         for item in queryset:
-            item.featured = (i < 3)
+            item.featured = (i < 1)
             i += 1
             ret.append(item)
         return ret
