@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='broadcastcms',
     version='dev',
-    #version='goodhopefm.1.0.2',
+    #version='goodhopefm.1.0.6',
     description='Broadcast CMS Django Applications',
     author='Praekelt Consulting',
     author_email='sysadmin@praekeltconsulting.com',
@@ -24,7 +24,7 @@ setup(
         'python-dateutil==1.4.1',
         'python-memcached==1.44',
         'python-twitter==0.6',
-        'PIL==1.1.6',
+        'PIL>=1.1.6',
         'simplejson==2.0.9',
         'user-messages==0.1-dev1',
         'whoosh==0.3.5',
