@@ -92,6 +92,31 @@
 	<p class="updates_more"><a href="{% url competitions %}">View all Competitions</a></p>
 </div><!--/Updates-->
 
+<div class="updates align-right events blue">
+    <h1>Events</h1>
+    {% for object in events %}
+        {% if object.featured %}
+            <div class="chunk_item">
+                <div class="chunk_body_first">
+                    <p class="upd_pic"><a href="{% call_view object url %}"><img src="{% scaled_image_url object 150 84 %}" width="150" height="84" alt="" /></a></p>
+                    <p class="upd_cat"><span class="upd_catname">{{ object.labels.visible.0.title }}</a></span></p>
+                    <h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
+                </div>
+            </div>
+        {% else %}
+            {% get_comment_count for object as comment_count %}
+            {% score_for_object object.contentbase as score %}
+            <div class="chunk_item">
+                <div class="chunk_body">
+                    <p class="upd_cat"><span class="upd_catname"><a>{{ object.labels.visible.0.title }}</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="{{ url }}#comments">{{ comment_count }} Comments</a> | <a href="{% url modals_content object.slug %}?height=600&amp;width=720" class="thickbox">Peek &raquo;</a></span></p>
+	                <h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+	<p class="updates_more"><a href="{% url events %}">View all Upcoming Events</a></p>
+</div><!--/Updates-->
+
 {% if videos %}
     <div class="updates global green multi">
         <h1>Videos &amp; Galleries</h1>
@@ -149,28 +174,3 @@
     </div><!--/Updates-->
 {% endif %}
 
-
-<div class="updates align-right events blue">
-    <h1>Events</h1>
-    {% for object in events %}
-        {% if object.featured %}
-            <div class="chunk_item">
-                <div class="chunk_body_first">
-                    <p class="upd_pic"><a href="{% call_view object url %}"><img src="{% scaled_image_url object 150 84 %}" width="150" height="84" alt="" /></a></p>
-                    <p class="upd_cat"><span class="upd_catname">{{ object.labels.visible.0.title }}</a></span></p>
-                    <h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
-                </div>
-            </div>
-        {% else %}
-            {% get_comment_count for object as comment_count %}
-            {% score_for_object object.contentbase as score %}
-            <div class="chunk_item">
-                <div class="chunk_body">
-                    <p class="upd_cat"><span class="upd_catname"><a>{{ object.labels.visible.0.title }}</a></span><span class="upd_meta">{{ score.score }} Likes | <a href="{{ url }}#comments">{{ comment_count }} Comments</a> | <a href="{% url modals_content object.slug %}?height=600&amp;width=720" class="thickbox">Peek &raquo;</a></span></p>
-	                <h2><a href="{% call_view object url %}">{{ object.title }}</a></h2>
-                </div>
-            </div>
-        {% endif %}
-    {% endfor %}
-	<p class="updates_more"><a href="{% url events %}">View all Upcoming Events</a></p>
-</div><!--/Updates-->
