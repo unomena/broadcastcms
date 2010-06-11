@@ -1,0 +1,8 @@
+{% extends "widgets/widgets/listing_block.html" %}
+{% load desktop_inclusion_tags public_tags %}
+
+{% block page_container %}
+    {% for object in object_list %}
+        {% call_view object render_block %}
+    {% endfor %}
+{% endblock %}

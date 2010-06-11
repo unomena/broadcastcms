@@ -1893,12 +1893,15 @@ class EntryViews(object):
     def render_block(self, context):
         content = self.content.as_leaf_class()
         credits = content.credits.order_by('role')
-        castmember_url = credits[0].castmember.url() if credits else ''
+        castmember = credits[0].castmember if credits else None
+        # get all of the contributors
+        contributors = content.credits.filter(role='2')
 
         context = {
             'self': self,
             'content': content,
-            'castmember_url': castmember_url,
+            'castmember': castmember,
+            'contributors': contributors,
         }
         return render_to_string('desktop/content/entry/block.html', context)
 

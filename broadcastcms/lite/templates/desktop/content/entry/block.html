@@ -1,7 +1,19 @@
 {% load scaled_image_tags %}
 
-<div class="block">
-    <p class="block_pic"><a href="{{ castmember_url }}"><img src="{% scaled_image_url content 188 104 %}" width="188" height="104" alt="" /></a></p>
-	<p class="block_name"><a href="{{ castmember_url }}">{{ content.title }}</a></p>
-	<p class="block_meta">{{ self.start|date:"H:i"}} - {{ self.end|date:"H:i"}}</p>
-</div>
+<div class="dj_listing">
+    {% if contributors %}
+        <div class="dl_contribs">
+            {% for contrib in contributors %}
+                <a href="{{ contrib.castmember.url }}"><img src="{% scaled_image_url contrib.castmember 80 46 %}" width="50" height="50" alt="" title="{{ contrib.castmember.title }}" /></a>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <p class="dl_pic">{% if castmember %}<a href="{{ castmember.url }}">{% endif %}<img src="{% scaled_image_url content 188 104 %}" width="172" height="95" alt="" />{% if castmember %}</a>{% endif %}</p>
+    <h3>{{ self.start|date:"H:i"}} - {{ self.end|date:"H:i"}}</h3>
+    <h2>{{ content.title }}{% if castmember %} with <a href="{{ castmember.url }}">{{ castmember.title }}</a>{% endif %}</h2>
+
+    {% if contributors %}
+        <p class="dl_contrib">Featuring: {% for contrib in contributors %}<a href="{{ contrib.castmember.url }}">{{ contrib.castmember.title }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    {% endif %}
+</div><!--/listing-->

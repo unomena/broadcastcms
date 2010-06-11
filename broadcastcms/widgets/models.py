@@ -937,7 +937,7 @@ class ShowsListingWidget(Widget):
         return list_detail.object_list(
             request=request,
             queryset=queryset,
-            template_name='widgets/widgets/listing_block.html',
+            template_name='widgets/widgets/listing_shows_line_up.html',
             extra_context=extra_context
         ).content
 
