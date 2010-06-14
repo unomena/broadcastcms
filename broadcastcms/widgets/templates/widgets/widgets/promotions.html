@@ -13,7 +13,7 @@
     	<div id="slides">
             {% for item in items %}
 	            <div>
-			        <p><a href="{% call_view item.content url %}"><img src="{% scaled_image_url item.content 414 260 %}" width="414" height="260" alt="" /></a></p>
+			        <p><a href="{{ item.url }}"><img src="{% scaled_image_url item.content 414 260 %}" width="414" height="260" alt="" /></a></p>
     			</div>
             {% endfor %}
     	</div>
