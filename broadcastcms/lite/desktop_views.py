@@ -1894,8 +1894,8 @@ class EntryViews(object):
         content = self.content.as_leaf_class()
         credits = content.credits.order_by('role')
         castmember = credits[0].castmember if credits else None
-        # get all of the contributors
-        contributors = content.credits.filter(role='2')
+        # get all of the contributors (contributors and newsreaders)
+        contributors = content.credits.filter(role__in=['2', '3'])
 
         context = {
             'self': self,
