@@ -165,4 +165,5 @@ urlpatterns = patterns('',
 if settings.SERVE_STATIC:
     urlpatterns += patterns('',
         (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+        (r'^missing-admin-media-prefix/(?P<path>.*)$', 'django.views.static.serve', {'document_root': "%sadmin/" % settings.MEDIA_ROOT, 'show_indexes': True}),
     )
