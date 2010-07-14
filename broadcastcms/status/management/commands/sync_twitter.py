@@ -1,5 +1,6 @@
 import collections
 import logging
+import urllib2
 
 from dateutil.parser import parse as parse_date
 
@@ -33,7 +34,11 @@ class Command(NoArgsCommand):
         for username, profiles in usernames.iteritems():
             if verbosity > 1:
                 print "[%s] fetching timeline" % username
-            tweets = api.GetUserTimeline(username)
+            try:
+                tweets = api.GetUserTimeline(username)
+            except urllib2.HTTPError:
+                #if twitter doesn;'t reply for this user ignore and continue
+                continue
            
             for tweet in tweets:
                 # mysql does not support timezone-aware datetime objects
