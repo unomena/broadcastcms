@@ -16,6 +16,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
+from django.utils.html import escape
 from django.views.generic import list_detail
 
 from broadcastcms import public
