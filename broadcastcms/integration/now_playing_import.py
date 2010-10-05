@@ -1,7 +1,14 @@
+import cStringIO
+import md5
+import mimetypes
+import pylast
+import random
 import urllib
 import xml.dom.minidom
 from random import randint
 from datetime import datetime, timedelta
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from broadcastcms.radio.models import Artist, Song, Credit
 from broadcastcms.calendar.models import Entry
@@ -22,14 +29,51 @@ def get_text_by_tag_name(parent, name):
             return text_nodes[0].data
     return None
 
+def get_cover_image(url):
+    invalid_md5s = ['833dccc04633e5616e9f34ae5d5ba057', 'fe252bebef963b73ff557a537c853104',]
+
+    data = urllib.urlopen(url).read()
+    if md5.new(data).hexdigest() in invalid_md5s:
+        return None
+
+    return data
+    
+def load_file(field, data, file_name):
+    f = cStringIO.StringIO()
+    f.write(data)
+    field_name = str(field)
+    content_type=mimetypes.guess_type(file_name)[0]
+    elements = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456890'
+    file_name = '%s.%s' % (''.join([random.choice(elements) for n in range(8)]), file_name.split('.')[-1])
+    return InMemoryUploadedFile(f, field_name, file_name, content_type, len(data), None)
+
+def load_artist_image(artist): 
+    API_KEY = "f6b4b668e2c5e8db7350ea539c87f76a"
+    API_SECRET = "5654158e5b5eccc51e9f37d36f589298"
+    lastfm_network = pylast.get_lastfm_network(api_key = API_KEY, api_secret = API_SECRET)
+    lastfm_artist = lastfm_network.get_artist(artist.title)
+    try:
+        cover_image_url = lastfm_artist.get_cover_image()
+    except pylast.WSError:
+        cover_image_url = None
+        
+    if cover_image_url:
+        cover_image = get_cover_image(cover_image_url)
+        if cover_image:
+            f = load_file(artist.image, cover_image, cover_image_url.split('/')[-1])
+            artist.image.save(f.name, f)
+
 def create_song(artist_title, song_title, role):
     song = None
     created = False
-    
-    artist, created = Artist.objects.get_or_create(title=artist_title)
+   
+    artist, artist_created = Artist.objects.get_or_create(title=artist_title)
     if not artist.is_public:
         artist.is_public = True
         artist.save()
+
+    if artist_created:
+        load_artist_image(artist)
     
     songs = Song.objects.filter(title__iexact=song_title)
     if songs:
@@ -106,18 +150,20 @@ def import_now_playing_rcs(feed_url):
     for slice_start in slices:
         feed_items.append(split_elements[slice_start: slice_start + parts_per_element])
 
+    valid_song = False
     for feed_item in feed_items:
-        if feed_item[2].lower() == 'song':
-            artist_title = feed_item[3]
-            song_title = feed_item[4]
-            length = feed_item[5]
-            valid_song = True
-            break
+        try:
+            if feed_item[2].lower() == 'song':
+                artist_title = feed_item[3]
+                song_title = feed_item[4]
+                length = feed_item[5]
+                valid_song = True
+                break
+        except IndexError:
+            pass
 
-
-
+    entry_created = False
     if valid_song:
-        
         # calculate start and end times. since the feed doesn't include exact play times,
         # we let the imported song's start time be import time (now)
         now = datetime.now()
@@ -132,9 +178,7 @@ def import_now_playing_rcs(feed_url):
         existing_entries = Entry.objects.permitted().by_content_type(Song).now().filter(content=song)
         if not existing_entries:
             entry, entry_created = Entry.objects.get_or_create(start=start, end=end, content=song, is_public=True)
-        else:
-            entry_created = False
-        
+       
     if entry_created:
         print "Created entry %s for song %s" % (entry, song)
     else:
