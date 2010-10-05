@@ -191,6 +191,11 @@ IMAGE_SCALES = {
                 (89, 50),
             )
         },
+        'Artist': {
+            'image': (
+                (46, 46),
+            )
+        },
     },
     'show': {
         'Show': {
