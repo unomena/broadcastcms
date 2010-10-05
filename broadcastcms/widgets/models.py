@@ -762,6 +762,13 @@ class OnAirWidget(Widget):
         entries = Entry.objects.permitted().by_content_type(content_type).now().filter(content__is_public=True)
         return entries[0] if entries else None
     
+    def get_public_past_entries(self, content_type, count):
+        """
+        Returns past public entries limited to count that has public content.
+        """
+        entries = Entry.objects.permitted().by_content_type(content_type).filter(content__is_public=True).order_by('-start')
+        return entries[:count] if entries else None
+    
     def get_public_next_on_air_entry(self, content_type):
         """
         Returns first 'coming up next' public entry that has public content
@@ -802,12 +809,8 @@ class OnAirWidget(Widget):
             # build the 'with' string linking to each castmembers blog
             with_str = " & ".join(['<a href="%s">%s</a>' % (castmember.url(), castmember.title) for castmember in with_castmembers])
         
-            # get the current or last played song and artist info
-            song_entry = self.get_public_on_air_entry(Song)
-            if not song_entry:
-                song_entry = self.get_public_last_entry(Song)
-            song = song_entry.content.as_leaf_class() if song_entry else None
-            artist = song.get_primary_artist() if song else None
+            # get previously played songs
+            song_entries = self.get_public_past_entries(Song, 5)
 
             context.update({
                 'entry': show_entry,
@@ -815,8 +818,7 @@ class OnAirWidget(Widget):
                 'on_air': on_air,
                 'with_str': with_str,
                 'primary_castmember': primary_castmember,
-                'song': song,
-                'artist': artist,
+                'song_entries': song_entries,
             })
             return render_to_string('widgets/widgets/on_air.html', context)
         else:
