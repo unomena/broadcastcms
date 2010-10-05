@@ -1,35 +1,55 @@
 {% load scaled_image_tags %}
 
 {% if show %}
-<div class="banner">
-    {% if show %}
-        <p class="banner_thumb"><img src="{% scaled_image_url show 216 77 %}" width="216" height="77" alt="" /></p>
-    {% endif %}
-    <p class="banner_info">
+    <div class="banner">
         {% if show %}
-    	    <span class="onair">{% if on_air %}On Air{% else %}Coming Up{% endif %}: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</span><br />
-	    	<span class="showtitle">{{ show.title }}{% if with_str %} with {{ with_str|safe|truncatewords_html:"5" }}{% endif %}</span><br />
+            <p class="banner_thumb"><img src="{% scaled_image_url show 216 77 %}" width="216" height="77" alt="" /></p>
         {% endif %}
-    	{% if song %}
-            <span class="nowplaying"><strong>Now Playing:</strong>{% if artist %} {{ artist.title }} -{% endif %} {{ song.title }}</span>
-        {% endif %}
-	</p>
-    <ul>
-	    {% if settings.player_controls %}
-            <li class="listen_live"><a href="javascript: openPlayer({% url listen_live %});">Listen Live</a></li>
-        {% else %}
-            <li class="shows"><a href="{% url shows_line_up %}">Show Lineup</a></li>
-        {% endif %}
-		{% if settings.studio_cam_urls %}
-            <li class="studio_cam"><a href="javascript: openCam({% url studio_cam %});">Web Cams</a></li>
-        {% else %}
-            <li class="news"><a href="{% url news %}">News</a></li>
-        {% endif %}
-    	{% if primary_castmember %}
-            <li class="my_blog"><a href="{{ primary_castmember.url }}">My Blog</a></li>
-        {% else %}
-            <li class="contact_us"><a href="{% url contact %}">Contact Us</a></li>
-        {% endif %}
-	</ul>
-</div><!--/Banner-->
+	    <p class="banner_info">
+            {% if show %}
+	            <span class="onair">{% if on_air %}On Air{% else %}Coming Up{% endif %}: {{ entry.start|date:"H:i" }} - {{ entry.end|date:"H:i" }}</span><br />
+    	    	<span class="showtitle">{{ show.title }}{% if with_str %} <em>with {{ with_str|safe|truncatewords_html:"5" }}</em>{% endif %}</span><br />
+            {% endif %}
+    	
+            {% if song_entries %}
+		        <div class="coda-slider-wrapper nowplaying">
+			        <div class="coda-slider preload coda-slider-2">
+				        {% for song_entry in song_entries %}
+                            {% with song_entry.content.as_leaf_class as song %}
+                                {% with song.get_primary_artist as artist %} 
+                                    <div class="panel">
+					                    <div class="panel-wrapper">
+						                    <div class="content">
+							                    {% if artist.image %}<img src="{% scaled_image_url artist 46 46 %}" width="46" height="46" alt="" />{% endif %}
+    								            <span><strong>{{ song.title }}</strong>{% comment %}<a href="#" class="like-btn"></a>{% endcomment %}
+	    							            {% if artist %}<em class="clearfix">{{ artist.title }}</em></span>{% endif %}
+		    						            {% if forloop.first %}<span class="nowplaying_corner"></span>{% endif %}
+			    				            </div>
+				    		            </div>
+					                </div>
+                                {% endwith %}
+                            {% endwith %}
+                        {% endfor %}
+		    		</div><!--/coda-slider -->
+			    </div><!--/coda-slider-wrapper -->
+            {% endif %}
+	    </p>
+        <ul>
+	        {% if settings.player_controls %}
+                <li class="listen_live"><a href="javascript: openPlayer({% url listen_live %});">Listen Live</a></li>
+            {% else %}
+                <li class="shows"><a href="{% url shows_line_up %}">Show Lineup</a></li>
+            {% endif %}
+    		{% if settings.studio_cam_urls %}
+                <li class="studio_cam"><a href="javascript: openCam({% url studio_cam %});">Web Cams</a></li>
+            {% else %}
+                <li class="news"><a href="{% url news %}">News</a></li>
+            {% endif %}
+    	    {% if primary_castmember %}
+                <li class="my_blog"><a href="{{ primary_castmember.url }}">My Blog</a></li>
+            {% else %}
+                <li class="contact_us"><a href="{% url contact %}">Contact Us</a></li>
+            {% endif %}
+	    </ul>
+    </div><!--/Banner-->
 {% endif %}
