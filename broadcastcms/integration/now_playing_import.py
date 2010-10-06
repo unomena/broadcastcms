@@ -72,7 +72,7 @@ def create_song(artist_title, song_title, role):
         artist.is_public = True
         artist.save()
 
-    if artist_created:
+    if not artist.image:
         load_artist_image(artist)
     
     songs = Song.objects.filter(title__iexact=song_title)
@@ -175,7 +175,7 @@ def import_now_playing_rcs(feed_url):
        
         # create song if it's not still playing
         song = create_song(artist_title, song_title, "Performer")
-        existing_entries = Entry.objects.permitted().by_content_type(Song).now().filter(content=song)
+        existing_entries = Entry.objects.permitted().by_content_type(Song).now().filter(content=song.contentbase)
         if not existing_entries:
             entry, entry_created = Entry.objects.get_or_create(start=start, end=end, content=song, is_public=True)
        
