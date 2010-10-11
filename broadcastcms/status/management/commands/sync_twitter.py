@@ -1,6 +1,7 @@
 import collections
 import logging
 import urllib2
+from datetime import timedelta
 
 from dateutil.parser import parse as parse_date
 
@@ -37,12 +38,14 @@ class Command(NoArgsCommand):
             try:
                 tweets = api.GetUserTimeline(username)
             except urllib2.HTTPError:
-                #if twitter doesn;'t reply for this user ignore and continue
+                #if twitter doesn't reply for this user ignore and continue
+                print "[%s] unable to fetch timeline" % username
                 continue
            
             for tweet in tweets:
                 # mysql does not support timezone-aware datetime objects
-                created_at = parse_date(tweet.created_at).replace(tzinfo=None)
+                # timezone issues, add 2 hours
+                created_at = parse_date(tweet.created_at).replace(tzinfo=None) + timedelta(days=1/24.0*2) 
                 
                 for profile in profiles:
                     # look for existing status update
@@ -62,4 +65,4 @@ class Command(NoArgsCommand):
                         status.save()
                     else:
                         if verbosity > 1:
-                            print "[%s] kipping %s for %s" % (username, tweet.id, profile.user)
+                            print "[%s] skipping %s for %s" % (username, tweet.id, profile.user)
