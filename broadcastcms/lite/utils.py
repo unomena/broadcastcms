@@ -323,15 +323,19 @@ class CastMemberPageMenu(PageMenu):
 
 class EntryWeekPageMenu(PageMenu):
     request_key = 'day'
-    items = [
-        {
-            'title': day[0],
-            'get_value': day[1],
-            'queryset_modifier': EntryWeekQuerysetModifier,
-            'default': (str(calendar.day_name[datetime.now().weekday()]).lower() == day[1]),
-        }
-    for day in [('Mon', 'monday'), ('Tue', 'tuesday'), ('Wed', 'wednesday'), ('Thu', 'thursday'), ('Fri', 'friday'), ('Sat', 'saturday'), ('Sun', 'sunday'),]]
+    
+    def __init__(self, request):
+        self.items = [
+            {
+                'title': day[0],
+                'get_value': day[1],
+                'queryset_modifier': EntryWeekQuerysetModifier,
+                'default': (str(calendar.day_name[datetime.now().weekday()]).lower() == day[1]),
+            }
+        for day in [('Mon', 'monday'), ('Tue', 'tuesday'), ('Wed', 'wednesday'), ('Thu', 'thursday'), ('Fri', 'friday'), ('Sat', 'saturday'), ('Sun', 'sunday'),]]
+        super (EntryWeekPageMenu, self).__init__(request)
 
+    
     @property
     def title(self):
         today = str(calendar.day_name[datetime.now().weekday()]).lower()
