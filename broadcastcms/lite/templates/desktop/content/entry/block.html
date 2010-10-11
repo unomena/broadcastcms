@@ -11,7 +11,7 @@
     
     <p class="dl_pic">{% if castmember %}<a href="{{ castmember.url }}">{% endif %}<img src="{% scaled_image_url content 188 104 %}" width="172" height="95" alt="" />{% if castmember %}</a>{% endif %}</p>
     <h3>{{ self.start|date:"H:i"}} - {{ self.end|date:"H:i"}}</h3>
-    <h2>{{ content.title }}{% if castmember %} with <a href="{{ castmember.url }}">{{ castmember.title }}</a>{% endif %}</h2>
+    <h2>{{ smart_title|safe }}</h2>
 
     {% if contributors %}
         <p class="dl_contrib">Featuring: {% for contrib in contributors %}<a href="{{ contrib.castmember.url }}">{{ contrib.castmember.title }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
