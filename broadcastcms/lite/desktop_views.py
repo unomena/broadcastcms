@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+import re
 import calendar
 import mimetypes
 try:
@@ -1897,12 +1898,22 @@ class EntryViews(object):
         # get all of the contributors (contributors and newsreaders)
         contributors = content.credits.filter(role__in=['2', '3'])
 
+       
+        # Compute smart title based linking to castmember if title in content title, otherwise adding a with tail.        
+        smart_title = content.title
+        if castmember and re.search(castmember.title, smart_title):
+            smart_title = re.sub(castmember.title, '<a href="%s">%s</a>' % (castmember.url(), castmember.title), smart_title)
+        elif castmember:
+            smart_title = '%s with <a href="%s">%s</a>' % (smart_title, castmember.url(), castmember.title) 
+        
         context = {
             'self': self,
             'content': content,
             'castmember': castmember,
             'contributors': contributors,
+            'smart_title': smart_title,
         }
+        
         return render_to_string('desktop/content/entry/block.html', context)
 
 class EventViews(object):
