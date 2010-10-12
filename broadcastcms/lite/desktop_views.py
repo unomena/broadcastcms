@@ -781,7 +781,7 @@ def competitions_content(request, slug, template_name='desktop/generic/object_de
 def events(request):
     context = RequestContext(request, {})
     
-    entries = Entry.objects.permitted().by_content_type(Event).order_by('start')
+    entries = Entry.objects.permitted().filter(content__is_public=True).by_content_type(Event).order_by('start')
     sorter = utils.EventSorter(entries, 'events', 'by', request)
 
     entry_dict = {}
@@ -794,12 +794,13 @@ def events(request):
         content = entry.content
         if content:
             content = content.as_leaf_class()
-            while start < end:
-                if entry_dict.has_key(start):
-                    entry_dict[start].append(content)
-                else:
-                    entry_dict[start] = [content]
-                start += timedelta(days=1)
+            if not content.apearances.all():
+                while start < end:
+                    if entry_dict.has_key(start):
+                        entry_dict[start].append(content)
+                    else:
+                        entry_dict[start] = [content]
+                    start += timedelta(days=1)
     
 
     days = entry_dict.keys()
