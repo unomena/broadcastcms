@@ -622,7 +622,7 @@ class NewsCompetitionsEvents(Widget):
         Returns queryset containing 2 upcoming events.
         """
         queryset = []
-        entries = Entry.objects.permitted().upcoming().by_content_type(Event).order_by('start')
+        entries = Entry.permitted.filter(content__is_public=True).upcoming().by_content_type(Event).order_by('start')
         if entries:
             for entry in entries:
                 content = entry.content
