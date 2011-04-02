@@ -48,13 +48,16 @@ def slugify(self):
     """
     # get the title from either the title or the id
     title = getattr(self, 'title', None) or self.id
+    if not title and self.content_type.model == u'entry':
+        title = self.content and self.content.title
     # slugify with the default django filter
     slug = defaultfilters.slugify(title)
     if self.slug == slug:
         return slug
     
     #check to see if slug exists, increment slug tail if it does
-    slugs = [content.slug for content in ModelBase.objects.all()]
+    slugs = [content.slug for content in
+             ModelBase.objects.filter(slug__contains=slug)]
     i = 1
     numbered_slug = slug
     while numbered_slug in slugs:
