@@ -137,18 +137,20 @@ def import_now_playing():
         print "No import made"
 
 def import_now_playing_rcs(feed_url):
+    """
+    Create now playing instances from a badly-delimited now playing list on
+    sabc.
+    """
     data = urllib.urlopen('%s?%s' % (feed_url, randint(0, 99999))).read()
-    parts_per_element = 7
 
-    split_elements = []
-    for element in data.split('     '):
-        if element:
-            split_elements.append(element.lstrip(' '))
-
-    slices = range(0, len(split_elements), parts_per_element)
+    # Parse as accurately as we can.
+    parts_per_line = 6
+    lines = data.split('\r\n')
     feed_items = []
-    for slice_start in slices:
-        feed_items.append(split_elements[slice_start: slice_start + parts_per_element])
+    for line in lines:
+        elements = [el.strip() for el in line.split('  ') if el]
+        if len(elements) == parts_per_line:
+            feed_items.append(elements)
 
     valid_song = False
     for feed_item in feed_items:
@@ -176,7 +178,18 @@ def import_now_playing_rcs(feed_url):
         # create song if it's not still playing
         song = create_song(artist_title, song_title, "Performer")
         existing_entries = Entry.objects.permitted().by_content_type(Song).now().filter(content=song.contentbase)
+
+        # In case the feed gets stuck, do not duplicate the last song:
+        last_song = None
         if not existing_entries:
+            all_song_entries = Entry.objects.permitted()\
+                                    .by_content_type(Song)\
+                                    .filter(content=song.contentbase)\
+                                    .order_by('-start')
+            if all_song_entries.count():
+                last_song = all_song_entries[0].content.as_leaf_class()
+
+        if not existing_entries and not last_song == song :
             entry, entry_created = Entry.objects.get_or_create(start=start, end=end, content=song, is_public=True)
        
     if entry_created:
