@@ -303,6 +303,7 @@ def rss_post_object_list(context, title, description, link, queryset):
             link="http://%s%s" % (context['site_domain'], item.url(context)),
             title=item.title,
             description=item.content,
+            pubdate=item.created,
         )
     return HttpResponse(feed.writeString('UTF-8'), mimetype="application/rss+xml")
 
