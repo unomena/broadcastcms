@@ -14,7 +14,7 @@ setup(
     ],
     install_requires = [
         'django-debug-toolbar==0.8.0',
-        'django-voting==0.1-pre',
+        'django-voting==0.1',
         'psycopg2==2.2.2',
         'pexpect==2.4',
         'python-memcached==1.44',
